@@ -4,8 +4,9 @@ out
 .idea
 .vs
 .vscode
-.zip
-.zipp
+
+*.zip
+*.zipp
 
 release/
 DSGO/
