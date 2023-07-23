@@ -1,24 +1,25 @@
 #include <SFML/Graphics.hpp>
+#include "Template.h"
+#include "Game.h"
+#include "cassert"
+#include <iostream>
 
 int main()
 {
-    sf::RenderWindow window(sf::VideoMode(200, 200), "SFML works!");
-    sf::CircleShape shape(100.f);
-    shape.setFillColor(sf::Color::Green);
-
-    while (window.isOpen())
-    {
-        sf::Event event;
-        while (window.pollEvent(event))
-        {
-            if (event.type == sf::Event::Closed)
-                window.close();
-        }
-
-        window.clear();
-        window.draw(shape);
-        window.display();
-    }
-
-    return 0;
+    arrowCursor.loadFromSystem(sf::Cursor::Arrow);
+    handCursor.loadFromSystem(sf::Cursor::Hand);
+    waitCursor.loadFromSystem(sf::Cursor::Wait);
+    textCursor.loadFromSystem(sf::Cursor::Text);
+	listFont.resize(numFont);
+	for (int i = 0; i < numFont; i++) {
+		if (!listFont[i].loadFromFile(fontName[i])) {
+			if (!listFont[i].loadFromFile(fontAlternativeName[i])) {
+				assert(false);
+			}
+		}
+	}
+	sf::ContextSettings settings;
+	settings.antialiasingLevel = 4;
+	Game game(settings);
+	game.run();
 }
