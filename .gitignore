@@ -9,4 +9,5 @@ out
 *.zipp
 
 release/
+!release/Fonts
 DSGO/
