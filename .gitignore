@@ -8,6 +8,6 @@ out
 *.zip
 *.zipp
 
-release/
+release/*
 !release/Fonts
 DSGO/
