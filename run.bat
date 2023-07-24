@@ -1,4 +1,5 @@
 @echo off
+cls
 cd release
 make || (
    echo build failed

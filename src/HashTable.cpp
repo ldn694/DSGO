@@ -164,8 +164,8 @@ bool HashTable::deleteV(int value) {
     return true;
 }
 
-void HashTable::draw(sf::RenderWindow& window, ColorTheme theme, sf::Time totalTime, sf::Time timePassed) {
+void HashTable::draw(sf::RenderWindow& window, ColorTheme theme, sf::Time totalTime, sf::Time timePassed, std::vector<Hash::Animation> animations) {
     for (int i = 0; i < size; i++) {
-        cells[i].draw(window, theme, totalTime, timePassed);
+        cells[i].draw(window, theme, totalTime, timePassed, animations);
     }
 }

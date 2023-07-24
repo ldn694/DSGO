@@ -17,8 +17,27 @@ add_executable(DSGO
 	include/Color.h
 	src/Game.cpp
 	include/Game.h
+	src/BackButton.cpp
+	include/BackButton.h
+	src/Box.cpp
+	include/Box.h
+	src/MultipleChoice.cpp
+	include/MultipleChoice.h
+	src/MyShape.cpp
+	include/MyShape.h
+	src/ReadFromFile.cpp
+	include/ReadFromFile.h
+	src/TriangleButton.cpp
+	include/TriangleButton.h
+	src/TypingBox.cpp
+	include/TypingBox.h
+	src/Stage.cpp
+	include/Stage.h
 	src/HashTable.cpp
-	include/HashTable.h)
+	include/HashTable.h
+	src/HashTableStage.cpp
+	include/HashTableStage.h
+	)
 
 target_link_libraries(DSGO PRIVATE sfml-graphics)
 target_compile_features(DSGO PRIVATE cxx_std_17)

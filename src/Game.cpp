@@ -1,33 +1,49 @@
 #include "Game.h"
 
 Game::Game(sf::ContextSettings settings) :
-	window(sf::VideoMode(WIDTH_RES, HEIGHT_RES), "DSGO", sf::Style::Close, settings),
-    hash(10, font(Consolas))
+	window(sf::VideoMode(WIDTH_RES, HEIGHT_RES), "DSGO", sf::Style::Close, settings), theme(LightTheme),
+	lightBulb("Images/full_bulb.png", WIDTH_RES - widthBox / 8, widthBox / 8, widthBox / 8 / 46 * 30, widthBox / 8, bulbColor),
+	darkBulb("Images/empty_bulb.png", WIDTH_RES - widthBox / 8, widthBox / 8, widthBox / 8 / 46 * 30, widthBox / 8, bulbColor),
+	themeBox("Images/curved_square.png", WIDTH_RES - widthBox / 8, widthBox / 8, widthBox / 4, widthBox / 4, backButtonNormalFillColor)
 {
+	hashTableBox = Box(410, 400, 360, 120, { CommandBoxNormal, CommandBoxSelected }, "Hash Table", font(fontType::Prototype), 30, NO_BORDER, 3);
 	window.setMouseCursor(arrowCursor);
 	window.setFramerateLimit(60);
 	srand(time(NULL));
 }
 
-void Game::processEvents() {
-    sf::Event event;
+void Game::handleMouseMove(float x, float y) {
+	if (hashTableBox.handleMouseMove(x, y, window)) return;
+	if (themeBox.handleMouseMove(x, y, window)) return;
+	window.setMouseCursor(arrowCursor);
+}
+
+void Game::processEvents()
+{
+	sf::Event event;
 	while (window.pollEvent(event))
-    {
-        if (event.type == sf::Event::Closed)
-            window.close();
-		if (event.type == sf::Event::KeyPressed) {
-			if (event.key.code == sf::Keyboard::I) {
-				int x = rand() % 20;
-				hash.insertV(x);
-				std::cout << "inserted " << x << "\n";
+	{
+		switch (event.type) {
+		case sf::Event::Closed:
+			window.close();
+			return;
+			break;
+		case sf::Event::MouseButtonPressed:
+			if (hashTableBox.isInside(event.mouseButton.x, event.mouseButton.y)) {
+				runHashTable();
 			}
-			if (event.key.code == sf::Keyboard::D) {
-				int x = rand() % 20;
-				hash.deleteV(x);
-				std::cout << "deleted " << x << "\n";
+			if (themeBox.isMousePressed(event.mouseButton.x, event.mouseButton.y)) {
+				theme = ColorTheme((theme + 1) % numColorTheme);
 			}
+			else {
+				handleMouseMove(2000, 2000);
+			}
+			break;
+		case sf::Event::MouseMoved:
+			handleMouseMove(event.mouseMove.x, event.mouseMove.y);
+			break;
 		}
-    }
+	}
 }
 
 void Game::update(sf::Time deltaT) {
@@ -35,11 +51,23 @@ void Game::update(sf::Time deltaT) {
 }
 
 void Game::render() {
-	window.clear(LavenderBushColor);
-	hash.draw(window, LightTheme);
+	window.clear(theme == LightTheme ? LavenderBushColor : EerieBlackColor);
+	themeBox.draw(window, theme);
+	if (theme == LightTheme) {
+		lightBulb.draw(window, theme);
+	}
+	else {
+		darkBulb.draw(window, theme);
+	}
+	hashTableBox.draw(window, theme);
 	window.display();
 }
 
+void Game::runHashTable() {
+	window.setMouseCursor(waitCursor);
+	HashTableStage hashTable(window, theme);
+	theme = hashTable.run();
+}
 
 void Game::run() {
 	window.setMouseCursor(arrowCursor);

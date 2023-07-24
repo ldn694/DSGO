@@ -6,12 +6,14 @@
 #include <random>
 #include "Color.h"
 #include "Template.h"
-#include "HashTable.h"
+#include "HashTableStage.h"
 
 struct Game {
 private:
-	HashTable hash;
+	ColorTheme theme;
     sf::RenderWindow window;
+	Box hashTableBox;
+	MyShape lightBulb, darkBulb, themeBox;
 public:
 	Game(sf::ContextSettings settings);
 	bool handleMousePressed(float x, float y);
@@ -22,5 +24,6 @@ public:
 	void processEvents();
 	void render();
 	void update(sf::Time deltaT);
+	void runHashTable();
 	void run();
 };

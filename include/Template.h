@@ -27,8 +27,8 @@ const bool ERASE_EDGE = false;
 
 const int maxID = int(1e9);
 const int pointCountCircle = 30;
-const double epsilonDouble = 1.f / 1000000.f;
-const double PI = 3.14159265358979323846;
+const float epsilonFloat = 1.f / 1000000.f;
+const float PI = 3.14159265358979323846;
 const sf::Time epsilonTime = sf::seconds(1.f / 1000000.f);
 const sf::Time timePerFrame = sf::seconds(1.f / 60.f);
 const sf::Time infTime = sf::seconds(1000000.f);
@@ -38,8 +38,8 @@ const sf::Time flickeringTime = sf::seconds(0.5f);
 const sf::Time errorDisplayTime = sf::seconds(1.0f);
 const sf::Time switchTime = sf::seconds(0.2f);
 
-const float heightBox = 80;
-const float widthBox = 240;
+const float heightBox = 50;
+const float widthBox = 200;
 const float outlineBox = 3;
 const float speedList[] = { 0.25, 0.5, 1.0, 2.0, 4.0 };
 const float sizeLetterDescription = 20;
@@ -52,8 +52,8 @@ const int maxLetter = 4;
 const int maxSizeData = 15;
 const int maxValueData = 99;
 
-const double heightScrubber = 20;
-const double zipWidth = 15;
+const float heightScrubber = 20;
+const float zipWidth = 15;
 
 enum EdgeType {
 	Undirected, SinglyDirected, DoublyDirected
@@ -62,22 +62,22 @@ enum EdgeType {
 std::string intToString(int a);
 int stringToInt(std::string a);
 
-double dist2p(double x1, double y1, double x2, double y2);
+float dist2p(float x1, float y1, float x2, float y2);
 
 sf::Time min(const sf::Time& a, const sf::Time& b);
 sf::Time max(const sf::Time& a, const sf::Time& b);
 
-double area(double x1, double y1, double x2, double y2, double x3, double y3);
+float area(float x1, float y1, float x2, float y2, float x3, float y3);
 
-bool isInsideTriangle(double x1, double y1, double x2, double y2, double x3, double y3, double x, double y);
+bool isInsideTriangle(float x1, float y1, float x2, float y2, float x3, float y3, float x, float y);
 
-void RotatePoint(double& x, double& y, double cx, double cy, double angle);
+void RotatePoint(float& x, float& y, float cx, float cy, float angle);
 
-void MovePoint(double& x1, double& y1, double x2, double y2, double dist);
+void MovePoint(float& x1, float& y1, float x2, float y2, float dist);
 
-void MovePointUpward(double& x1, double& y1, double x2, double y2, double h);
+void MovePointUpward(float& x1, float& y1, float x2, float y2, float h);
 
-void MovePointParallel(double& x, double& y, double x1, double y1, double x2, double y2); //move point A(x, y) to a A'(x', y') so that AA' is parallel to BC in which B is (x1, y1) and C is (x2, y2) and |AA'|=|BC|
+void MovePointParallel(float& x, float& y, float x1, float y1, float x2, float y2); //move point A(x, y) to a A'(x', y') so that AA' is parallel to BC in which B is (x1, y1) and C is (x2, y2) and |AA'|=|BC|
 
 const std::string fontName[] = { "Fonts/arial.ttf", "Fonts/Consolas.ttf", "Fonts/Prototype.ttf"};
 const std::string fontAlternativeName[] = { "..\\..\\Fonts\\Arial.ttf", "..\\..\\Fonts\\Consolas.ttf", "..\\..\\Fonts\\Prototype.ttf" };
@@ -89,4 +89,4 @@ extern std::vector <sf::Font> listFont;
 extern sf::Cursor arrowCursor, handCursor, waitCursor, textCursor;
 sf::Font* font(fontType id);
 
-sf::Text CompressWords(std::string cur, double x, double y, double width, double height, sf::Font* font, double characterSize, sf::Color color); //return cur with \n so that the width of sf::Text is not greater than width
+sf::Text CompressWords(std::string cur, float x, float y, float width, float height, sf::Font* font, float characterSize, sf::Color color); //return cur with \n so that the width of sf::Text is not greater than width
