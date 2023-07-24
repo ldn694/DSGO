@@ -13,8 +13,12 @@ add_executable(DSGO
 	src/main.cpp
 	src/Template.cpp
 	include/Template.h
+	src/Color.cpp
+	include/Color.h
 	src/Game.cpp
-	include/Game.h)
+	include/Game.h
+	src/HashTable.cpp
+	include/HashTable.h)
 
 target_link_libraries(DSGO PRIVATE sfml-graphics)
 target_compile_features(DSGO PRIVATE cxx_std_17)

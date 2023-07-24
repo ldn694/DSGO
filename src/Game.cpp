@@ -1,15 +1,12 @@
 #include "Game.h"
-#include "Template.h"
 
 Game::Game(sf::ContextSettings settings) :
 	window(sf::VideoMode(WIDTH_RES, HEIGHT_RES), "DSGO", sf::Style::Close, settings),
-    shape(100)
+    hash(10, font(Consolas))
 {
 	window.setMouseCursor(arrowCursor);
 	window.setFramerateLimit(60);
-    shape.setOrigin(100, 100);
-    shape.setPosition(WIDTH_RES / 2, HEIGHT_RES / 2);
-    shape.setFillColor(sf::Color::Red);
+	srand(time(NULL));
 }
 
 void Game::processEvents() {
@@ -18,6 +15,18 @@ void Game::processEvents() {
     {
         if (event.type == sf::Event::Closed)
             window.close();
+		if (event.type == sf::Event::KeyPressed) {
+			if (event.key.code == sf::Keyboard::I) {
+				int x = rand() % 20;
+				hash.insertV(x);
+				std::cout << "inserted " << x << "\n";
+			}
+			if (event.key.code == sf::Keyboard::D) {
+				int x = rand() % 20;
+				hash.deleteV(x);
+				std::cout << "deleted " << x << "\n";
+			}
+		}
     }
 }
 
@@ -26,8 +35,8 @@ void Game::update(sf::Time deltaT) {
 }
 
 void Game::render() {
-	window.clear(sf::Color::White);
-	window.draw(shape);
+	window.clear(LavenderBushColor);
+	hash.draw(window, LightTheme);
 	window.display();
 }
 

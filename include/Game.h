@@ -4,10 +4,13 @@
 #include <vector>
 #include <cassert>
 #include <random>
+#include "Color.h"
+#include "Template.h"
+#include "HashTable.h"
 
 struct Game {
 private:
-	sf::CircleShape shape;
+	HashTable hash;
     sf::RenderWindow window;
 public:
 	Game(sf::ContextSettings settings);

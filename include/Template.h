@@ -38,12 +38,15 @@ const sf::Time flickeringTime = sf::seconds(0.5f);
 const sf::Time errorDisplayTime = sf::seconds(1.0f);
 const sf::Time switchTime = sf::seconds(0.2f);
 
-const double heightBox = 80;
-const double widthBox = 240;
-const double outlineBox = 3;
-const double speedList[] = { 0.25, 0.5, 1.0, 2.0, 4.0 };
-const double sizeLetterDescription = 20;
-const double sizeLetterError = 20;
+const float heightBox = 80;
+const float widthBox = 240;
+const float outlineBox = 3;
+const float speedList[] = { 0.25, 0.5, 1.0, 2.0, 4.0 };
+const float sizeLetterDescription = 20;
+const float sizeLetterError = 20;
+const float sizeValueLetter = 20;
+const float radiusHash = 30;
+const float thicknessHash = 3;
 
 const int maxLetter = 4;
 const int maxSizeData = 15;
