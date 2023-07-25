@@ -31,6 +31,16 @@ add_executable(DSGO
 	include/TriangleButton.h
 	src/TypingBox.cpp
 	include/TypingBox.h
+	src/IngameSettings.cpp
+	include/IngameSettings.h
+	src/MediaControl.cpp
+	include/MediaControl.h
+	src/PlayButton.cpp
+	include/PlayButton.h
+	src/Scrubber.cpp
+	include/Scrubber.h
+	src/Switch.cpp
+	include/Switch.h
 	src/Stage.cpp
 	include/Stage.h
 	src/HashTable.cpp

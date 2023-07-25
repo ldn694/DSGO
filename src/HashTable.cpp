@@ -50,7 +50,7 @@ void HashCell::setColorType(Hash::ColorType _type) {
     type = _type;
 }
 
-void HashCell::draw(sf::RenderWindow& window, ColorTheme theme, sf::Time totalTime, sf::Time timePassed, std::vector<Hash::Animation> animations) {
+void HashCell::draw(sf::RenderWindow& window, ColorTheme theme, sf::Time totalTime, sf::Time timePassed, std::vector<Animation> animations) {
     if (totalTime < epsilonTime) {
         cell.setFillColor(Hash::color[theme][type].fillColor);
         cell.setOutlineColor(Hash::color[theme][type].outlineColor);
@@ -66,8 +66,8 @@ void HashCell::draw(sf::RenderWindow& window, ColorTheme theme, sf::Time totalTi
             }
         }
         for (int i = 0; i < animations.size(); i++) {
-            if (animations[i].animationType == Hash::colorTypeChanging) {
-                Hash::Color newColor = Hash::fadingColorType(type, animations[i].colorType, theme, timePassed.asSeconds() / totalTime.asSeconds());
+            if (animations[i].animationType == colorTypeChanging) {
+                Hash::Color newColor = Hash::fadingColorType(type, Hash::ColorType(animations[i].nextColorType), theme, timePassed.asSeconds() / totalTime.asSeconds());
                 cell.setFillColor(newColor.fillColor);
                 cell.setOutlineColor(newColor.outlineColor);
                 valueText.setFillColor(newColor.valueColor);
@@ -164,7 +164,7 @@ bool HashTable::deleteV(int value) {
     return true;
 }
 
-void HashTable::draw(sf::RenderWindow& window, ColorTheme theme, sf::Time totalTime, sf::Time timePassed, std::vector<Hash::Animation> animations) {
+void HashTable::draw(sf::RenderWindow& window, ColorTheme theme, sf::Time totalTime, sf::Time timePassed, std::vector<Animation> animations) {
     for (int i = 0; i < size; i++) {
         cells[i].draw(window, theme, totalTime, timePassed, animations);
     }

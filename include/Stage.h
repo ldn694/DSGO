@@ -9,6 +9,7 @@
 #include "MultipleChoice.h"
 #include "BackButton.h"
 #include "ReadFromFile.h"
+#include "IngameSettings.h"
 
 struct Stage {
 protected:
@@ -41,11 +42,19 @@ protected:
 	std::vector <std::vector <int>> numValue;
 
 	BackButton backButton;
-
+	
+	IngameSettings ingameSettings;
 
 	MyShape lightBulb, darkBulb, themeBox;
 	ColorTheme theme;
 	sf::RenderWindow& window;
+
+
+	AnimatingDirection animatingDirection;
+	sf::Time curTime;
+	int previousStep;
+	std::vector <std::pair<std::vector <Animation>, sf::Time> > animationList;
+
 public:
 	Stage(sf::RenderWindow &window, std::vector <std::string> operationName, std::vector <std::vector <std::string> > modeName, 
 		std::vector <std::vector <std::vector <std::string> > > valueName, 
@@ -61,4 +70,9 @@ public:
 	void draw();
 	void stageUpdate(sf::Time deltaT);
 	void setTheme(ColorTheme newTheme);
+	void setAnimatingDirection(AnimatingDirection dir);
+	int getCurStep();
+	sf::Time getTotalTime();
+	void updateCurTime(sf::Time deltaT);
+	void addAnimationStep(std::vector <Animation> animations, sf::Time time);
 };

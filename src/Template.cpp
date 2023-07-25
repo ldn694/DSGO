@@ -134,3 +134,9 @@ sf::Text CompressWords(std::string cur, float x, float y, float width, float hei
 	tmpText.setFillColor(color);
 	return tmpText;
 }
+
+Animation::Animation(DSType _dsType, AnimationType _animationType, int _nextColorType, sf::Time _totalTime, sf::Time _timePassed) :
+	dsType(_dsType), animationType(_animationType), nextColorType(_nextColorType), totalTime(_totalTime), timePassed(_timePassed) {}
+
+Animation::Animation(DSType _dsType, AnimationType _animationType, sf::Vector2f _nextPosition, sf::Time _totalTime, sf::Time _timePassed) :
+	dsType(_dsType), animationType(_animationType), nextPosition(_nextPosition), totalTime(_totalTime), timePassed(_timePassed) {}

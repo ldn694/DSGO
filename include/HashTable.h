@@ -6,13 +6,6 @@
 #include "Color.h"
 
 namespace Hash {
-    enum AnimationType {
-        colorTypeChanging
-    };
-    struct Animation {
-        AnimationType animationType;
-        Hash::ColorType colorType;
-    };
     enum State {
         empty, full, deleted
     };
@@ -35,7 +28,7 @@ struct HashCell {
     void setState(Hash::State state);
     void setColorType(Hash::ColorType type);
     //frontend
-    void draw(sf::RenderWindow& window, ColorTheme theme, sf::Time totalTime = sf::seconds(0.f), sf::Time timePassed = sf::seconds(0.f), std::vector<Hash::Animation> animations = std::vector<Hash::Animation>());
+    void draw(sf::RenderWindow& window, ColorTheme theme, sf::Time totalTime = sf::seconds(0.f), sf::Time timePassed = sf::seconds(0.f), std::vector<Animation> animations = std::vector<Animation>());
 };
 
 struct HashTable {
@@ -52,5 +45,5 @@ struct HashTable {
     bool deleteV(int value);
     void setColorType(int id, Hash::ColorType type);
     //frontend
-    void draw(sf::RenderWindow& window, ColorTheme theme, sf::Time totalTime = sf::seconds(0.f), sf::Time timePassed = sf::seconds(0.f), std::vector<Hash::Animation> animations = std::vector<Hash::Animation>());
+    void draw(sf::RenderWindow& window, ColorTheme theme, sf::Time totalTime = sf::seconds(0.f), sf::Time timePassed = sf::seconds(0.f), std::vector<Animation> animations = std::vector<Animation>());
 };

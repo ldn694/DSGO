@@ -90,3 +90,23 @@ extern sf::Cursor arrowCursor, handCursor, waitCursor, textCursor;
 sf::Font* font(fontType id);
 
 sf::Text CompressWords(std::string cur, float x, float y, float width, float height, sf::Font* font, float characterSize, sf::Color color); //return cur with \n so that the width of sf::Text is not greater than width
+
+enum DSType {
+	HashTableDS
+};
+enum AnimationType {
+	colorTypeChanging, Move
+};
+struct Animation {
+	DSType dsType;
+	AnimationType animationType;
+	int nextColorType;
+	sf::Vector2f nextPosition;
+	sf::Time totalTime, timePassed;
+	Animation(DSType dsType, AnimationType animationType, int nextColorType, sf::Time totalTime, sf::Time timePassed);
+	Animation(DSType dsType, AnimationType animationType, sf::Vector2f nextPosition, sf::Time totalTime, sf::Time timePassed);
+};
+
+enum AnimatingDirection {
+	Pause, Continuous, Forward, Backward
+};

@@ -13,7 +13,8 @@ Stage::Stage(sf::RenderWindow& _window, std::vector <std::string> _operationName
 				0, HEIGHT_RES - heightBox * 4 - outlineBox * 2, widthBox * 2, heightBox, font(fontType::Prototype), maxSizeData, 0, maxValueData),
 	lightBulb("Images/full_bulb.png", WIDTH_RES - widthBox / 8, widthBox / 8, widthBox / 8 / 46 * 30, widthBox / 8, bulbColor),
 	darkBulb("Images/empty_bulb.png", WIDTH_RES - widthBox / 8, widthBox / 8, widthBox / 8 / 46 * 30, widthBox / 8, bulbColor),
-	themeBox("Images/curved_square.png", WIDTH_RES - widthBox / 8, widthBox / 8, widthBox / 4, widthBox / 4, backButtonNormalFillColor)
+	themeBox("Images/curved_square.png", WIDTH_RES - widthBox / 8, widthBox / 8, widthBox / 4, widthBox / 4, backButtonNormalFillColor),
+	ingameSettings(widthBox * 2, HEIGHT_RES - heightBox * 3, widthBox * 2, heightBox * 3, _theme, &animatingDirection)
 {
 	numOperation = operationName.size();
 	operationBox.resize(numOperation);
@@ -110,6 +111,7 @@ void Stage::updateModeBox(int newMode) {
 
 bool Stage::handleMousePressed(float x, float y) {
 	handleMouseMove(x, y);
+	ingameSettings.handleMousePressed(x, y);
 	if (!operationSelecting) {
 		if (operationBox[curOperation].isInside(x, y)) {
 			upwardTriangle.setRotation(180.f);
@@ -189,6 +191,10 @@ void Stage::handleKeyPressed(int key) {
 	if (key == int(sf::Keyboard::Enter)) {
 		operating = true;
 	}
+	if (key == int(sf::Keyboard::Space)) {
+		//toggleIsAnimating();	
+	}
+	ingameSettings.handleKeyPressed(key);
 }
 
 void Stage::handleMouseMove(float x, float y) {
@@ -217,10 +223,11 @@ void Stage::handleMouseMove(float x, float y) {
 	themeBox.handleMouseMove(x, y, window);
 	backButton.handleMouseMove(x, y, window);
 	readFromFile.handleMouseMove(x, y, window);
+	ingameSettings.handleMouseMove(x, y, window);
 }
 
 void Stage::handleMouseReleased(float x, float y) {
-	
+	ingameSettings.handleMouseReleased(x, y);
 }
 
 void Stage::draw() {
@@ -274,14 +281,75 @@ void Stage::draw() {
 	}
 	backButton.draw(window, theme);
 	window.draw(upwardTriangle);
+	ingameSettings.draw(window, theme);
+}
+
+sf::Time Stage::getTotalTime() {
+	sf::Time totalTime = sf::Time::Zero;
+	for (int i = 0; i < animationList.size(); i++) {
+		totalTime += animationList[i].second;
+	}
+	return totalTime;
+}
+
+int Stage::getCurStep() {
+	sf::Time totalTime = sf::Time::Zero;
+	for (int i = 0; i < animationList.size(); i++) {
+		totalTime += animationList[i].second;
+		if (curTime < totalTime) {
+			return i;
+		}
+	}
+	return animationList.size();
+}
+
+void Stage::updateCurTime(sf::Time deltaT) {
+	curTime += deltaT;
+	if (curTime > getTotalTime()) {
+		curTime = getTotalTime();
+		animatingDirection = Pause;
+	}
+	if (curTime < sf::Time::Zero) {
+		curTime = sf::Time::Zero;
+	}
 }
 
 void Stage::stageUpdate(sf::Time deltaT) {
 	for (int i = 0; i < numValue[curOperation][curMode]; i++) {
 		valueTypingBox[i].update(deltaT);
 	}
+	if (animatingDirection != Pause) {
+		if (animatingDirection == Continuous) {
+			updateCurTime(deltaT);
+		}
+		else {
+			if (previousStep == -1) {
+					previousStep = getCurStep();
+					updateCurTime(deltaT * float(animatingDirection == Forward ? 1 : -1));
+			}
+			else {
+				if (previousStep == getCurStep()) {
+					updateCurTime(deltaT * float(animatingDirection == Forward ? 1 : -1));
+				}
+				else {
+					animatingDirection = Pause;
+					previousStep = -1;
+
+				}
+			}
+		}
+	}
+	ingameSettings.update(deltaT);
+}
+
+void Stage::setAnimatingDirection(AnimatingDirection dir) {
+	animatingDirection = dir;
 }
 
 void Stage::setTheme(ColorTheme newTheme) {
 	theme = newTheme;
+}
+
+void Stage::addAnimationStep(std::vector <Animation> animations, sf::Time time) {
+	animationList.push_back({ animations, time });
 }

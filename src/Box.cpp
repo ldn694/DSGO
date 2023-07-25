@@ -83,7 +83,6 @@ void Box::draw(sf::RenderWindow& window, ColorTheme theme) {
 	if (!isDrawable) {
 		return;
 	}
-	// std::cout << curMode << " " << theme << "\n";
 	outerRect.setFillColor(colorBox[colorModes[curMode]][theme].fillColor);
 	outerRect.setOutlineColor(colorBox[colorModes[curMode]][theme].outlineColor);
 	outerRect.setOutlineThickness(outlineSize);
