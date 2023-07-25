@@ -49,8 +49,9 @@ const float radiusHash = 30;
 const float thicknessHash = 3;
 
 const int maxLetter = 4;
-const int maxSizeData = 15;
-const int maxValueData = 99;
+extern int maxSizeData;
+extern int maxValueData;
+extern int zeroInt;
 
 const float heightScrubber = 20;
 const float zipWidth = 15;
@@ -91,20 +92,16 @@ sf::Font* font(fontType id);
 
 sf::Text CompressWords(std::string cur, float x, float y, float width, float height, sf::Font* font, float characterSize, sf::Color color); //return cur with \n so that the width of sf::Text is not greater than width
 
-enum DSType {
-	HashTableDS
-};
 enum AnimationType {
-	colorTypeChanging, Move
+	SetColorType, Move, InsertVariable, DeleteVariable, SetValue
 };
 struct Animation {
-	DSType dsType;
 	AnimationType animationType;
-	int nextColorType;
+	int id1, id2 = 0;
+	int nextColorType, nextValue;
+	std::vector <std::string> variableList;
 	sf::Vector2f nextPosition;
-	sf::Time totalTime, timePassed;
-	Animation(DSType dsType, AnimationType animationType, int nextColorType, sf::Time totalTime, sf::Time timePassed);
-	Animation(DSType dsType, AnimationType animationType, sf::Vector2f nextPosition, sf::Time totalTime, sf::Time timePassed);
+	bool operator < (const Animation& other) const;
 };
 
 enum AnimatingDirection {

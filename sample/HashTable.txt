@@ -1,0 +1,8 @@
+//Insert
+int index = value % n, cnt = 0;
+while (table[index].state == full && cnt < n) {
+	index = (index + 1) % n;
+    cnt++;
+}
+if (cnt == n) return;
+table[index].value = {value, full};

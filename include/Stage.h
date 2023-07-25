@@ -34,7 +34,7 @@ protected:
 
 	std::vector <std::vector <std::vector <std::string> > > valueName;
 	std::vector <std::vector <std::vector <TypingBoxMode> > > typingMode;
-	std::vector <std::vector <std::vector <std::pair <int, int> > > > valueBound;
+	std::vector <std::vector <std::vector <std::pair <int*, int*> > > > valueBound;
 	std::vector <BigTypingBox> valueTypingBox;
 
 	ReadFromFile readFromFile;
@@ -59,7 +59,7 @@ public:
 	Stage(sf::RenderWindow &window, std::vector <std::string> operationName, std::vector <std::vector <std::string> > modeName, 
 		std::vector <std::vector <std::vector <std::string> > > valueName, 
 		std::vector <std::vector <std::vector <TypingBoxMode> > > typingMode,
-		std::vector <std::vector <std::vector <std::pair <int, int> > > > valueBound,
+		std::vector <std::vector <std::vector <std::pair <int*, int*> > > > valueBound,
 		ColorTheme theme = LightTheme);
 	void setDSName(std::string name);
 	void updateModeBox(int newMode);
@@ -72,7 +72,12 @@ public:
 	void setTheme(ColorTheme newTheme);
 	void setAnimatingDirection(AnimatingDirection dir);
 	int getCurStep();
+	sf::Time getPrefixTime(int step);
 	sf::Time getTotalTime();
 	void updateCurTime(sf::Time deltaT);
-	void addAnimationStep(std::vector <Animation> animations, sf::Time time);
+
+	void insertVariable(std::vector <Animation> &animations, int index, std::vector <std::string> variableList);
+	void deleteVariable(std::vector <Animation> &animations, int index, std::vector <std::string> variableList);
+	void setValue(std::vector <Animation> &animations, int index, int value);
+	void setColorType(std::vector <Animation> &animations, int index, int nextColorType);
 };

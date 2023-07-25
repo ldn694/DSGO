@@ -43,6 +43,8 @@ add_executable(DSGO
 	include/Switch.h
 	src/Stage.cpp
 	include/Stage.h
+	src/HashCell.cpp
+	include/HashCell.h
 	src/HashTable.cpp
 	include/HashTable.h
 	src/HashTableStage.cpp

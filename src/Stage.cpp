@@ -5,7 +5,7 @@
 Stage::Stage(sf::RenderWindow& _window, std::vector <std::string> _operationName, std::vector <std::vector <std::string> > _modeName,
 	std::vector <std::vector <std::vector <std::string> > > _valueName,
 	std::vector <std::vector <std::vector <TypingBoxMode> > > _typingMode,
-	std::vector <std::vector <std::vector <std::pair <int, int> > > > _valueBound,
+	std::vector <std::vector <std::vector <std::pair <int*, int*> > > > _valueBound,
 	ColorTheme _theme) :
 	window(_window), operationName(_operationName), modeName(_modeName), valueName(_valueName), typingMode(_typingMode), valueBound(_valueBound), theme(_theme),
 	backButton(0, 0, widthBox / 4, widthBox / 4),
@@ -104,7 +104,7 @@ void Stage::updateModeBox(int newMode) {
 		for (int i = 0; i < numValue[curOperation][curMode]; i++) {
 			valueTypingBox[i] = BigTypingBox(2 * widthBox / numValue[curOperation][curMode] * i, HEIGHT_RES - heightBox, 2 * widthBox / numValue[curOperation][curMode], heightBox, widthBox / 3, outlineBox, valueName[curOperation][curMode][i],
 				0, HEIGHT_RES - heightBox * 4 - outlineBox * 2, widthBox * 2, heightBox,
-				typingMode[curOperation][curMode][i], font(fontType::Prototype), typingModeMaxCharacter[typingMode[curOperation][curMode][i]], valueBound[curOperation][curMode][i].first, valueBound[curOperation][curMode][i].second);
+				typingMode[curOperation][curMode][i], font(fontType::Prototype), typingModeMaxCharacter[typingMode[curOperation][curMode][i]], *(valueBound[curOperation][curMode][i].first), *(valueBound[curOperation][curMode][i].second));
 		}
 	}
 }
@@ -284,6 +284,17 @@ void Stage::draw() {
 	ingameSettings.draw(window, theme);
 }
 
+sf::Time Stage::getPrefixTime(int step) {
+	if (step >= animationList.size()) {
+		return getTotalTime();
+	}
+	sf::Time prefixTime = sf::Time::Zero;
+	for (int i = 0; i < step; i++) {
+		prefixTime += animationList[i].second;
+	}
+	return prefixTime;
+}
+
 sf::Time Stage::getTotalTime() {
 	sf::Time totalTime = sf::Time::Zero;
 	for (int i = 0; i < animationList.size(); i++) {
@@ -296,7 +307,7 @@ int Stage::getCurStep() {
 	sf::Time totalTime = sf::Time::Zero;
 	for (int i = 0; i < animationList.size(); i++) {
 		totalTime += animationList[i].second;
-		if (curTime < totalTime) {
+		if (curTime < totalTime || (curTime - totalTime < epsilonTime && curTime - totalTime > -epsilonTime)) {
 			return i;
 		}
 	}
@@ -350,6 +361,34 @@ void Stage::setTheme(ColorTheme newTheme) {
 	theme = newTheme;
 }
 
-void Stage::addAnimationStep(std::vector <Animation> animations, sf::Time time) {
-	animationList.push_back({ animations, time });
+void Stage::insertVariable(std::vector <Animation> &animations, int index, std::vector <std::string> variableList) {
+	Animation tmp;
+	tmp.animationType = InsertVariable;
+	tmp.id1 = index;
+	tmp.variableList = variableList;
+	animations.push_back(tmp);
+}
+
+void Stage::deleteVariable(std::vector <Animation> &animations, int index, std::vector <std::string> variableList) {
+	Animation tmp;
+	tmp.animationType = DeleteVariable;
+	tmp.id1 = index;
+	tmp.variableList = variableList;
+	animations.push_back(tmp);
+}
+
+void Stage::setValue(std::vector <Animation> &animations, int index, int value) {
+	Animation tmp;
+	tmp.animationType = SetValue;
+	tmp.id1 = index;
+	tmp.nextValue = value;
+	animations.push_back(tmp);
+}
+
+void Stage::setColorType(std::vector <Animation> &animations, int index, int nextColorType) {
+	Animation tmp;
+	tmp.animationType = SetColorType;
+	tmp.id1 = index;
+	tmp.nextColorType = nextColorType;
+	animations.push_back(tmp);
 }

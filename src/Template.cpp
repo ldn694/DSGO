@@ -1,7 +1,9 @@
 #include <string>
 #include "Template.h"
 
-
+int maxSizeData = 15;
+int maxValueData = 99;
+int zeroInt = 0;
 
 int stringToInt(std::string a) {
 	int res = 0;
@@ -135,8 +137,6 @@ sf::Text CompressWords(std::string cur, float x, float y, float width, float hei
 	return tmpText;
 }
 
-Animation::Animation(DSType _dsType, AnimationType _animationType, int _nextColorType, sf::Time _totalTime, sf::Time _timePassed) :
-	dsType(_dsType), animationType(_animationType), nextColorType(_nextColorType), totalTime(_totalTime), timePassed(_timePassed) {}
-
-Animation::Animation(DSType _dsType, AnimationType _animationType, sf::Vector2f _nextPosition, sf::Time _totalTime, sf::Time _timePassed) :
-	dsType(_dsType), animationType(_animationType), nextPosition(_nextPosition), totalTime(_totalTime), timePassed(_timePassed) {}
+bool Animation::operator < (const Animation& other) const {
+	return id1 == other.id1 ? id2 < other.id2 : id1 < other.id1;
+}

@@ -3,68 +3,42 @@
 #include "Template.h"
 
 HashTableStage::HashTableStage(sf::RenderWindow& window, ColorTheme theme) :
-	Stage(window, { "Create", "Insert", "Delete", "Search", "Update", "Access"},
+	Stage(window, { "Create", "Insert", "Delete", "Search"},
 		{
-			{"Empty", "Random", "Random Sorted", "Fixed Size", "Manual", "Upload File"},
-			{"i = 0 (head)", "i = n (after tail)", "i = 1..n - 1 (middle)"},
-			{"i = 0 (head)", "i = n - 1 (tail)", "i = 1..n - 2 (middle)"},
+			{"Random", "Empty", "Manual", "Upload File"},
 			{"v = ?"},
-			{"i = ?, v = ?"},
-			{"i = ?"}
+			{"v = ?"},
+			{"v = ?"}
 		},
 		{
 			{
 				{},
-				{},
-				{},
 				{"n ="},
-				{"v[] ="},
+				{"n =", "v[] ="},
 				{}
-			},
-			{
-				{"v ="},
-				{"v ="},
-				{"i =", "v ="}
-			},
-			{
-				{},
-				{},
-				{"i ="}
 			},
 			{
 				{"v ="}
 			},
 			{
-				{"i =", "v ="}
+				{"v ="}
 			},
 			{
-				{"i ="}
+				{"v ="}
 			}
 		},
 		{
 			{
 				{},
-				{},
-				{},
 				{singleNumber},
-				{multipleNumber},
+				{singleNumber, multipleNumber},
 				{}
 			},
 			{
 				{singleNumber},
-				{singleNumber},
-				{singleNumber, singleNumber}
-			},
-			{
-				{},
-				{},
-				{singleNumber}
 			},
 			{
 				{singleNumber}
-			},
-			{
-				{singleNumber, singleNumber}
 			},
 			{
 				{singleNumber}
@@ -73,36 +47,35 @@ HashTableStage::HashTableStage(sf::RenderWindow& window, ColorTheme theme) :
 		{
 			{
 				{},
-				{},
-				{},
-				{{0, maxSizeData}},
-				{{0, maxValueData}},
+				{{&zeroInt, &maxSizeData}},
+				{{&zeroInt, &maxSizeData}, {&zeroInt, &maxValueData}},
 				{}
 			},
 			{
-				{{0, maxValueData}},
-				{{0, maxValueData}},
-				{{0, maxSizeData}, {0, maxValueData}}
+				{{&zeroInt, &maxValueData}}
 			},
 			{
-				{},
-				{},
-				{{0, maxSizeData}}
+				{{&zeroInt, &maxValueData}}
 			},
 			{
-				{{0, maxValueData}}
-			},
-			{
-				{{0, maxSizeData}, {0, maxValueData}}
-			},
-			{
-				{{0, maxSizeData}}
+				{{&zeroInt, &maxValueData}}
 			}
 		},
-		theme),
-    hash(1, font(fontType::Consolas))
+		theme)
 {
 	setDSName("Hash Table");
+	hashList.push_back(HashTable(1, font(fontType::Prototype)));
+	size = 1;
+}
+
+void HashTableStage::insertValue(int value) {
+	resetAnimation();
+	int index = value % size;
+	std::vector <Animation> animations;
+	insertVariable(animations, index, {"index = " + intToString(index)});
+	setColorType(animations, index, Hash::ColorType::highlight);
+	addAnimationStep(animations, stepTime);
+	setAnimatingDirection(Continuous);
 }
 
 std::pair<bool, ColorTheme> HashTableStage::processEvents() {
@@ -133,17 +106,16 @@ std::pair<bool, ColorTheme> HashTableStage::processEvents() {
 	if (operating) {
 		std::string modeString = modeName[curOperation][curMode];
 		if (operationName[curOperation] == "Create") {
-			if (modeString == "Empty") {
-				
-			}
 			if (modeString == "Random") {
 				
 			}
-			if (modeString == "Random Sorted") {
-				
-			}
-			if (modeString == "Fixed Size") {
-				
+			if (modeString == "Empty") {
+				int v = valueTypingBox[0].getProperInt();
+				if (v != -1) {
+					size = v;
+					hashList.clear();
+					hashList.push_back(HashTable(v, font(fontType::Prototype)));
+				}
 			}
 			if (modeString == "Manual") {
 				
@@ -153,43 +125,35 @@ std::pair<bool, ColorTheme> HashTableStage::processEvents() {
 			}
 		}
 		if (operationName[curOperation] == "Insert") {
-			if (modeString == "i = 0 (head)") {
-				
-			}
-			if (modeString == "i = n (after tail)") {
-				
-			}
-			if (modeString == "i = 1..n - 1 (middle)") {
-				
-			}
+			int v = valueTypingBox[0].getProperInt();
+				if (v != -1) {
+					resetAnimation();
+					insertValue(v);
+				}
 		}
 		if (operationName[curOperation] == "Delete") {
-			if (modeString == "i = 0 (head)") {
-				
-			}
-			if (modeString == "i = n - 1 (tail)") {
-				
-			}
-			if (modeString == "i = 1..n - 2 (middle)") {
-				
-			}
+			
 		}
 		if (operationName[curOperation] == "Search") {
 			
 		}
-		if (operationName[curOperation] == "Update") {
-			if (modeString == "i = ?, v = ?") {
-				
-			}
-		}
-		if (operationName[curOperation] == "Access") {
-			if (modeString == "i = ?") {
-				
-			}
-		}
 		operating = false;
 	}
 	return { false, theme };
+}
+
+void HashTableStage::resetAnimation() {
+	animationList.clear();
+	curTime = sf::Time::Zero;
+	previousStep = -1;
+	HashTable hash = hashList.back();
+	hashList.clear();
+	hashList.push_back(hash);
+}
+
+void HashTableStage::addAnimationStep(std::vector <Animation> animations, sf::Time time) {
+	animationList.push_back({ animations, time });
+	hashList.push_back(hashList.back().execAnimation(animations));
 }
 
 void HashTableStage::update(sf::Time deltaT) {
@@ -198,6 +162,13 @@ void HashTableStage::update(sf::Time deltaT) {
 
 void HashTableStage::render() {
 	window.clear(theme == LightTheme ? LavenderBushColor : EerieBlackColor);
+	if (hashList.size() == 1) {
+		hashList[0].draw(window, theme, sf::Time::Zero, sf::Time::Zero, {});
+	}
+	else {
+		int curStep = getCurStep();
+		hashList[curStep].draw(window, theme, animationList[curStep].second, curTime - getPrefixTime(curStep), animationList[curStep].first);
+	}
 	draw();
 	window.display();
 }
