@@ -75,7 +75,7 @@ void ReadFromFile::draw(sf::RenderWindow& window, ColorTheme theme) {
         setWarning();
     }
     if (isDisplaying) {
-        Box box(x, y, width, height, { ColorBoxType::UploadBox }, fileName, font, 30, true, 1);
+        Box box(x, y, width, height, { ColorBoxType::UploadBox }, fileName, font, 20, true, 1);
         box.draw(window, theme);
         if (displayingWarning) {
             sf::RectangleShape tmpRect(sf::Vector2f(widthWarning, heightWarning));

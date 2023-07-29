@@ -17,7 +17,7 @@ struct HashCell {
     sf::RectangleShape mainDiagonal, antiDiagonal;
     Hash::ColorType type;
     int value;
-    int state; //state = 0: empty, state = 1: full, state = 2: deleted
+    int state;
     sf::Text valueText;
     std::set <std::string> variableList;
     sf::Text variableText;
@@ -32,6 +32,10 @@ struct HashCell {
     void deleteVariable(std::vector <std::string> variables);
     void setState(Hash::State state);
     void setColorType(Hash::ColorType type);
+    std::vector <std::string> getVariables();
+
+    int getValue();
+    int getState();
     //frontend
     void draw(sf::RenderWindow& window, ColorTheme theme, sf::Time totalTime = sf::seconds(0.f), sf::Time timePassed = sf::seconds(0.f), std::vector<Animation> animations = std::vector<Animation>());
 };

@@ -89,12 +89,28 @@ void HashCell::setColorType(Hash::ColorType _type) {
     type = _type;
 }
 
+int HashCell::getValue() {
+    return value;
+}
+
+int HashCell::getState() {
+    return state;
+}
+
+std::vector <std::string> HashCell::getVariables() {
+    std::vector <std::string> res;
+    for (auto it = variableList.begin(); it != variableList.end(); it++) {
+        res.push_back(*it);
+    }
+    return res;
+}
+
 void HashCell::draw(sf::RenderWindow& window, ColorTheme theme, sf::Time totalTime, sf::Time timePassed, std::vector<Animation> animations) {
+    cell.setFillColor(Hash::color[theme][type].fillColor);
+    cell.setOutlineColor(Hash::color[theme][type].outlineColor);
+    valueText.setFillColor(Hash::color[theme][type].valueColor);
+    variableText.setFillColor(Hash::color[theme][type].variableColor);
     if (totalTime < epsilonTime) {
-        cell.setFillColor(Hash::color[theme][type].fillColor);
-        cell.setOutlineColor(Hash::color[theme][type].outlineColor);
-        valueText.setFillColor(Hash::color[theme][type].valueColor);
-        variableText.setFillColor(Hash::color[theme][type].variableColor);
         window.draw(cell);
         if (state == Hash::full) {
             window.draw(valueText);
@@ -130,13 +146,19 @@ void HashCell::draw(sf::RenderWindow& window, ColorTheme theme, sf::Time totalTi
             if (animations[i].animationType == AnimationType::DeleteVariable) {
                 tmp.deleteVariable(animations[i].variableList);
             }
+            if (animations[i].animationType == AnimationType::SetState) {
+                tmp.setState(Hash::State(animations[i].nextState));
+            }
+            if (animations[i].animationType == AnimationType::SetValue) {
+                tmp.setValue(animations[i].nextValue);
+            }
         }
         window.draw(tmp.cell);
         window.draw(tmp.variableText);
-        if (state == Hash::full) {
+        if (tmp.state == Hash::full) {
             window.draw(tmp.valueText);
         }
-        if (state == Hash::deleted) {
+        if (tmp.state == Hash::deleted) {
             mainDiagonal.setFillColor(Hash::color[theme][type].outlineColor);
             window.draw(tmp.mainDiagonal);
             antiDiagonal.setFillColor(Hash::color[theme][type].outlineColor);

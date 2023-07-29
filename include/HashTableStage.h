@@ -8,8 +8,9 @@ private:
 	int size;
 	std::pair<bool, ColorTheme> processEvents();
 	std::vector <HashTable> hashList;
+	void setDefaultView();
 	void resetAnimation();
-	void addAnimationStep(std::vector <Animation> animations, sf::Time time);
+	void addAnimationStep(std::vector <Animation> animations, sf::Time time, int line, std::string description);
 	void update(sf::Time deltaT);
 	void render();
 

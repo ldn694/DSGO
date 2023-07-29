@@ -1,7 +1,7 @@
 #include "MediaControl.h"
 
 MediaControl::MediaControl(float _x, float _y, float _width, float _height, float* _percent, AnimatingDirection* _animatingDirection) :
-	x(_x), y(_y), width(_width), height(_height),
+	x(_x), y(_y), width(_width), height(_height), animatingDirection(_animatingDirection), percent(_percent),
 	scrubber(x, y + (height / 4 - height / 6) / 2, width, height / 6, zipWidth, _percent),
 	playButton(x + width * 0.5, y + height * 0.75, height / 4, _percent, _animatingDirection),
 	prevButton("Images/backward.png", x + width * 2 / 6, y + height * 0.75, height / 4, height / 4, playButtonCircleColor),
@@ -12,28 +12,24 @@ MediaControl::MediaControl(float _x, float _y, float _width, float _height, floa
 	
 }
 
+bool MediaControl::getIsChangingFrame() {
+	return scrubber.getIsChangingFrame();
+}
+
 void MediaControl::handleMousePressed(float x, float y) {
 	scrubber.handleMousePressed(x, y);
 	playButton.handleMousePressed(x, y);
 	if (nextButton.isMousePressed(x, y)) {
-		// if (ds->curFrame + 1 < ds->listFrame.size()) {
-		// 	ds->setFrame(ds->curFrame + 1);
-		// 	ds->setIsAnimating(false);
-		// }
+		*animatingDirection = Forward;
 	}
 	if (prevButton.isMousePressed(x, y)) {
-		// if (ds->curFrame - 1 >= 0) {
-		// 	ds->setFrame(ds->curFrame - 1);
-		// 	ds->setIsAnimating(false);
-		// }
+		*animatingDirection = Backward;
 	}
 	if (beginButton.isMousePressed(x, y)) {
-		// ds->setFrame(0);
-		// ds->setIsAnimating(false);
+		*animatingDirection = Home;
 	}
 	if (endButton.isMousePressed(x, y)) {
-		// ds->setFrame(ds->listFrame.size() - 1);
-		// ds->setIsAnimating(false);
+		*animatingDirection = End;
 	}
 }
 

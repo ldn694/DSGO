@@ -9,9 +9,6 @@ bool Scrubber::getIsChangingFrame() {
 }
 
 float Scrubber::getPercent(float mouseX, float mouseY) {
-	if (!isChangingFrame) {
-		return -1;
-	}
 	float percent = (mouseX - x) / width;
 	if (percent < 0) {
 		percent = 0;
@@ -28,6 +25,7 @@ void Scrubber::handleMousePressed(float mouseX, float mouseY) {
 		return;
 	}
 	isChangingFrame = true;
+	*percent = getPercent(mouseX, mouseY);
 }
 
 void Scrubber::handleMouseMove(float mouseX, float mouseY, sf::RenderWindow& window) {
@@ -38,6 +36,9 @@ void Scrubber::handleMouseMove(float mouseX, float mouseY, sf::RenderWindow& win
 		isHovering = true;
 		window.setMouseCursor(handCursor);
 	}
+	if (isChangingFrame) {
+		*percent = getPercent(mouseX, mouseY);
+	}
 }
 
 void Scrubber::handleMouseReleased(float mouseX, float mouseY) {
@@ -45,6 +46,7 @@ void Scrubber::handleMouseReleased(float mouseX, float mouseY) {
 		return;
 	}
 	isChangingFrame = false;
+	*percent = getPercent(mouseX, mouseY);
 }
 
 void Scrubber::handleKeyPressed(int key) {

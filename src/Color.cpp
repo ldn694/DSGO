@@ -26,3 +26,87 @@ Hash::Color Hash::fadingColorType(Hash::ColorType before, Hash::ColorType after,
 		fadingColor(Hash::color[theme][before].variableColor, Hash::color[theme][after].variableColor, percent)
 	);
 }
+
+const sf::Color toolBoxColor[numColorTheme] = { AntiFlashWhiteColor, DimGrayColor };
+
+const ColorBox colorBox[numColorBoxType][numColorTheme] =
+{
+	{ //CommandBoxNormal
+		ColorBox(LightRedColor , toolBoxColor[0], BlackColor),
+		ColorBox(RoyalPurpleColor, toolBoxColor[1], LavenderBushColor),
+	},
+	{ //CommandBoxSelected
+		ColorBox(BrightPinkColor, LavenderBushColor, WhiteColor),
+		ColorBox(VistaBlueColor, EerieBlackColor, EerieBlackColor),
+	},
+	{ //GoBoxNormal
+		ColorBox(LavenderBushColor, LavenderBushColor, EerieBlackColor),
+		ColorBox(EerieBlackColor, EerieBlackColor, LavenderBushColor)
+	},
+	{ //GoBoxSelected
+		ColorBox(BrightPinkColor, BrightPinkColor, WhiteColor),
+		ColorBox(VistaBlueColor, VistaBlueColor, EerieBlackColor)
+	},
+	{ //TriangleButtonNormal
+		ColorBox(EerieBlackColor, LavenderBushColor, BlackColor),
+		ColorBox(LavenderBushColor, EerieBlackColor, LavenderBushColor)
+	},
+	{ //TriangleButtonSelected
+		ColorBox(BrightPinkColor, LavenderBushColor, BlackColor),
+		ColorBox(VistaBlueColor, EerieBlackColor, LavenderBushColor)
+	},
+	{ //Typing_Box
+		ColorBox(BlackColor, WhiteColor, WhiteColor),
+		ColorBox(EerieBlackColor, LavenderBushColor, WhiteColor)
+	},
+	{ //MediaBox
+		ColorBox(LightRedColor, toolBoxColor[0], BlackColor),
+		ColorBox(RoyalPurpleColor, toolBoxColor[1], WhiteColor)
+	},
+	{ //CodeOuterBox
+		ColorBox(TeaRoseColor, toolBoxColor[0], WhiteColor),
+		ColorBox(UranianBlueColor, toolBoxColor[1], EerieBlackColor)
+	},
+	{ //UploadBox
+		ColorBox(AntiFlashWhiteColor, BlackColor, BlackColor),
+		ColorBox(AntiFlashWhiteColor, BlackColor, BlackColor)
+	}
+};
+
+const sf::Color codeNormalViewColor[numColorTheme] = { BlackColor, EerieBlackColor };
+const sf::Color codeHighlightViewColor[numColorTheme] = { WhiteColor, EerieBlackColor };
+const sf::Color codeHighlightBackGroundColor[numColorTheme] = { BrightPinkColor, DarkCyanColor };
+
+const sf::Color slideBarBackgroundColor[numColorTheme] = { EerieBlackColor, BlackColor };
+const sf::Color slideBarColor[numColorTheme] = { BrightPinkColor, MediumSlateBlueColor };
+const sf::Color slideBarOutlineColor[numColorTheme] = { EerieBlackColor, BlackColor };
+
+const sf::Color scrubberZipColor[numColorTheme] = { BrightPinkColor, UranianBlueColor };
+const sf::Color scrubberPassedColor[numColorTheme] = { TeaRoseColor, MediumSlateBlueColor };
+const sf::Color scrubberRemainColor[numColorTheme] = { BlackColor, EerieBlackColor };
+
+const sf::Color playButtonCircleColor[numColorTheme] = { BrightPinkColor, UranianBlueColor };
+const sf::Color playButtonTriangleColor[numColorTheme] = { TeaRoseColor, EerieBlackColor };
+
+const sf::Color choicesColor[numColorTheme] = { EerieBlackColor, LavenderBushColor };
+const sf::Color choicesOuterCircleColor[numColorTheme] = { EerieBlackColor,  EerieBlackColor };
+const sf::Color choicesInnerCircleColor[numColorTheme] = { TeaRoseColor, UranianBlueColor };
+
+const sf::Color backButtonNormalOutlineColor[numColorTheme] = { LavenderBushColor, EerieBlackColor };
+const sf::Color backButtonNormalFillColor[numColorTheme] = { LightRedColor, RoyalPurpleColor };
+
+const sf::Color descriptionFillColor[numColorTheme] = { BrightPinkColor , VistaBlueColor };
+const sf::Color descriptionTextColor[numColorTheme] = { WhiteColor, EerieBlackColor };
+
+const sf::Color warningFillColor[numColorTheme] = { TeaRoseColor , MediumSlateBlueColor };
+const sf::Color warningTextColor[numColorTheme] = { BlackColor, WhiteColor };
+
+const sf::Color bulbColor[numColorTheme] = { LavenderBushColor, LavenderBushColor };
+
+const sf::Color errorTextColor[numColorTheme] = { RedColor, VistaBlueColor };
+
+const sf::Color switchZipperOnColor[numColorTheme] = { BrightPinkColor, EerieBlackColor };
+const sf::Color switchZipperOffColor[numColorTheme] = { TeaRoseColor, VistaBlueColor };
+const sf::Color switchOnColor[numColorTheme] = { TeaRoseColor, VistaBlueColor };
+const sf::Color switchOffColor[numColorTheme] = { EerieBlackColor, EerieBlackColor };
+const sf::Color switchTextColor[numColorTheme] = { EerieBlackColor, LavenderBushColor };

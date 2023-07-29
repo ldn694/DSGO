@@ -6,6 +6,7 @@
 #include "HashCell.h"
 
 struct HashTable {
+    const int maxCellRow = 10;
     int size;
     std::vector <HashCell> cells;
     HashCell defaultCell;

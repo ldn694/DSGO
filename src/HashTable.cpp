@@ -9,9 +9,9 @@ HashTable::HashTable(int _size, sf::Font* font) :
     size(_size)
 {
     cells.resize(size);
-    int startX = (WIDTH_RES - (3 * radiusHash * (size - 1))) / 2;
+    int startX = (WIDTH_RES - 2 * widthBox - (3 * radiusHash * (maxCellRow - 1))) / 2 + 2 * widthBox;
     for (int i = 0; i < size; i++) {
-        cells[i] = std::move(HashCell(startX + i * 3 * radiusHash, HEIGHT_RES / 3, font));
+        cells[i] = std::move(HashCell(startX + (i % maxCellRow) * 3 * radiusHash, HEIGHT_RES / 3 + 5 * radiusHash * (i / maxCellRow), font));
         cells[i].insertVariable(intToString(i));
     }
 }
@@ -21,7 +21,21 @@ HashTable HashTable::execAnimation(std::vector <Animation> animations) {
     for (int i = 0; i < size; i++) {
         for (int j = 0; j < animations.size(); j++) {
             if (animations[j].id1 == i) {
-                tmp.cells[i].setColorType(Hash::ColorType(animations[j].nextColorType));
+                if (animations[j].animationType == SetColorType) {
+                    tmp.cells[i].setColorType(Hash::ColorType(animations[j].nextColorType));
+                }
+                if (animations[j].animationType == InsertVariable) {
+                    tmp.cells[i].insertVariable(animations[j].variableList);
+                }
+                if (animations[j].animationType == DeleteVariable) {
+                    tmp.cells[i].deleteVariable(animations[j].variableList);
+                }
+                if (animations[j].animationType == SetState) {
+                    tmp.cells[i].setState(Hash::State(animations[j].nextState));
+                }
+                if (animations[j].animationType == SetValue) {
+                    tmp.cells[i].setValue(animations[j].nextValue);
+                }
             }
         }
     }

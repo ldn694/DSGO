@@ -41,6 +41,12 @@ add_executable(DSGO
 	include/Scrubber.h
 	src/Switch.cpp
 	include/Switch.h
+	src/SlideBar.cpp
+	include/SlideBar.h
+	src/CodeBox.cpp
+	include/CodeBox.h
+	src/CodeVisualizer.cpp
+	include/CodeVisualizer.h
 	src/Stage.cpp
 	include/Stage.h
 	src/HashCell.cpp

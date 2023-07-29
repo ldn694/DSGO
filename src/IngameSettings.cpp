@@ -2,13 +2,25 @@
 #include "Box.h"
 
 IngameSettings::IngameSettings(float _x, float _y, float _width, float _height, ColorTheme theme, AnimatingDirection* animatingDirection) :
-	x(_x), y(_y), width(_width), height(_height), 
+	x(_x), y(_y), width(_width), height(_height), speed(1.f), percent(0.f), isDescription(true), skipAnimation(false),
 	mediaControl(_x + _width * 0.1, _y + _height * 1 / 30, _width * 0.8, _height * 8 / 30, &percent, animatingDirection),
 	descriptionSwitch(_x, _y + _height * 1 / 3, _width / 2, _height * 1 / 3, "Description Box", font(fontType::Prototype), true),
 	skipAnimationSwitch(_x, _y + _height * 2 / 3, _width / 2, _height * 1 / 3, "Instant Update", font(fontType::Prototype), false),
 	speedChoices(_x + _width * 0.5, _y + _height * 1 / 3, _width / 2, _height * 2 / 3, { "x0.25", "x0.5", "x1.0", "x2.0", "x4.0" }, font(fontType::Prototype), 2)
 {
 
+}
+
+bool IngameSettings::getIsChangingFrame() {
+	return mediaControl.getIsChangingFrame();
+}
+
+float IngameSettings::getPercent() {
+	return percent;
+}
+
+void IngameSettings::setPercent(float newPercent) {
+	percent = newPercent;
 }
 
 float IngameSettings::getSpeed() {
@@ -59,8 +71,8 @@ void IngameSettings::update(sf::Time deltaT) {
 void IngameSettings::draw(sf::RenderWindow& window, ColorTheme theme) {
 	Box outerBox(x, y, width, height, { MediaBox });
 	outerBox.draw(window, theme);
-	mediaControl.draw(window, theme);
-	speedChoices.draw(window, theme);
 	descriptionSwitch.draw(window, theme);
 	skipAnimationSwitch.draw(window, theme);
+	speedChoices.draw(window, theme);
+	mediaControl.draw(window, theme);
 }

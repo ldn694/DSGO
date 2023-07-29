@@ -1,9 +1,47 @@
 #include <string>
 #include "Template.h"
 
-int maxSizeData = 15;
-int maxValueData = 99;
+const int WIDTH_RES = 1600;
+const int HEIGHT_RES = 900;
+
+
+const bool ADD_EDGE = true;
+const bool ERASE_EDGE = false;
+
+const int maxID = int(1e9);
+const int pointCountCircle = 30;
+const float epsilonFloat = 1.f / 1000000.f;
+const float PI = 3.14159265358979323846;
+extern const sf::Time epsilonTime = sf::seconds(1.f / 1000000.f);
+const sf::Time timePerFrame = sf::seconds(1.f / 60.f);
+const sf::Time infTime = sf::seconds(1000000.f);
+const sf::Time stepTime = sf::seconds(0.5f);
+const sf::Time delayTime = sf::seconds(0.2f);
+const sf::Time flickeringTime = sf::seconds(0.5f);
+const sf::Time errorDisplayTime = sf::seconds(1.0f);
+const sf::Time switchTime = sf::seconds(0.2f);
+
+const float heightBox = 60;
+const float widthBox = 200;
+const float outlineBox = 3;
+const float speedList[] = { 0.25, 0.5, 1.0, 2.0, 4.0 };
+const float sizeLetterDescription = 20;
+const float sizeLetterError = 20;
+const float sizeValueLetter = 20;
+const float radiusHash = 30;
+const float thicknessHash = 3;
+
+const int UNKOWN = -(1e9 + 7);
+
+const int maxLetter = 4;
+
+int maxSizeDataHash = 30;
+int maxValueDataHash = 99;
 int zeroInt = 0;
+int oneInt = 1;
+
+const float heightScrubber = 20;
+const float zipWidth = 15;
 
 int stringToInt(std::string a) {
 	int res = 0;
@@ -36,6 +74,16 @@ sf::Time min(const sf::Time& a, const sf::Time& b) {
 
 sf::Time max(const sf::Time& a, const sf::Time& b) {
 	return a > b ? a : b;
+}
+
+bool diffSign(int a, int b) {
+	if (a == 0) {
+		return b != 0;
+	}
+	if (b == 0) {
+		return a != 0;
+	}
+	return a / abs(a) * b < 0;
 }
 
 void MovePoint(float& x1, float& y1, float x2, float y2, float dist) {
@@ -140,3 +188,6 @@ sf::Text CompressWords(std::string cur, float x, float y, float width, float hei
 bool Animation::operator < (const Animation& other) const {
 	return id1 == other.id1 ? id2 < other.id2 : id1 < other.id1;
 }
+
+AnimationStep::AnimationStep(std::vector <Animation> animations, sf::Time time, int line, std::string description) :
+	animations(animations), time(time), line(line), description(description) {}

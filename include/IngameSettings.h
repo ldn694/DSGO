@@ -14,7 +14,9 @@ private:
 	bool isDescription, skipAnimation;
 public:
 	IngameSettings(float x = 0.f, float y = 0.f, float width = 0.f, float height = 0.f, ColorTheme theme = LightTheme, AnimatingDirection* animatingDirection = nullptr);
+	bool getIsChangingFrame();
 	float getPercent();
+	void setPercent(float newPercent);
 	float getSpeed();
 	bool getIsDescription();
 	bool getSkipAnimation();
