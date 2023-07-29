@@ -7,17 +7,17 @@ Stage::Stage(sf::RenderWindow& _window, std::vector <std::string> _operationName
 	std::vector <std::vector <std::vector <TypingBoxMode> > > _typingMode,
 	std::vector <std::vector <std::vector <std::pair <int*, int*> > > > _valueBound,
 	std::vector <std::vector <std::vector <std::string> > > codes,
-	int* maxSizeData, int* maxValueData,
+	int* maxSizeData, int* maxValueData, InputType type,
 	ColorTheme _theme) :
 	window(_window), operationName(_operationName), modeName(_modeName), valueName(_valueName), typingMode(_typingMode), valueBound(_valueBound), theme(_theme), codes(codes), highlightLine(-1),
 	backButton(WIDTH_RES - widthBox / 2, 0, widthBox / 4, widthBox / 4),
-	readFromFile(widthBox * 0.625, HEIGHT_RES - heightBox * 3.75, widthBox * 0.75, heightBox / 2,
-				0, HEIGHT_RES - heightBox * 4 - outlineBox * 2, widthBox * 2, heightBox, font(fontType::Prototype), *maxSizeData, 0, *maxValueData),
+	readFromFile(widthBox * 0.625, HEIGHT_RES - heightBox * 11.75, widthBox * 0.75, heightBox / 2,
+				0, HEIGHT_RES - heightBox * 15, widthBox * 2, heightBox, font(fontType::Prototype), *maxSizeData, 0, *maxValueData, type),
 	lightBulb("Images/full_bulb.png", WIDTH_RES - widthBox / 8, widthBox / 8, widthBox / 8 / 46 * 30, widthBox / 8, bulbColor),
 	darkBulb("Images/empty_bulb.png", WIDTH_RES - widthBox / 8, widthBox / 8, widthBox / 8 / 46 * 30, widthBox / 8, bulbColor),
 	themeBox("Images/curved_square.png", WIDTH_RES - widthBox / 8, widthBox / 8, widthBox / 4, widthBox / 4, backButtonNormalFillColor),
-	ingameSettings(0, HEIGHT_RES - heightBox * 3, widthBox * 2, heightBox * 3, _theme, &animatingDirection),
-	codeVisualizer(0, HEIGHT_RES - heightBox * 13, widthBox * 2, heightBox * 6, 0, HEIGHT_RES - heightBox * 14.75, widthBox * 2, heightBox * 1.5),
+	ingameSettings(0, HEIGHT_RES - heightBox * 11, widthBox * 2, heightBox * 3, _theme, &animatingDirection),
+	codeVisualizer(0, HEIGHT_RES - heightBox * 6, widthBox * 2, heightBox * 6, 0, HEIGHT_RES - heightBox * 7.5, widthBox * 2, heightBox * 1.5),
 	toolBox(sf::Vector2f(2 * widthBox, HEIGHT_RES))
 {
 	toolBox.setPosition(0, 0);
@@ -28,15 +28,15 @@ Stage::Stage(sf::RenderWindow& _window, std::vector <std::string> _operationName
 	operating = false;
 	operationSelecting = false;
 	for (int i = 0; i < numOperation; i++) {
-		operationBox[i] = Box(0, HEIGHT_RES - heightBox * 6, widthBox, heightBox, { CommandBoxNormal, CommandBoxSelected },
+		operationBox[i] = Box(0, HEIGHT_RES - heightBox * 14, widthBox, heightBox, { CommandBoxNormal, CommandBoxSelected },
 						operationName[i], font(fontType::Prototype), 30, WITH_BORDER, outlineBox);
 		if (i != 0) {
 			operationBox[i].setDrawable(false);
 		}
 	}
 
-	outerGoBox = Box(widthBox, HEIGHT_RES - heightBox * 6, widthBox, heightBox, { CommandBoxNormal });
-	goBox = Box(widthBox * 1.25f, HEIGHT_RES - heightBox * 5.75f, widthBox / 2.0f, heightBox / 2.0f, { GoBoxNormal, GoBoxSelected },
+	outerGoBox = Box(widthBox, HEIGHT_RES - heightBox * 14, widthBox, heightBox, { CommandBoxNormal });
+	goBox = Box(widthBox * 1.25f, HEIGHT_RES - heightBox * 13.75f, widthBox / 2.0f, heightBox / 2.0f, { GoBoxNormal, GoBoxSelected },
 				"GO", font(fontType::Prototype), 20);
 
 	assert(modeName.size() == numOperation);
@@ -46,7 +46,7 @@ Stage::Stage(sf::RenderWindow& _window, std::vector <std::string> _operationName
 		numMode[i] = modeName[i].size();
 		modeBox[i].resize(numMode[i]);
 		for (int j = 0; j < numMode[i]; j++) {
-			modeBox[i][j] = Box(0, HEIGHT_RES - heightBox * 5, 2 * widthBox, heightBox, { CommandBoxNormal },
+			modeBox[i][j] = Box(0, HEIGHT_RES - heightBox * 13, 2 * widthBox, heightBox, { CommandBoxNormal },
 							modeName[i][j], font(fontType::Prototype), 20);
 			modeBox[i][j].setDrawable(false);
 		}
@@ -56,14 +56,15 @@ Stage::Stage(sf::RenderWindow& _window, std::vector <std::string> _operationName
 	}
 	curMode = 0;
 
-	prevModeButton = TriangleButton(widthBox / 5.0f, HEIGHT_RES - heightBox * 4.5f, 12, 3, -90.f);
-	nextModeButton = TriangleButton(2 * widthBox - widthBox / 5.0f, HEIGHT_RES - heightBox * 4.5f, 12, 3, 90.f);
-	upwardTriangle.setPointCount(3);
-	upwardTriangle.setRadius(7);
-	upwardTriangle.setOutlineThickness(0);
-	upwardTriangle.setOrigin(upwardTriangle.getLocalBounds().left + upwardTriangle.getLocalBounds().width / 2, upwardTriangle.getLocalBounds().top + upwardTriangle.getLocalBounds().height / 2);
-	upwardTriangle.setPosition(widthBox - widthBox * 0.06f, HEIGHT_RES - heightBox * 5.5f);
-	upwarding = true;
+	prevModeButton = TriangleButton(widthBox / 5.0f, HEIGHT_RES - heightBox * 12.5f, 12, 3, -90.f);
+	nextModeButton = TriangleButton(2 * widthBox - widthBox / 5.0f, HEIGHT_RES - heightBox * 12.5f, 12, 3, 90.f);
+	rightwardTriangle.setPointCount(3);
+	rightwardTriangle.setRadius(7);
+	rightwardTriangle.setOutlineThickness(0);
+	rightwardTriangle.setOrigin(rightwardTriangle.getLocalBounds().left + rightwardTriangle.getLocalBounds().width / 2, rightwardTriangle.getLocalBounds().top + rightwardTriangle.getLocalBounds().height / 2);
+	rightwardTriangle.setPosition(widthBox - widthBox * 0.06f, HEIGHT_RES - heightBox * 13.5f);
+	rightwardTriangle.setRotation(90.f);
+	rightwarding = true;
 
 	numValue.resize(numOperation);
 	assert(valueName.size() == numOperation);
@@ -111,8 +112,8 @@ void Stage::updateModeBox(int newMode) {
 		readFromFile.reset();
 		valueTypingBox.resize(numValue[curOperation][curMode]);
 		for (int i = 0; i < numValue[curOperation][curMode]; i++) {
-			valueTypingBox[i] = BigTypingBox(2 * widthBox / numValue[curOperation][curMode] * i, HEIGHT_RES - 4 * heightBox, 2 * widthBox / numValue[curOperation][curMode], heightBox, widthBox / 3, outlineBox, valueName[curOperation][curMode][i],
-				0, HEIGHT_RES - heightBox * 7, widthBox * 2, heightBox,
+			valueTypingBox[i] = BigTypingBox(2 * widthBox / numValue[curOperation][curMode] * i, HEIGHT_RES - 12 * heightBox, 2 * widthBox / numValue[curOperation][curMode], heightBox, widthBox / 3, outlineBox, valueName[curOperation][curMode][i],
+				0, HEIGHT_RES - heightBox * 15, widthBox * 2, heightBox,
 				typingMode[curOperation][curMode][i], font(fontType::Prototype), typingModeMaxCharacter[typingMode[curOperation][curMode][i]], *(valueBound[curOperation][curMode][i].first), *(valueBound[curOperation][curMode][i].second));
 		}
 	}
@@ -122,17 +123,20 @@ bool Stage::handleMousePressed(float x, float y) {
 	handleMouseMove(x, y);
 	ingameSettings.handleMousePressed(x, y);
 	codeVisualizer.handleMousePressed(x, y);
+	if (goBox.isInside(x, y) && !operationSelecting) {
+		operating = true;
+	}
 	if (!operationSelecting) {
 		if (operationBox[curOperation].isInside(x, y)) {
-			upwardTriangle.setRotation(180.f);
+			rightwardTriangle.setRotation(270.f);
 			operationSelecting = true;
 			//operationBox[curOperation].setColorMode(CommandBoxSelected);
-			float x1 = 0, y1 = HEIGHT_RES - heightBox * 6;
+			float x1 = 0, y1 = HEIGHT_RES - heightBox * 14;
 			for (int i = 0; i < numOperation; i++) {
 				if (i == curOperation) {
 					continue;
 				}
-				y1 -= heightBox;
+				x1 += widthBox;
 				operationBox[i].setPosition(x1, y1);
 				operationBox[i].setColorMode(CommandBoxNormal);
 				operationBox[i].setDrawable(true);
@@ -140,7 +144,7 @@ bool Stage::handleMousePressed(float x, float y) {
 		}
 	}
 	else {
-		upwardTriangle.setRotation(0.f);
+		rightwardTriangle.setRotation(90.f);
 		bool flag = false;
 		for (int i = 0; i < numOperation; i++) {
 			if (operationBox[i].isInside(x, y)) {
@@ -153,7 +157,7 @@ bool Stage::handleMousePressed(float x, float y) {
 					updateModeBox(0);
 				}
 				for (int j = 0; j < numOperation; j++) {
-					operationBox[j].setPosition(0, HEIGHT_RES - heightBox * 6);
+					operationBox[j].setPosition(0, HEIGHT_RES - heightBox * 14);
 					operationBox[j].setColorMode(CommandBoxNormal);
 					operationBox[j].setDrawable(false);
 				}
@@ -165,15 +169,12 @@ bool Stage::handleMousePressed(float x, float y) {
 		if (!flag) {
 			operationSelecting = false;
 			for (int i = 0; i < numOperation; i++) {
-				operationBox[i].setPosition(0, HEIGHT_RES - heightBox * 6);
+				operationBox[i].setPosition(0, HEIGHT_RES - heightBox * 14);
 				operationBox[i].setColorMode(CommandBoxNormal);
 				operationBox[i].setDrawable(false);
 			}
 			operationBox[curOperation].setDrawable(true);
 		}
-	}
-	if (goBox.isInside(x, y)) {
-		operating = true;
 	}
 	if (prevModeButton.isInside(x, y)) {
 		updateModeBox((curMode + numMode[curOperation] - 1) % numMode[curOperation]);
@@ -217,10 +218,10 @@ void Stage::handleMouseMove(float x, float y) {
 	for (int i = 0; i < numOperation; i++) {
 		if (i == curOperation) {
 			if (operationBox[i].handleMouseMove(x, y, window)) {
-				upwarding = false;
+				rightwarding = false;
 			}
 			else {
-				upwarding = true;
+				rightwarding = true;
 			}
 		}
 		else {
@@ -268,19 +269,19 @@ void Stage::draw() {
 	prevModeButton.draw(window, theme);
 	nextModeButton.draw(window, theme);
 	if (theme == LightTheme) {
-		if (upwarding) {
-			upwardTriangle.setFillColor(BlackColor);
+		if (rightwarding) {
+			rightwardTriangle.setFillColor(BlackColor);
 		}
 		else {
-			upwardTriangle.setFillColor(WhiteColor);
+			rightwardTriangle.setFillColor(WhiteColor);
 		}
 	}
 	else {
-		if (upwarding) {
-			upwardTriangle.setFillColor(WhiteColor);
+		if (rightwarding) {
+			rightwardTriangle.setFillColor(WhiteColor);
 		}
 		else {
-			upwardTriangle.setFillColor(BlackColor);
+			rightwardTriangle.setFillColor(BlackColor);
 		}
 	}
 	if (numValue[curOperation][curMode]) {
@@ -290,7 +291,7 @@ void Stage::draw() {
 	}
 	else {
 		if (modeName[curOperation][curMode] == "Upload File") {
-			Box emptyBox(0, HEIGHT_RES - heightBox * 4, widthBox * 2, heightBox, { CommandBoxNormal });
+			Box emptyBox(0, HEIGHT_RES - heightBox * 12, widthBox * 2, heightBox, { CommandBoxNormal });
 			emptyBox.draw(window, theme);
 		}
 	}
@@ -299,7 +300,7 @@ void Stage::draw() {
 		operationBox[i].draw(window, theme);
 	}
 	backButton.draw(window, theme);
-	window.draw(upwardTriangle);
+	window.draw(rightwardTriangle);
 }
 
 sf::Time Stage::getPrefixTime(int step) {

@@ -27,6 +27,22 @@ Hash::Color Hash::fadingColorType(Hash::ColorType before, Hash::ColorType after,
 	);
 }
 
+const Hash::Color Hash::color[numColorTheme][numColorType] =
+    {
+        {
+            Color(LavenderBushColor, BlackColor, BlackColor, RedColor),
+            Color(OrangeColor, OrangeColor, LavenderBushColor, RedColor),
+            Color(LavenderBushColor, OrangeColor, OrangeColor, RedColor),
+			Color(LightGreenColor, LightGreenColor, LavenderBushColor, RedColor)
+        } ,
+        {
+            Color(EerieBlackColor, WhiteColor, WhiteColor, WhiteColor),
+            Color(MediumSlateBlueColor, MediumSlateBlueColor, EerieBlackColor, WhiteColor),
+            Color(EerieBlackColor, MediumSlateBlueColor, MediumSlateBlueColor, WhiteColor),
+			Color(VistaBlueColor, VistaBlueColor, EerieBlackColor, WhiteColor)
+        }
+    };
+
 const sf::Color toolBoxColor[numColorTheme] = { AntiFlashWhiteColor, DimGrayColor };
 
 const ColorBox colorBox[numColorBoxType][numColorTheme] =

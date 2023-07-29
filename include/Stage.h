@@ -30,8 +30,8 @@ protected:
 	int curMode;
 
 	TriangleButton prevModeButton, nextModeButton;
-	sf::CircleShape upwardTriangle;
-	bool upwarding;
+	sf::CircleShape rightwardTriangle;
+	bool rightwarding;
 
 	std::vector <std::vector <std::vector <std::string> > > valueName;
 	std::vector <std::vector <std::vector <TypingBoxMode> > > typingMode;
@@ -42,6 +42,7 @@ protected:
 	int highlightLine;
 
 	ReadFromFile readFromFile;
+	InputType type;
 
 	std::vector <std::vector <int>> numValue;
 
@@ -68,7 +69,7 @@ public:
 		std::vector <std::vector <std::vector <TypingBoxMode> > > typingMode,
 		std::vector <std::vector <std::vector <std::pair <int*, int*> > > > valueBound,
 		std::vector <std::vector <std::vector <std::string> > > codes,
-		int* maxSizeData, int* maxValueData,
+		int* maxSizeData, int* maxValueData, InputType type,
 		ColorTheme theme = LightTheme);
 	void setDSName(std::string name);
 	void updateModeBox(int newMode);

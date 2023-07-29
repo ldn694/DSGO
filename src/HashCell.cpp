@@ -110,15 +110,15 @@ void HashCell::draw(sf::RenderWindow& window, ColorTheme theme, sf::Time totalTi
     cell.setOutlineColor(Hash::color[theme][type].outlineColor);
     valueText.setFillColor(Hash::color[theme][type].valueColor);
     variableText.setFillColor(Hash::color[theme][type].variableColor);
+    mainDiagonal.setFillColor(Hash::color[theme][type].outlineColor);
+    antiDiagonal.setFillColor(Hash::color[theme][type].outlineColor);
     if (totalTime < epsilonTime) {
         window.draw(cell);
         if (state == Hash::full) {
             window.draw(valueText);
         }
         if (state == Hash::deleted) {
-            mainDiagonal.setFillColor(Hash::color[theme][type].outlineColor);
             window.draw(mainDiagonal);
-            antiDiagonal.setFillColor(Hash::color[theme][type].outlineColor);
             window.draw(antiDiagonal);
         }
         window.draw(variableText);
@@ -139,6 +139,8 @@ void HashCell::draw(sf::RenderWindow& window, ColorTheme theme, sf::Time totalTi
                 tmp.cell.setOutlineColor(newColor.outlineColor);
                 tmp.valueText.setFillColor(newColor.valueColor);
                 tmp.variableText.setFillColor(newColor.variableColor);
+                tmp.mainDiagonal.setFillColor(newColor.outlineColor);
+                tmp.antiDiagonal.setFillColor(newColor.outlineColor);
             }
             if (animations[i].animationType == AnimationType::InsertVariable) {
                 tmp.insertVariable(animations[i].variableList);

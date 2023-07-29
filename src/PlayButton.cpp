@@ -29,6 +29,17 @@ void PlayButton::handleMouseMove(float mouseX, float mouseY, sf::RenderWindow& w
 	}
 }
 
+void PlayButton::handleKeyPressed(int key) {
+	if (key == sf::Keyboard::Space) {
+		if (*animatingDirection == Pause) {
+			*animatingDirection = Continuous;
+		}
+		else {
+			*animatingDirection = Pause;
+		}
+	}
+}
+
 void PlayButton::draw(sf::RenderWindow& window, ColorTheme theme) {
 	circle.draw(window, theme);
 	if (*animatingDirection == Pause) {

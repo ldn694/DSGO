@@ -48,25 +48,18 @@ void MediaControl::handleMouseReleased(float x, float y) {
 
 void MediaControl::handleKeyPressed(int key) {
 	scrubber.handleKeyPressed(key);
+	playButton.handleKeyPressed(key);
 	if (key == (int)sf::Keyboard::Right) { //next
-		// if (ds->curFrame + 1 < ds->listFrame.size()) {
-		// 	ds->setFrame(ds->curFrame + 1);
-		// 	ds->setIsAnimating(false);
-		// }
+		*animatingDirection = Forward;
 	}
 	if (key == (int)sf::Keyboard::Left) { //prev
-		// if (ds->curFrame - 1 >= 0) {
-		// 	ds->setFrame(ds->curFrame - 1);
-		// 	ds->setIsAnimating(false);
-		// }
+		*animatingDirection = Backward;
 	}
-	if (key == (int)sf::Keyboard::Home) {
-		// ds->setFrame(0);
-		// ds->setIsAnimating(false);
+	if (key == (int)sf::Keyboard::Home) { //home
+		*animatingDirection = Home;
 	}
-	if (key == (int)sf::Keyboard::End) {
-		// ds->setFrame(ds->listFrame.size() - 1);
-		// ds->setIsAnimating(false);
+	if (key == (int)sf::Keyboard::End) { //end
+		*animatingDirection = End;
 	}
 }
 

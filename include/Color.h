@@ -46,10 +46,10 @@ enum ColorTheme {
 namespace Hash {
 
     enum ColorType {
-        normal, highlight, lowlight
+        normal, highlight, lowlight, highlight2
     };
 
-    const int numColorType = 3;
+    const int numColorType = 4;
     
     struct Color {
         sf::Color fillColor, outlineColor, valueColor, variableColor;
@@ -58,19 +58,7 @@ namespace Hash {
 	
 	Color fadingColorType(ColorType before, ColorType after, ColorTheme theme, float percent);
 
-    const Color color[numColorTheme][numColorType] =
-    {
-        {
-            Color(LavenderBushColor, BlackColor, BlackColor, RedColor),
-            Color(OrangeColor, OrangeColor, LavenderBushColor, RedColor),
-            Color(LavenderBushColor, OrangeColor, OrangeColor, RedColor),
-        } ,
-        {
-            Color(EerieBlackColor, WhiteColor, WhiteColor, WhiteColor),
-            Color(MediumSlateBlueColor, MediumSlateBlueColor, EerieBlackColor, WhiteColor),
-            Color(EerieBlackColor, MediumSlateBlueColor, MediumSlateBlueColor, WhiteColor),
-        }
-    };
+    extern const Color color[numColorTheme][numColorType];
 }
 
 

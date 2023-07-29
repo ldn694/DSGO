@@ -1,9 +1,9 @@
 #include "CodeBox.h"
 
 CodeBox::CodeBox(float _x, float _y, float _width, float _height) :
-    x(_x), y(_y), width(_width), height(_height), slideBar(x, y + height * 0.9, width, height * 0.1),
+    x(_x), y(_y), width(_width), height(_height), slideBar(x, y + height * 0.95, width, height * 0.05),
     leftRect(sf::Vector2f(_width, _height)), rightRect(sf::Vector2f(_width, _height)),
-    outerBox(_x, _y, _width, _height * 0.9, {CodeOuterBox}), highlightLine(-1), finalMaxWidth(0) {
+    outerBox(_x, _y, _width, _height * 0.95, {CodeOuterBox}), highlightLine(-1), finalMaxWidth(0) {
     highlightLine = -1;
     leftRect.setPosition(x - width - 3, y);
     rightRect.setPosition(x + width + 3, y);

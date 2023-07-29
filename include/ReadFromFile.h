@@ -3,6 +3,9 @@
 #include "Template.h"
 #include "Color.h"
 
+enum InputType {
+	HashTableInput, GraphInput, ListInput
+};
 
 struct ReadFromFile {
 private:
@@ -11,11 +14,12 @@ private:
 	std::string fileName, address, warning;
 	bool isDisplaying, displayingWarning;
 	int minValue, maxValue, maxSize;
+	InputType type;
 
 public:
 	ReadFromFile(float x, float y, float width, float height,
 		float xWarning, float yWarning, float widthWarning, float heightWarning,
-		sf::Font* font, int maxSize, int minValue, int maxValue);
+		sf::Font* font, int maxSize, int minValue, int maxValue, InputType type);
 	void handleMousePressed(float x, float y);
 	void handleMouseMove(float x, float y, sf::RenderWindow& window);
 	std::vector <int> getListInt();

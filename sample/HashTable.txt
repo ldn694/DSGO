@@ -1,8 +1,26 @@
 //Insert
 int index = value % n, cnt = 0;
 while (table[index].state == full && cnt < n) {
-	index = (index + 1) % n;
-    cnt++;
+	index = (index + 1) % n; cnt++;
 }
 if (cnt == n) return;
 table[index].value = {value, full};
+
+//Delete
+int index = value % n, cnt = 0;
+while (table[index].state != empty && cnt < n) {
+    if (table[index].state == full && table[index].value == value) {
+        table[index].state = deleted;
+        return;
+    }
+    index = (index + 1) % n; cnt++;
+}
+
+//Search
+int index = value % n, cnt = 0;
+while (table[index].state != empty && cnt < n) {
+    if (table[index].state == full && table[index].value == value) {
+        return true;
+    }
+    index = (index + 1) % n; cnt++;
+}

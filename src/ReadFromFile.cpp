@@ -6,11 +6,11 @@ static TCHAR szFileName[MAX_PATH];
 
 ReadFromFile::ReadFromFile(float _x, float _y, float _width, float _height,
     float _xWarning, float _yWarning, float _widthWarning, float _heightWarning,
-    sf::Font* _font, int _maxSize, int _minValue, int _maxValue) :
+    sf::Font* _font, int _maxSize, int _minValue, int _maxValue, InputType _type) :
     x(_x), y(_y), width(_width), height(_height), 
     xWarning(_xWarning), yWarning(_yWarning), widthWarning(_widthWarning), heightWarning(_heightWarning),
     font(_font), maxSize(_maxSize), minValue(_minValue), maxValue(_maxValue),
-    isDisplaying(false), displayingWarning(false), fileName("Choose file") {}
+    isDisplaying(false), displayingWarning(false), fileName("Choose file"), type(_type) {}
 
 std::wstring charPtrToWideString(const char* charString) {
     // Create a std::wstring_convert using std::codecvt_utf8
@@ -84,7 +84,7 @@ void ReadFromFile::draw(sf::RenderWindow& window, ColorTheme theme) {
             window.draw(tmpRect);
             sf::Text WarningText = CompressWords(warning,
                 xWarning, yWarning, widthWarning, heightWarning,
-                font, 25, warningTextColor[theme]);
+                font, 20, warningTextColor[theme]);
             window.draw(WarningText);
         }
     }
@@ -150,6 +150,11 @@ void ReadFromFile::setWarning() {
     if (!tmp.empty() && (tmp[0] == -4)) {
         displayingWarning = true;
         warning = "Maximum size is " + intToString(maxSize);
+        return;
+    }
+    if (!tmp.empty() && type == HashTableInput && tmp.size() - 1 > tmp[0]) {
+        displayingWarning = true;
+        warning = "Number of elements must NOT be greater than " + intToString(tmp[0]);
         return;
     }
     displayingWarning = false;
