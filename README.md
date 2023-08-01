@@ -1,6 +1,6 @@
-#DSGO
+# DSGO
 
-##Introduction
+## Introduction
 
 DSGO - Data Structure Graphical Observer is a visualizer for data structures (Hash Table, AVL tree, 2-3-4 tree, Heap, Trie and Graph).
 
