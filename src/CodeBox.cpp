@@ -71,7 +71,6 @@ void CodeBox::draw(sf::RenderWindow& window, ColorTheme theme) {
         window.draw(highlightRect);
     }
     float curPercent = slideBar.getPercent();
-    //std::cout << curPercent << "\n";
     for (int i = 0; i < texts.size(); i++) {
         if (i == highlightLine) {
             texts[i].setFillColor(codeHighlightViewColor[theme]);

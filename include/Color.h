@@ -62,6 +62,25 @@ namespace Hash {
 }
 
 
+//-----------------------------------------------------------------------------------
+
+namespace AVL {
+
+    enum ColorType {
+        normal, highlight, lowlight, highlight2
+    };
+
+    const int numColorType = 4;
+    
+    struct Color {
+        sf::Color fillColor, outlineColor, valueColor, variableColor;
+        Color(sf::Color fillColor, sf::Color outlineColor, sf::Color valueColor, sf::Color variableColor);
+    };
+	
+	Color fadingColorType(ColorType before, ColorType after, ColorTheme theme, float percent);
+
+    extern const Color color[numColorTheme][numColorType];
+}
 
 //-----------------------------------------------------------------------------------
 

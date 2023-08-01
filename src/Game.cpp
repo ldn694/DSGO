@@ -7,6 +7,7 @@ Game::Game(sf::ContextSettings settings) :
 	themeBox("Images/curved_square.png", WIDTH_RES - widthBox / 8, widthBox / 8, widthBox / 4, widthBox / 4, backButtonNormalFillColor)
 {
 	hashTableBox = Box(410, 400, 360, 120, { CommandBoxNormal, CommandBoxSelected }, "Hash Table", font(fontType::Prototype), 30, NO_BORDER, 3);
+	AVLBox = Box(410, 550, 360, 120, { CommandBoxNormal, CommandBoxSelected }, "AVL Tree", font(fontType::Prototype), 30, NO_BORDER, 3);
 	window.setMouseCursor(arrowCursor);
 	window.setFramerateLimit(60);
 	srand(time(NULL));
@@ -14,6 +15,7 @@ Game::Game(sf::ContextSettings settings) :
 
 void Game::handleMouseMove(float x, float y) {
 	if (hashTableBox.handleMouseMove(x, y, window)) return;
+	if (AVLBox.handleMouseMove(x, y, window)) return;
 	if (themeBox.handleMouseMove(x, y, window)) return;
 	window.setMouseCursor(arrowCursor);
 }
@@ -32,6 +34,10 @@ void Game::processEvents()
 			if (hashTableBox.isInside(event.mouseButton.x, event.mouseButton.y)) {
 				runHashTable();
 			}
+			else if (AVLBox.isInside(event.mouseButton.x, event.mouseButton.y)) {
+				runAVL();
+			}
+			else
 			if (themeBox.isMousePressed(event.mouseButton.x, event.mouseButton.y)) {
 				theme = ColorTheme((theme + 1) % numColorTheme);
 			}
@@ -60,6 +66,7 @@ void Game::render() {
 		darkBulb.draw(window, theme);
 	}
 	hashTableBox.draw(window, theme);
+	AVLBox.draw(window, theme);
 	window.display();
 }
 
@@ -67,6 +74,12 @@ void Game::runHashTable() {
 	window.setMouseCursor(waitCursor);
 	HashTableStage hashTable(window, theme);
 	theme = hashTable.run();
+}
+
+void Game::runAVL() {
+	window.setMouseCursor(waitCursor);
+	AVLStage AVL(window, theme);
+	theme = AVL.run();
 }
 
 void Game::run() {

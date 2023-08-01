@@ -21,20 +21,22 @@ HashTable HashTable::execAnimation(std::vector <Animation> animations) {
     for (int i = 0; i < size; i++) {
         for (int j = 0; j < animations.size(); j++) {
             if (animations[j].id1 == i) {
-                if (animations[j].animationType == SetColorType) {
-                    tmp.cells[i].setColorType(Hash::ColorType(animations[j].nextColorType));
-                }
-                if (animations[j].animationType == InsertVariable) {
-                    tmp.cells[i].insertVariable(animations[j].variableList);
-                }
-                if (animations[j].animationType == DeleteVariable) {
-                    tmp.cells[i].deleteVariable(animations[j].variableList);
-                }
-                if (animations[j].animationType == SetState) {
-                    tmp.cells[i].setState(Hash::State(animations[j].nextState));
-                }
-                if (animations[j].animationType == SetValue) {
-                    tmp.cells[i].setValue(animations[j].nextValue);
+                switch (animations[j].animationType) {
+                    case SetColorType:
+                        tmp.cells[i].setColorType(Hash::ColorType(animations[j].nextValue));
+                        break;
+                    case InsertVariable:
+                        tmp.cells[i].insertVariable(animations[j].variableList);
+                        break;
+                    case DeleteVariable:
+                        tmp.cells[i].deleteVariable(animations[j].variableList);
+                        break;
+                    case SetState:
+                        tmp.cells[i].setState(Hash::State(animations[j].nextValue));
+                        break;
+                    case SetValue:
+                        tmp.cells[i].setValue(animations[j].nextValue);
+                        break;
                 }
             }
         }

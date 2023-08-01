@@ -1,0 +1,8 @@
+//Insert
+
+insert value
+check balance factor of this and its children
+    case L: rotateLeft(this)
+    case R: rotateRight(this)
+    case LR: rotateLeft(this.left); rotateRight(this)
+    case RL: rotateRight(this.right); rotateLeft(this)

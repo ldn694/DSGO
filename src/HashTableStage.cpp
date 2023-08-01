@@ -460,7 +460,6 @@ void HashTableStage::render() {
 	}
 	else {
 		int curStep = getCurStep();
-		//std::cout << curTime.asSeconds() << " " << curStep << "\n";
 		bool exactStep = false;
 		if (curStep < 0) {
 			curStep = -curStep - 1;

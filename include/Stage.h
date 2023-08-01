@@ -92,4 +92,9 @@ public:
 	void setValue(std::vector <Animation> &animations, int index, int value);
 	void setState(std::vector <Animation> &animations, int index, int state);
 	void setColorType(std::vector <Animation> &animations, int index, int nextColorType);
+	void setRoot(std::vector <Animation> &animations, int value);
+	void addNode(std::vector <Animation> &animations, int index, int value);
+	void deleteNode(std::vector <Animation> &animations, int index);
+	void setLeftNode(std::vector <Animation> &animations, int index, int value);
+	void setRightNode(std::vector <Animation> &animations, int index, int value);
 };

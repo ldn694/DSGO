@@ -7,12 +7,13 @@
 #include "Color.h"
 #include "Template.h"
 #include "HashTableStage.h"
+#include "AVLStage.h"
 
 struct Game {
 private:
 	ColorTheme theme;
     sf::RenderWindow window;
-	Box hashTableBox;
+	Box hashTableBox, AVLBox;
 	MyShape lightBulb, darkBulb, themeBox;
 public:
 	Game(sf::ContextSettings settings);
@@ -25,5 +26,6 @@ public:
 	void render();
 	void update(sf::Time deltaT);
 	void runHashTable();
+	void runAVL();
 	void run();
 };

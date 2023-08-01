@@ -340,7 +340,6 @@ int Stage::getCurStep() {
 }
 
 void Stage::updateCurTime(sf::Time deltaT) {
-	// std::cout << curTime.asSeconds() << " " << deltaT.asSeconds() << "\n";
 	curTime += deltaT;
 	if (curTime > getTotalTime()) {
 		curTime = getTotalTime();
@@ -388,7 +387,6 @@ void Stage::stageUpdate(sf::Time deltaT) {
 				}
 				else {
 					int curStep = getCurStep();
-					//std::cout << curStep << " " << previousStep << "\n";
 					if (previousStep < 0 && curStep >= 0) {
 						animatingDirection = Pause;
 						previousStep = UNKOWN;
@@ -458,7 +456,7 @@ void Stage::setState(std::vector <Animation> &animations, int index, int state) 
 	Animation tmp;
 	tmp.animationType = SetState;
 	tmp.id1 = index;
-	tmp.nextState = state;
+	tmp.nextValue = state;
 	animations.push_back(tmp);
 }
 
@@ -466,6 +464,44 @@ void Stage::setColorType(std::vector <Animation> &animations, int index, int nex
 	Animation tmp;
 	tmp.animationType = SetColorType;
 	tmp.id1 = index;
-	tmp.nextColorType = nextColorType;
+	tmp.nextValue = nextColorType;
+	animations.push_back(tmp);
+}
+
+void Stage::setRoot(std::vector <Animation> &animations, int nextValue) {
+	Animation tmp;
+	tmp.animationType = SetRoot;
+	tmp.nextValue = nextValue;
+	animations.push_back(tmp);
+}
+
+void Stage::addNode(std::vector <Animation> &animations, int index, int value) {
+	Animation tmp;
+	tmp.animationType = AddNode;
+	tmp.id1 = index;
+	tmp.nextValue = value;
+	animations.push_back(tmp);
+}
+
+void Stage::deleteNode(std::vector <Animation> &animations, int index) {
+	Animation tmp;
+	tmp.animationType = DeleteNode;
+	tmp.id1 = index;
+	animations.push_back(tmp);
+}
+
+void Stage::setLeftNode(std::vector <Animation> &animations, int index, int nextValue) {
+	Animation tmp;
+	tmp.animationType = SetLeftNode;
+	tmp.id1 = index;
+	tmp.nextValue = nextValue;
+	animations.push_back(tmp);
+}
+
+void Stage::setRightNode(std::vector <Animation> &animations, int index, int nextValue) {
+	Animation tmp;
+	tmp.animationType = SetRightNode;
+	tmp.id1 = index;
+	tmp.nextValue = nextValue;
 	animations.push_back(tmp);
 }

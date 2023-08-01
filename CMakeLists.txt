@@ -55,6 +55,12 @@ add_executable(DSGO
 	include/HashTable.h
 	src/HashTableStage.cpp
 	include/HashTableStage.h
+	src/AVLNode.cpp
+	include/AVLNode.h
+	src/AVLGraph.cpp
+	include/AVLGraph.h
+	src/AVLStage.cpp
+	include/AVLStage.h
 	)
 
 target_link_libraries(DSGO PRIVATE sfml-graphics)

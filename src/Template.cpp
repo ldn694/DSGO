@@ -27,16 +27,28 @@ const float outlineBox = 3;
 const float speedList[] = { 0.25, 0.5, 1.0, 2.0, 4.0 };
 const float sizeLetterDescription = 20;
 const float sizeLetterError = 20;
-const float sizeValueLetter = 20;
+
+const float sizeValueLetterHash = 20;
 const float radiusHash = 30;
 const float thicknessHash = 3;
+int maxSizeDataHash = 30;
+int maxValueDataHash = 99;
+
+const bool LEFT = true;
+const bool RIGHT = false;
+const int maxHeightAVL = 5;
+const float sizeValueLetterAVL = 25;
+const float radiusAVL = 25;
+const float thicknessAVL = 3;
+const float minHorizontalDistAVL = 60;
+const float verticalDistAVL = 120;
+int maxSizeDataAVL = 31;
+int maxValueDataAVL = 99;
 
 const int UNKOWN = -(1e9 + 7);
 
 const int maxLetter = 4;
 
-int maxSizeDataHash = 30;
-int maxValueDataHash = 99;
 int zeroInt = 0;
 int oneInt = 1;
 
@@ -116,6 +128,10 @@ void MovePointUpward(float& x1, float& y1, float x2, float y2, float h) {
 	y1 += dy;
 }
 
+float length(sf::Vector2f a) {
+	return sqrt(a.x * a.x + a.y * a.y);
+}
+
 sf::Cursor arrowCursor, handCursor, waitCursor, textCursor;
 std::vector <sf::Font> listFont;
 
@@ -143,6 +159,14 @@ void RotatePoint(float& x, float& y, float cx, float cy, float angle) {
 	float rotatedY = sin(angle) * (x - cx) + cos(angle) * (y - cy) + cy;
 	x = rotatedX;
 	y = rotatedY;
+}
+
+sf::Vector2f normalize(sf::Vector2f a) {
+	float len = length(a);
+	if (len < epsilonFloat) {
+		return a;
+	}
+	return sf::Vector2f(a.x / len, a.y / len);
 }
 
 sf::Text CompressWords(std::string cur, float x, float y, float width, float height, sf::Font* font, float characterSize, sf::Color color) {
@@ -186,7 +210,10 @@ sf::Text CompressWords(std::string cur, float x, float y, float width, float hei
 }
 
 bool Animation::operator < (const Animation& other) const {
-	return id1 == other.id1 ? id2 < other.id2 : id1 < other.id1;
+	if (animationType == other.animationType) {
+		return id1 == other.id1 ? id2 < other.id2 : id1 < other.id1;
+	}
+	return animationType < other.animationType;
 }
 
 AnimationStep::AnimationStep(std::vector <Animation> animations, sf::Time time, int line, std::string description) :

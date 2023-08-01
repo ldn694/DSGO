@@ -15,12 +15,12 @@ HashCell::HashCell(float _x, float _y, sf::Font* font, Hash::ColorType _type) :
     antiDiagonal.setRotation(-45);
     valueText.setFont(*font);
     valueText.setString(intToString(value));
-    valueText.setCharacterSize(sizeValueLetter);
+    valueText.setCharacterSize(sizeValueLetterHash);
     valueText.setOrigin(valueText.getLocalBounds().left + valueText.getLocalBounds().width / 2, valueText.getLocalBounds().top + valueText.getLocalBounds().height / 2);
     valueText.setPosition(_x, _y);
     variableText.setFont(*font);
     variableText.setString("");
-    variableText.setCharacterSize(sizeValueLetter);
+    variableText.setCharacterSize(sizeValueLetterHash);
     variableText.setOrigin(variableText.getLocalBounds().left + variableText.getLocalBounds().width / 2, variableText.getLocalBounds().top + variableText.getLocalBounds().height / 2);
     variableText.setPosition(_x, _y + radiusHash * 2);
 }
@@ -133,26 +133,33 @@ void HashCell::draw(sf::RenderWindow& window, ColorTheme theme, sf::Time totalTi
         }
         HashCell tmp = *this;
         for (int i = 0; i < animations.size(); i++) {
-            if (animations[i].animationType == SetColorType) {
-                Hash::Color newColor = Hash::fadingColorType(type, Hash::ColorType(animations[i].nextColorType), theme, timePassed.asSeconds() / totalTime.asSeconds());
-                tmp.cell.setFillColor(newColor.fillColor);
-                tmp.cell.setOutlineColor(newColor.outlineColor);
-                tmp.valueText.setFillColor(newColor.valueColor);
-                tmp.variableText.setFillColor(newColor.variableColor);
-                tmp.mainDiagonal.setFillColor(newColor.outlineColor);
-                tmp.antiDiagonal.setFillColor(newColor.outlineColor);
-            }
-            if (animations[i].animationType == AnimationType::InsertVariable) {
-                tmp.insertVariable(animations[i].variableList);
-            }
-            if (animations[i].animationType == AnimationType::DeleteVariable) {
-                tmp.deleteVariable(animations[i].variableList);
-            }
-            if (animations[i].animationType == AnimationType::SetState) {
-                tmp.setState(Hash::State(animations[i].nextState));
-            }
-            if (animations[i].animationType == AnimationType::SetValue) {
-                tmp.setValue(animations[i].nextValue);
+            switch (animations[i].animationType) {
+                case SetColorType: {
+                    Hash::Color newColor = Hash::fadingColorType(type, Hash::ColorType(animations[i].nextValue), theme, timePassed.asSeconds() / totalTime.asSeconds());
+                    tmp.cell.setFillColor(newColor.fillColor);
+                    tmp.cell.setOutlineColor(newColor.outlineColor);
+                    tmp.valueText.setFillColor(newColor.valueColor);
+                    tmp.variableText.setFillColor(newColor.variableColor);
+                    tmp.mainDiagonal.setFillColor(newColor.outlineColor);
+                    tmp.antiDiagonal.setFillColor(newColor.outlineColor);
+                    break;
+                }
+                case InsertVariable: {
+                    tmp.insertVariable(animations[i].variableList);
+                    break;
+                }
+                case DeleteVariable: {
+                    tmp.deleteVariable(animations[i].variableList);
+                    break;
+                }
+                case SetState: {
+                    tmp.setState(Hash::State(animations[i].nextValue));
+                    break;
+                }
+                case SetValue: {
+                    tmp.setValue(animations[i].nextValue);
+                    break;
+                }
             }
         }
         window.draw(tmp.cell);
