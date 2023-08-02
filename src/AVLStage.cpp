@@ -75,11 +75,12 @@ AVLStage::AVLStage(sf::RenderWindow& window, ColorTheme theme) :
 			{
 				{
 					"insert value",
-					"check balance factor of this and its children",
-    				"	case L: rotateLeft(this)",
-    				"	case R: rotateRight(this)",
+					"check balance factor of this node",
+    				"	case LL: rotateRight(this)",
+    				"	case RR: rotateLeft(this)",
     				"	case LR: rotateLeft(this.left); rotateRight(this)",
-    				"	case RL: rotateRight(this.right); rotateLeft(this)"
+    				"	case RL: rotateRight(this.right); rotateLeft(this)",
+					"	case OK: continue"
 				}
 			},
 			{
@@ -111,7 +112,7 @@ AVLStage::AVLStage(sf::RenderWindow& window, ColorTheme theme) :
 {
     rootPosition = sf::Vector2f((WIDTH_RES - 2 * widthBox) / 2 + 2 * widthBox, HEIGHT_RES / 4);
 	setDSName("AVL Tree");
-	AVLList.push_back(AVLGraph(rootPosition, font(fontType::Prototype)));
+	AVLList.push_back(AVLGraph(rootPosition, font(fontType::Arial)));
 	size = 0;
 }
 
@@ -124,6 +125,44 @@ void AVLStage::setDefaultView() {
 		setColorType(animations, i, AVL::ColorType::normal);
 	}
 	addAnimationStep(animations, stepTime, -1, "Reformat for visualization");
+}
+
+void AVLStage::leftRotate(std::vector <Animation>& animations, int id) {
+	AVLGraph& graph = AVLList.back();
+	int par = graph.getParent(id);
+	if (par == -1) {
+		setRoot(animations, graph.nodes[id].rightNode);
+	}
+	else {
+		if (AVLList.back().nodes[par].leftNode == id) {
+			setLeftNode(animations, par, graph.nodes[id].rightNode);
+		}
+		else {
+			setRightNode(animations, par, graph.nodes[id].rightNode);
+		}
+	}
+	int rightNode = graph.nodes[id].rightNode;
+	setRightNode(animations, id, graph.nodes[rightNode].leftNode);
+	setLeftNode(animations, rightNode, id);
+}
+
+void AVLStage::rightRotate(std::vector <Animation>& animations, int id) {
+	AVLGraph& graph = AVLList.back();
+	int par = graph.getParent(id);
+	if (par == -1) {
+		setRoot(animations, graph.nodes[id].leftNode);
+	}
+	else {
+		if (AVLList.back().nodes[par].leftNode == id) {
+			setLeftNode(animations, par, graph.nodes[id].leftNode);
+		}
+		else {
+			setRightNode(animations, par, graph.nodes[id].leftNode);
+		}
+	}
+	int leftNode = graph.nodes[id].leftNode;
+	setLeftNode(animations, id, graph.nodes[leftNode].rightNode);
+	setRightNode(animations, leftNode, id);
 }
 
 void AVLStage::insertValue(int value) {
@@ -141,8 +180,10 @@ void AVLStage::insertValue(int value) {
 		addAnimationStep(animations, stepTime, 0, "Empty tree, insert root = " + intToString(value));
 	}
 	else {
+		std::vector <int> idList;
 		int root = AVLList.back().root;
 		while (true) {
+			idList.push_back(root);
 			animations.clear();
 			setColorType(animations, root, AVL::ColorType::highlight);
 			addAnimationStep(animations, stepTime, 0, "Compare " + intToString(value) + " with " + intToString(AVLList.back().nodes[root].value));
@@ -192,6 +233,68 @@ void AVLStage::insertValue(int value) {
 				}
 			}
 		}
+		idList.push_back(id);
+		while (!idList.empty()) {
+			int id = idList.back();
+			idList.pop_back();
+			
+			animations.clear();
+			int bf = AVLList.back().getBalanceFactor(id);
+			insertVariable(animations, id, {"bf = " + intToString(bf)});
+			setColorType(animations, id, AVL::ColorType::highlight);
+			addAnimationStep(animations, stepTime, 1, "Calculate balance factor of " + intToString(AVLList.back().nodes[id].value));
+
+			AVLGraph& graph = AVLList.back();
+			int idLeft = graph.nodes[id].leftNode;
+			int idRight = graph.nodes[id].rightNode;
+			if (bf > 1) {
+				if (value < graph.nodes[idLeft].value) {//Left Left
+					animations.clear();
+					rightRotate(animations, id);
+					addAnimationStep(animations, stepTime, 2, "Left Left case, rotate right");
+				}
+				else {//Left Right
+					animations.clear();
+					int leftNode = AVLList.back().nodes[id].leftNode;
+					leftRotate(animations, leftNode);
+					addAnimationStep(animations, stepTime, 4, "Left Right case, rotate left " + intToString(AVLList.back().nodes[leftNode].value) + " first");
+					
+					animations.clear();
+					rightRotate(animations, id);
+					addAnimationStep(animations, stepTime, 4, "Then rotate right " + intToString(AVLList.back().nodes[id].value));
+				}
+			}
+			else if (graph.getBalanceFactor(id) < -1) {
+				if (value > graph.nodes[idRight].value) {//Right Right
+					animations.clear();
+					leftRotate(animations, id);
+					addAnimationStep(animations, stepTime, 3, "Right Right case, rotate left");
+				}
+				else {//Right Left
+					animations.clear();
+					int rightNode = AVLList.back().nodes[id].rightNode;
+					rightRotate(animations, rightNode);
+					addAnimationStep(animations, stepTime, 5, "Right Left case, rotate right " + intToString(AVLList.back().nodes[rightNode].value) + " first");
+					
+					animations.clear();
+					leftRotate(animations, id);
+					addAnimationStep(animations, stepTime, 5, "Then rotate left " + intToString(AVLList.back().nodes[id].value));
+				}
+			}
+			else {
+				animations.clear();
+				addAnimationStep(animations, stepTime, 6, "No need to rotate");
+			}
+			animations.clear();
+			deleteVariable(animations, id, AVLList.back().nodes[id].getVariables());
+			setColorType(animations, id, AVL::ColorType::normal);
+			if (id != AVLList.back().root) {
+				addAnimationStep(animations, stepTime, -1, "Moving to its parent node");
+			}
+			else {
+				addAnimationStep(animations, stepTime, -1, "Finished");
+			}
+		}
 	}
 	setDefaultView();
 }
@@ -236,7 +339,7 @@ std::pair<bool, ColorTheme> AVLStage::processEvents() {
 				int num = rand() % maxSizeDataAVL;
 				size = 0;
 				AVLList.clear();
-				AVLList.push_back(AVLGraph(rootPosition, font(fontType::Prototype)));
+				AVLList.push_back(AVLGraph(rootPosition, font(fontType::Arial)));
 				for (int i = 0; i < num; i++) {
 					insertValue(rand() % (maxValueDataAVL + 1));
 				}
@@ -245,7 +348,7 @@ std::pair<bool, ColorTheme> AVLStage::processEvents() {
 			if (modeString == "Empty") {
 				size = 0;
 				AVLList.clear();
-				AVLList.push_back(AVLGraph(rootPosition, font(fontType::Prototype)));
+				AVLList.push_back(AVLGraph(rootPosition, font(fontType::Arial)));
 				resetAnimation();
 			}
 			if (modeString == "Fixed Size") {
@@ -253,7 +356,7 @@ std::pair<bool, ColorTheme> AVLStage::processEvents() {
 				if (v != -1) {
 					size = 0;
 					AVLList.clear();
-					AVLList.push_back(AVLGraph(rootPosition, font(fontType::Prototype)));
+					AVLList.push_back(AVLGraph(rootPosition, font(fontType::Arial)));
 					for (int i = 0; i < v; i++) {
 						insertValue(rand() % (maxValueDataAVL + 1));
 					}
@@ -265,7 +368,7 @@ std::pair<bool, ColorTheme> AVLStage::processEvents() {
 				if (values.empty() || values[0] != -1) {
 					size = 0;
 					AVLList.clear();
-					AVLList.push_back(AVLGraph(rootPosition, font(fontType::Prototype)));
+					AVLList.push_back(AVLGraph(rootPosition, font(fontType::Arial)));
 					for (int i = 0; i < values.size(); i++) {
 						insertValue(values[i]);
 					}
@@ -280,7 +383,7 @@ std::pair<bool, ColorTheme> AVLStage::processEvents() {
 					}
 					size = 0;
 					AVLList.clear();
-					AVLList.push_back(AVLGraph(rootPosition, font(fontType::Prototype)));
+					AVLList.push_back(AVLGraph(rootPosition, font(fontType::Arial)));
 					for (int i = 0; i < values.size(); i++) {
 						insertValue(values[i]);
 					}

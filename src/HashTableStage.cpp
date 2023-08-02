@@ -110,7 +110,7 @@ HashTableStage::HashTableStage(sf::RenderWindow& window, ColorTheme theme) :
 		theme)
 {
 	setDSName("Hash Table");
-	hashList.push_back(HashTable(1, font(fontType::Prototype)));
+	hashList.push_back(HashTable(1, font(fontType::Arial)));
 	size = 1;
 }
 
@@ -348,7 +348,7 @@ std::pair<bool, ColorTheme> HashTableStage::processEvents() {
 				size = rand() % maxSizeDataHash + 1;
 				int smallSize = rand() % (size + 1);
 				hashList.clear();
-				hashList.push_back(HashTable(size, font(fontType::Prototype)));
+				hashList.push_back(HashTable(size, font(fontType::Arial)));
 				for (int i = 0; i < smallSize; i++) {
 					insertValue(rand() % (maxValueDataHash + 1));
 				}
@@ -359,7 +359,7 @@ std::pair<bool, ColorTheme> HashTableStage::processEvents() {
 				if (v != -1) {
 					size = v;
 					hashList.clear();
-					hashList.push_back(HashTable(v, font(fontType::Prototype)));
+					hashList.push_back(HashTable(v, font(fontType::Arial)));
 				}
 			}
 			if (modeString == "Fixed Size") {
@@ -367,7 +367,7 @@ std::pair<bool, ColorTheme> HashTableStage::processEvents() {
 				if (v != -1) {
 					size = v;
 					hashList.clear();
-					hashList.push_back(HashTable(v, font(fontType::Prototype)));
+					hashList.push_back(HashTable(v, font(fontType::Arial)));
 					int smallSize = rand() % (size + 1);
 					for (int i = 0; i < smallSize; i++) {
 						insertValue(rand() % (maxValueDataHash + 1));
@@ -381,7 +381,7 @@ std::pair<bool, ColorTheme> HashTableStage::processEvents() {
 				if (num != -1 && (values.empty() || values[0] != -1)) {
 					size = num;
 					hashList.clear();
-					hashList.push_back(HashTable(num, font(fontType::Prototype)));
+					hashList.push_back(HashTable(num, font(fontType::Arial)));
 					for (int i = 0; i < values.size(); i++) {
 						insertValue(values[i]);
 					}
@@ -396,7 +396,7 @@ std::pair<bool, ColorTheme> HashTableStage::processEvents() {
 					}
 					size = values[0];
 					hashList.clear();
-					hashList.push_back(HashTable(size, font(fontType::Prototype)));
+					hashList.push_back(HashTable(size, font(fontType::Arial)));
 					for (int i = 1; i < values.size(); i++) {
 						insertValue(values[i]);
 					}

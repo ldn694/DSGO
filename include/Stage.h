@@ -97,4 +97,6 @@ public:
 	void deleteNode(std::vector <Animation> &animations, int index);
 	void setLeftNode(std::vector <Animation> &animations, int index, int value);
 	void setRightNode(std::vector <Animation> &animations, int index, int value);
+	void setLeftEdgeColorType(std::vector <Animation> &animations, int index, int nextColorType);
+	void setRightEdgeColorType(std::vector <Animation> &animations, int index, int nextColorType);
 };

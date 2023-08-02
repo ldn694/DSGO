@@ -20,6 +20,37 @@ int AVLGraph::getMexID() {
     assert(false);
 }
 
+int AVLGraph::getParent(int id) {
+    if (id == -1) {
+        return -1;
+    }
+    for (auto x = nodes.begin(); x != nodes.end(); x++) {
+        if (x->second.leftNode == id || x->second.rightNode == id) {
+            return x->first;
+        }
+    }
+    return -1;
+}
+
+int AVLGraph::getHeigth(int id) {
+    if (id == -1) {
+        return 0;
+    }
+    int trai = getHeigth(nodes[id].leftNode);
+    int phai = getHeigth(nodes[id].rightNode);
+    return std::max(trai, phai) + 1;
+}
+
+int AVLGraph::getBalanceFactor(int id) {
+    if (id == -1) {
+        return 0;
+    }
+    int trai = getHeigth(nodes[id].leftNode);
+    int phai = getHeigth(nodes[id].rightNode);
+    // std::cout << "bf " << id << " " << trai << " " << phai << "\n";
+    return trai - phai;
+}
+
 sf::RectangleShape AVLGraph::getEdgeLine(sf::Vector2f startPosition, sf::Vector2f endPosition, float percent) {
     sf::Vector2f diff = endPosition - startPosition;
     if (length(diff) < 2 * (radiusAVL + thicknessAVL)) {
@@ -112,7 +143,22 @@ AVLGraph AVLGraph::execAnimation(std::vector <Animation> animations) {
 void AVLGraph::draw(sf::RenderWindow& window, ColorTheme theme, sf::Time totalTime, sf::Time timePassed, std::vector<Animation> animations) {
     if (timePassed < epsilonTime) {
         for (auto x = nodes.begin(); x != nodes.end(); x++) {
+            // std::cout << x->second.value << " " << x->second.leftNode << " " << x->second.rightNode << "\n";
             x->second.draw(window, theme);
+            if (x->second.leftNode != -1) {
+                sf::RectangleShape line = getEdgeLine(x->second.getPosition(), nodes[x->second.leftNode].getPosition(), 1.f);
+                if (line.getSize() != sf::Vector2f()) {
+                    line.setFillColor(AVL::color[theme][x->second.leftEdgeType].outlineColor);
+                    window.draw(line);
+                }
+            }
+            if (x->second.rightNode != -1) {
+                sf::RectangleShape line = getEdgeLine(x->second.getPosition(), nodes[x->second.rightNode].getPosition(), 1.f);
+                if (line.getSize() != sf::Vector2f()) {
+                    line.setFillColor(AVL::color[theme][x->second.rightEdgeType].outlineColor);
+                    window.draw(line);
+                }
+            }
         }
     }
     float percent = (totalTime < epsilonTime ? 1.f : timePassed / totalTime);
@@ -149,28 +195,80 @@ void AVLGraph::draw(sf::RenderWindow& window, ColorTheme theme, sf::Time totalTi
             nodes[id].draw(window, theme, totalTime, timePassed, x->second);
         }
     }
-    // //Edges
-    // for (auto x = nodes.begin(); x != nodes.end(); x++) {
-    //     int idU = x->first;
-    //     sf::Vector2f startPositionU = x->second.getPosition();
-    //     sf::Vector2f goalPositionU;
-    //     if (tmp.nodes.find(idU) == tmp.nodes.end()) {
-    //         goalPositionU = x->second.getPosition();
-    //     }
-    //     else {
-    //         goalPositionU = tmp.nodes[idU].getPosition();
-    //     }
-    //     if (nodes[idU].leftNode != -1) {
-    //         //old edge disappear
-    //         int idV = nodes[idU].leftNode;
-    //         sf::Vector2f startPositionV = nodes[idV].getPosition();
-    //         sf::Vector2f goalPositionV = tmp.nodes.find(idV) == tmp.nodes.end() ? nodes[idV].getPosition() : tmp.nodes[idV].getPosition();
-    //         if (tmp.nodes.find(idU) == tmp.nodes.end() || tmp.nodes[idU].leftNode != nodes[idU].leftNode) {
-    //             sf::Vector2f uPosition = startPositionU + (goalPositionU - startPositionU) * percent;
-    //             sf::Vector2f vPosition = startPositionV + (goalPositionV - startPositionV) * percent;
-    //             sf::RectangleShape line = getEdgeLine(uPosition, vPosition, 1 - percent);
-    //             line.setFillColor(AVL::color[])
-    //         }
-    //     }
-    // }
+    //Edges
+    for (auto x = nodes.begin(); x != nodes.end(); x++) {
+        int idU = x->first;
+        sf::Vector2f startPositionU = x->second.getPosition();
+        sf::Vector2f goalPositionU;
+        if (tmp.nodes.find(idU) == tmp.nodes.end()) {
+            goalPositionU = x->second.getPosition();
+        }
+        else {
+            goalPositionU = tmp.nodes[idU].getPosition();
+        }
+        if (nodes[idU].leftNode != -1) {//old left edge disappear
+            int idV = nodes[idU].leftNode;
+            sf::Vector2f startPositionV = nodes[idV].getPosition();
+            sf::Vector2f goalPositionV = tmp.nodes.find(idV) == tmp.nodes.end() ? nodes[idV].getPosition() : tmp.nodes[idV].getPosition();
+            if (tmp.nodes.find(idU) == tmp.nodes.end() || tmp.nodes[idU].leftNode != nodes[idU].leftNode) {
+                sf::Vector2f uPosition = startPositionU + (goalPositionU - startPositionU) * percent;
+                sf::Vector2f vPosition = startPositionV + (goalPositionV - startPositionV) * percent;
+                sf::RectangleShape line = getEdgeLine(uPosition, vPosition, 1 - percent);
+                line.setFillColor(AVL::color[theme][nodes[idU].leftEdgeType].outlineColor);
+                window.draw(line);
+            }
+        }
+        if (nodes[idU].rightNode != -1) {//old right edge disappear
+            int idV = nodes[idU].rightNode;
+            sf::Vector2f startPositionV = nodes[idV].getPosition();
+            sf::Vector2f goalPositionV = tmp.nodes.find(idV) == tmp.nodes.end() ? nodes[idV].getPosition() : tmp.nodes[idV].getPosition();
+            if (tmp.nodes.find(idU) == tmp.nodes.end() || tmp.nodes[idU].rightNode != nodes[idU].rightNode) {
+                sf::Vector2f uPosition = startPositionU + (goalPositionU - startPositionU) * percent;
+                sf::Vector2f vPosition = startPositionV + (goalPositionV - startPositionV) * percent;
+                sf::RectangleShape line = getEdgeLine(uPosition, vPosition, 1 - percent);
+                line.setFillColor(AVL::color[theme][nodes[idU].rightEdgeType].outlineColor);
+                window.draw(line);
+            }
+        }
+        if (tmp.nodes.find(idU) != tmp.nodes.end() && tmp.nodes[idU].leftNode != nodes[idU].leftNode && tmp.nodes[idU].leftNode != -1) {//new left edge appear
+            int idV = tmp.nodes[idU].leftNode;
+            sf::Vector2f startPositionV = nodes.find(idV) == nodes.end() ? tmp.nodes[idV].getPosition() : nodes[idV].getPosition();
+            sf::Vector2f goalPositionV = tmp.nodes[idV].getPosition();
+            sf::Vector2f uPosition = startPositionU + (goalPositionU - startPositionU) * percent;
+            sf::Vector2f vPosition = startPositionV + (goalPositionV - startPositionV) * percent;
+            sf::RectangleShape line = getEdgeLine(uPosition, vPosition, percent);
+            line.setFillColor(AVL::color[theme][tmp.nodes[idU].leftEdgeType].outlineColor);
+            window.draw(line);
+        }
+        if (tmp.nodes.find(idU) != tmp.nodes.end() && tmp.nodes[idU].rightNode != nodes[idU].rightNode && tmp.nodes[idU].rightNode != -1) {//new right edge appear
+            int idV = tmp.nodes[idU].rightNode;
+            sf::Vector2f startPositionV = nodes.find(idV) == nodes.end() ? tmp.nodes[idV].getPosition() : nodes[idV].getPosition();
+            sf::Vector2f goalPositionV = tmp.nodes[idV].getPosition();
+            sf::Vector2f uPosition = startPositionU + (goalPositionU - startPositionU) * percent;
+            sf::Vector2f vPosition = startPositionV + (goalPositionV - startPositionV) * percent;
+            sf::RectangleShape line = getEdgeLine(uPosition, vPosition, percent);
+            line.setFillColor(AVL::color[theme][tmp.nodes[idU].rightEdgeType].outlineColor);
+            window.draw(line);
+        }
+        if (tmp.nodes.find(idU) != tmp.nodes.end() && tmp.nodes[idU].leftNode == nodes[idU].leftNode && nodes[idU].leftNode != -1) {//same left edge
+            int idV = nodes[idU].leftNode;
+            sf::Vector2f startPositionV = nodes[idV].getPosition();
+            sf::Vector2f goalPositionV = tmp.nodes[idV].getPosition();
+            sf::Vector2f uPosition = startPositionU + (goalPositionU - startPositionU) * percent;
+            sf::Vector2f vPosition = startPositionV + (goalPositionV - startPositionV) * percent;
+            sf::RectangleShape line = getEdgeLine(uPosition, vPosition, 1);
+            line.setFillColor(AVL::color[theme][nodes[idU].leftEdgeType].outlineColor);
+            window.draw(line);
+        }
+        if (tmp.nodes.find(idU) != tmp.nodes.end() && tmp.nodes[idU].rightNode == nodes[idU].rightNode && nodes[idU].rightNode != -1) {//same right edge
+            int idV = nodes[idU].rightNode;
+            sf::Vector2f startPositionV = nodes[idV].getPosition();
+            sf::Vector2f goalPositionV = tmp.nodes[idV].getPosition();
+            sf::Vector2f uPosition = startPositionU + (goalPositionU - startPositionU) * percent;
+            sf::Vector2f vPosition = startPositionV + (goalPositionV - startPositionV) * percent;
+            sf::RectangleShape line = getEdgeLine(uPosition, vPosition, 1);
+            line.setFillColor(AVL::color[theme][nodes[idU].rightEdgeType].outlineColor);
+            window.draw(line);
+        }
+    }
 }

@@ -7,7 +7,10 @@ struct AVLGraph{
     sf::Vector2f startPosition;
     AVLGraph(sf::Vector2f startPosition, sf::Font* font);
 
+    int getParent(int id);
     int getMexID();
+    int getHeigth(int id);
+    int getBalanceFactor(int id);
     sf::RectangleShape getEdgeLine(sf::Vector2f startPosition, sf::Vector2f endPosition, float percent);
 
     void arrange(int id, sf::Vector2f position, int depth);

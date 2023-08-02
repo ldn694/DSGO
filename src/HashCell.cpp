@@ -14,6 +14,7 @@ HashCell::HashCell(float _x, float _y, sf::Font* font, Hash::ColorType _type) :
     antiDiagonal.setOrigin(antiDiagonal.getLocalBounds().left + antiDiagonal.getLocalBounds().width, antiDiagonal.getLocalBounds().top  + antiDiagonal.getLocalBounds().height / 2);
     antiDiagonal.setRotation(-45);
     valueText.setFont(*font);
+    valueText.setStyle(sf::Text::Bold);
     valueText.setString(intToString(value));
     valueText.setCharacterSize(sizeValueLetterHash);
     valueText.setOrigin(valueText.getLocalBounds().left + valueText.getLocalBounds().width / 2, valueText.getLocalBounds().top + valueText.getLocalBounds().height / 2);

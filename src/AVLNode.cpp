@@ -18,11 +18,12 @@
 // }
 
 AVLNode::AVLNode(sf::Vector2f pos, int value, sf::Font* font) :
-circle(radiusAVL), value(value), leftNode(-1), rightNode(-1){
+circle(radiusAVL), value(value), leftNode(-1), rightNode(-1), type(AVL::ColorType::normal), leftEdgeType(AVL::ColorType::normal), rightEdgeType(AVL::ColorType::normal){
     circle.setOrigin(radiusAVL / 2, radiusAVL / 2);
     circle.setPosition(pos);
     circle.setOutlineThickness(thicknessAVL);
     valueText.setFont(*font);
+    valueText.setStyle(sf::Text::Bold);
     valueText.setString(intToString(value));
     valueText.setCharacterSize(sizeValueLetterAVL);
     valueText.setOrigin(valueText.getLocalBounds().left + valueText.getLocalBounds().width / 2, valueText.getLocalBounds().top + valueText.getLocalBounds().height / 2);
@@ -162,6 +163,14 @@ void AVLNode::draw(sf::RenderWindow& window, ColorTheme theme, sf::Time totalTim
                     tmp.circle.setOutlineColor(newColor.outlineColor);
                     tmp.valueText.setFillColor(newColor.valueColor);
                     tmp.variableText.setFillColor(newColor.variableColor);
+                    break;
+                }
+                case SetLeftEdgeColorType: {
+                    tmp.leftEdgeType = AVL::ColorType(animations[i].nextValue);
+                    break;
+                }
+                case SetRightEdgeColorType: {
+                    tmp.rightEdgeType = AVL::ColorType(animations[i].nextValue);
                     break;
                 }
                 case Move: {

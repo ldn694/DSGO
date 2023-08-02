@@ -468,6 +468,22 @@ void Stage::setColorType(std::vector <Animation> &animations, int index, int nex
 	animations.push_back(tmp);
 }
 
+void Stage::setLeftEdgeColorType(std::vector <Animation> &animations, int index, int nextColorType) {
+	Animation tmp;
+	tmp.animationType = SetLeftEdgeColorType;
+	tmp.id1 = index;
+	tmp.nextValue = nextColorType;
+	animations.push_back(tmp);
+}
+
+void Stage::setRightEdgeColorType(std::vector <Animation> &animations, int index, int nextColorType) {
+	Animation tmp;
+	tmp.animationType = SetRightEdgeColorType;
+	tmp.id1 = index;
+	tmp.nextValue = nextColorType;
+	animations.push_back(tmp);
+}
+
 void Stage::setRoot(std::vector <Animation> &animations, int nextValue) {
 	Animation tmp;
 	tmp.animationType = SetRoot;

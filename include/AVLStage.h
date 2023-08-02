@@ -10,6 +10,8 @@ private:
 	std::pair<bool, ColorTheme> processEvents();
 	std::vector <AVLGraph> AVLList;
 	void setDefaultView();
+	void leftRotate(std::vector <Animation>& animations, int id);
+	void rightRotate(std::vector <Animation>& animations, int id);
 	void resetAnimation();
 	void addAnimationStep(std::vector <Animation> animations, sf::Time time, int line, std::string description);
 	void update(sf::Time deltaT);

@@ -36,12 +36,12 @@ int maxValueDataHash = 99;
 
 const bool LEFT = true;
 const bool RIGHT = false;
-const int maxHeightAVL = 5;
-const float sizeValueLetterAVL = 25;
-const float radiusAVL = 25;
+const int maxHeightAVL = 6;
+const float sizeValueLetterAVL = 15;
+const float radiusAVL = 15;
 const float thicknessAVL = 3;
-const float minHorizontalDistAVL = 60;
-const float verticalDistAVL = 120;
+const float minHorizontalDistAVL = 35;
+const float verticalDistAVL = 90;
 int maxSizeDataAVL = 31;
 int maxValueDataAVL = 99;
 
@@ -64,6 +64,8 @@ int stringToInt(std::string a) {
 }
 
 std::string intToString(int a) {
+	bool negative = a < 0;
+	a = abs(a);
 	std::string res;
 	while (a > 0) {
 		res.push_back(char(a % 10 + '0'));
@@ -72,6 +74,9 @@ std::string intToString(int a) {
 	reverse(res.begin(), res.end());
 	if (res.empty()) {
 		res.push_back('0');
+	}
+	if (negative) {
+		res = "-" + res;
 	}
 	return res;
 }
