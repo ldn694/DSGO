@@ -76,10 +76,10 @@ void AVLGraph::arrange(int id, sf::Vector2f position, int depth) {
             leftPosition = position + sf::Vector2f(-minHorizontalDistAVL / 2, verticalDistAVL);
             rightPosition = position + sf::Vector2f(minHorizontalDistAVL / 2, verticalDistAVL);
         }
-        if (nodes[id].leftNode != -1) {
+        if (nodes[id].leftNode != -1 && nodes.find(nodes[id].leftNode) != nodes.end()) {
             arrange(nodes[id].leftNode, leftPosition, depth + 1);
         }
-        if (nodes[id].rightNode != -1) {
+        if (nodes[id].rightNode != -1 && nodes.find(nodes[id].rightNode) != nodes.end()) {
             arrange(nodes[id].rightNode, rightPosition, depth + 1);
         } 
     }
@@ -87,24 +87,44 @@ void AVLGraph::arrange(int id, sf::Vector2f position, int depth) {
 
 void AVLGraph::arrangeAVLTrees() {
     if (root != -1) {
-        arrange(root, startPosition, 1);
+        if (nodes.find(root) != nodes.end()) {
+            arrange(root, startPosition, 1);
+        }
     }
 }
 
 AVLGraph AVLGraph::execAnimation(std::vector <Animation> animations) {
     AVLGraph tmp = *this;
     std::sort(animations.begin(), animations.end());
+    //std::cout << "------\n";
     for (int i = 0; i < animations.size(); i++) {
+        //std::cout << "before " << i << ":" << animations[i].animationType << " " << animations[i].id1 << "\n";
         switch (animations[i].animationType) {
+            case SetValue: {
+                if (tmp.nodes.find(animations[i].id1) == tmp.nodes.end()) {
+                    assert(false);
+                }
+                tmp.nodes[animations[i].id1].setValue(animations[i].nextValue);
+                break;
+            }
             case InsertVariable: {
+                if (tmp.nodes.find(animations[i].id1) == tmp.nodes.end()) {
+                    assert(false);
+                }
                 tmp.nodes[animations[i].id1].insertVariable(animations[i].variableList);
                 break;
             }
             case DeleteVariable: {
+                if (tmp.nodes.find(animations[i].id1) == tmp.nodes.end()) {
+                    assert(false);
+                }
                 tmp.nodes[animations[i].id1].deleteVariable(animations[i].variableList);
                 break;
             }
             case SetColorType: {
+                if (tmp.nodes.find(animations[i].id1) == tmp.nodes.end()) {
+                    assert(false);
+                }
                 tmp.nodes[animations[i].id1].setColorType(AVL::ColorType(animations[i].nextValue));
                 break;
             }
@@ -119,15 +139,22 @@ AVLGraph AVLGraph::execAnimation(std::vector <Animation> animations) {
                     assert(false);
                 }
                 tmp.nodes.erase(animations[i].id1);
+                //std::cout << "HAHA! " << tmp.nodes.size() << "\n";
                 tmp.arrangeAVLTrees();
                 break;
             }
             case SetLeftNode: {
+                if (tmp.nodes.find(animations[i].id1) == tmp.nodes.end()) {
+                    assert(false);
+                }
                 tmp.nodes[animations[i].id1].leftNode = animations[i].nextValue;
                 tmp.arrangeAVLTrees();
                 break;
             }
             case SetRightNode: {
+                if (tmp.nodes.find(animations[i].id1) == tmp.nodes.end()) {
+                    assert(false);
+                }
                 tmp.nodes[animations[i].id1].rightNode = animations[i].nextValue;
                 tmp.arrangeAVLTrees();
                 break;
@@ -154,6 +181,7 @@ AVLGraph AVLGraph::execAnimation(std::vector <Animation> animations) {
                 break;
             }
         }
+        //std::cout << "after " << i << ":" << animations[i].animationType << " " << tmp.nodes.size() << "\n";
     }
     return tmp;
 }
@@ -201,8 +229,11 @@ void AVLGraph::draw(sf::RenderWindow& window, ColorTheme theme, sf::Time totalTi
         }
     }
     for (int i = 0; i < animations.size(); i++) {
-        animationMap[animations[i].id1].push_back(animations[i]);
+        if (animations[i].id1 != -1) {
+            animationMap[animations[i].id1].push_back(animations[i]);
+        }
     }
+    // std::cout << animationMap.size() << " " << nodes.size() << " " << tmp.nodes.size() << "\n";
     for (auto x = animationMap.begin(); x != animationMap.end(); x++) {
         int id = x->first;
         if (nodes.find(id) == nodes.end()) { //New node

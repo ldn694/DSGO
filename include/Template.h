@@ -114,16 +114,17 @@ sf::Font* font(fontType id);
 sf::Text CompressWords(std::string cur, float x, float y, float width, float height, sf::Font* font, float characterSize, sf::Color color); //return cur with \n so that the width of sf::Text is not greater than width
 
 enum AnimationType {
-	AddNode, DeleteNode, SetLeftNode, SetRightNode, SetRoot,
+	AddNode, SetLeftNode, SetRightNode, SetRoot,
 	SetValue, SetState, SetSize,
 	SetColorType, Move, InsertVariable, DeleteVariable,
-	SetLeftEdgeColorType, SetRightEdgeColorType
+	SetLeftEdgeColorType, SetRightEdgeColorType,
+	DeleteNode
 };
 struct Animation {
 	AnimationType animationType;
-	int id1, id2 = 0;
-	int nextValue;
-	float nextPercent;
+	int id1 = -1, id2 = 0;
+	int nextValue = 0;
+	float nextPercent = 0.f;
 	std::vector <std::string> variableList;
 	sf::Vector2f nextPosition;
 	bool operator < (const Animation& other) const;

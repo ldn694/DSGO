@@ -85,14 +85,13 @@ AVLStage::AVLStage(sf::RenderWindow& window, ColorTheme theme) :
 			},
 			{
 				{
-					"int index = value % n, cnt = 0;",
-					"while (table[index].state != empty && cnt < n) {",
-    				"	if (table[index].state == full && table[index].value == value) {",
-        			"		table[index].state = deleted;",
-        			"		return;",
-    				"	}",
-    				"	index = (index + 1) % n; cnt++;",
-					"}"
+					"delete value",
+					"check balance factor of this node",
+    				"	case LL: rotateRight(this)",
+    				"	case RR: rotateLeft(this)",
+    				"	case LR: rotateLeft(this.left); rotateRight(this)",
+    				"	case RL: rotateRight(this.right); rotateLeft(this)",
+					"	case OK: continue"
 				}
 			},
 			{
@@ -118,13 +117,14 @@ AVLStage::AVLStage(sf::RenderWindow& window, ColorTheme theme) :
 
 void AVLStage::setDefaultView() {
 	std::vector <Animation> animations;
-	for (int i = 0; i < size; i++) {
+	for (auto x = AVLList.back().nodes.begin(); x != AVLList.back().nodes.end(); x++) {
+		int id = x->first;
 		// std::vector <std::string> variables = AVLList.back().nodes[i].getVariables();
 		// deleteVariable(animations, i, variables);
 		// insertVariable(animations, i, { intToString(i) });
-		setColorType(animations, i, AVL::ColorType::normal);
-		setLeftEdgeColorType(animations, i, AVL::ColorType::normal);
-		setRightEdgeColorType(animations, i, AVL::ColorType::normal);
+		setColorType(animations, id, AVL::ColorType::normal);
+		setLeftEdgeColorType(animations, id, AVL::ColorType::normal);
+		setRightEdgeColorType(animations, id, AVL::ColorType::normal);
 	}
 	addAnimationStep(animations, stepTime, -1, "Reformat for visualization");
 }
@@ -310,7 +310,260 @@ void AVLStage::insertValue(int value) {
 }
 
 void AVLStage::deleteValue(int value) {
-	
+	resetAnimation();
+	setAnimatingDirection(Continuous);
+	std::vector <Animation> animations;
+	if (size == 1) {
+		size--;
+		animations.clear();
+		setColorType(animations, AVLList.back().root, AVL::ColorType::highlight);
+		addAnimationStep(animations, stepTime, 0, "Empty tree");
+
+		animations.clear();
+		deleteNode(animations, AVLList.back().root);
+		setRoot(animations, -1);
+		addAnimationStep(animations, stepTime, 0, "Delete root");
+		return;
+	}
+	std::vector <int> idList;
+	int root = AVLList.back().root;
+	while (true) {
+		idList.push_back(root);
+		animations.clear();
+		setColorType(animations, root, AVL::ColorType::highlight);
+		addAnimationStep(animations, stepTime, 0, "Compare " + intToString(value) + " with " + intToString(AVLList.back().nodes[root].value));
+
+		if (AVLList.back().nodes[root].value == value) {
+			animations.clear();
+			setColorType(animations, root, AVL::ColorType::highlight2);
+			addAnimationStep(animations, stepTime, 0, "Found " + intToString(value) + ", start deleting");
+			break;
+		}
+		else if (AVLList.back().nodes[root].value > value) {
+			if (AVLList.back().nodes[root].leftNode == -1) {
+				animations.clear();
+				addAnimationStep(animations, stepTime, 0, "Not found " + intToString(value) + ", so we stop here");
+
+				setDefaultView();
+				return;
+			}
+			else {
+				animations.clear();
+				setColorType(animations, root, AVL::ColorType::lowlight);
+				setColorType(animations, AVLList.back().nodes[root].leftNode, AVL::ColorType::highlight);
+				setLeftEdgeColorType(animations, root, AVL::ColorType::highlight);
+				addAnimationStep(animations, stepTime, 0, "Go to the left child of " + intToString(AVLList.back().nodes[root].value));
+				root = AVLList.back().nodes[root].leftNode;
+			}
+		}
+		else {
+			if (AVLList.back().nodes[root].rightNode == -1) {
+				animations.clear();
+				addAnimationStep(animations, stepTime, 0, "Not found " + intToString(value) + ", so we stop here");
+
+				setDefaultView();
+				return;
+			}
+			else {
+				animations.clear();
+				setColorType(animations, root, AVL::ColorType::lowlight);
+				setColorType(animations, AVLList.back().nodes[root].rightNode, AVL::ColorType::highlight);
+				setRightEdgeColorType(animations, root, AVL::ColorType::highlight);
+				addAnimationStep(animations, stepTime, 0, "Go to the right child of " + intToString(AVLList.back().nodes[root].value));
+				root = AVLList.back().nodes[root].rightNode;
+			}
+		}
+	}
+	idList.pop_back();
+	if (AVLList.back().nodes[root].leftNode == -1 && AVLList.back().nodes[root].rightNode == -1) {
+		animations.clear();
+		int par = AVLList.back().getParent(root);
+		if (par != -1) {
+			if (AVLList.back().nodes[par].leftNode == root) {
+				setLeftNode(animations, par, -1);
+			}
+			else {
+				setRightNode(animations, par, -1);
+			}
+		}
+		deleteNode(animations, root);
+		addAnimationStep(animations, stepTime, 0, "Delete leaf node " + intToString(AVLList.back().nodes[root].value));
+	}
+	else if (AVLList.back().nodes[root].leftNode == -1) {
+		idList.push_back(AVLList.back().nodes[root].rightNode);
+
+		animations.clear();
+		setColorType(animations, AVLList.back().nodes[root].rightNode, AVL::ColorType::highlight);
+		setRightEdgeColorType(animations, root, AVL::ColorType::highlight);
+		addAnimationStep(animations, stepTime, 0, "Only has right child, so we replace it with its right child");
+
+		animations.clear();
+		int par = AVLList.back().getParent(root);
+		deleteNode(animations, root);
+		if (par != -1) {
+			bool isLeft = AVLList.back().nodes[par].leftNode == root;
+			if (isLeft) {
+				setLeftEdgeColorType(animations, par, AVL::ColorType::highlight);
+				setLeftNode(animations, par, AVLList.back().nodes[root].rightNode);
+			}
+			else {
+				setRightEdgeColorType(animations, par, AVL::ColorType::highlight);
+				setRightNode(animations, par, AVLList.back().nodes[root].rightNode);
+			}
+		}
+		else {
+			setRoot(animations, AVLList.back().nodes[root].rightNode);
+		}
+		addAnimationStep(animations, stepTime, 0, "Delete node " + intToString(AVLList.back().nodes[root].value));
+	}
+	else if (AVLList.back().nodes[root].rightNode == -1) {
+		idList.push_back(AVLList.back().nodes[root].leftNode);
+
+		animations.clear();
+		setColorType(animations, AVLList.back().nodes[root].leftNode, AVL::ColorType::highlight);
+		setLeftEdgeColorType(animations, root, AVL::ColorType::highlight);
+		addAnimationStep(animations, stepTime, 0, "Only has left child, so we replace it with its left child");
+
+		animations.clear();
+		int par = AVLList.back().getParent(root);
+		deleteNode(animations, root);
+		if (par != -1) {
+			bool isLeft = AVLList.back().nodes[par].leftNode == root;
+			if (isLeft) {
+				setLeftEdgeColorType(animations, par, AVL::ColorType::highlight);
+				setLeftNode(animations, par, AVLList.back().nodes[root].leftNode);
+			}
+			else {
+				setRightEdgeColorType(animations, par, AVL::ColorType::highlight);
+				setRightNode(animations, par, AVLList.back().nodes[root].leftNode);
+			}
+		}
+		else {
+			setRoot(animations, AVLList.back().nodes[root].leftNode);
+		}
+		addAnimationStep(animations, stepTime, 0, "Delete node " + intToString(AVLList.back().nodes[root].value));
+	}
+	else {
+		idList.push_back(root);
+		int u = AVLList.back().nodes[root].rightNode;
+		animations.clear();
+		setColorType(animations, u, AVL::ColorType::highlight);
+		setRightEdgeColorType(animations, root, AVL::ColorType::highlight);
+		addAnimationStep(animations, stepTime, 0, "Has both children, so we find the smallest node in the right subtree");
+
+		while (AVLList.back().nodes[u].leftNode != -1) {
+			idList.push_back(u);
+			animations.clear();
+			setColorType(animations, u, AVL::ColorType::lowlight);
+			setColorType(animations, AVLList.back().nodes[u].leftNode, AVL::ColorType::highlight);
+			setLeftEdgeColorType(animations, u, AVL::ColorType::highlight);
+			addAnimationStep(animations, stepTime, 0, "Go to the left child of " + intToString(AVLList.back().nodes[u].value));
+			u = AVLList.back().nodes[u].leftNode;
+		}
+
+		animations.clear();
+		setColorType(animations, u, AVL::ColorType::highlight2);
+		addAnimationStep(animations, stepTime, 0, "Found the smallest node in the right subtree");
+
+		animations.clear();
+		setValue(animations, root, AVLList.back().nodes[u].value);
+		setValue(animations, u, AVLList.back().nodes[root].value);
+		addAnimationStep(animations, stepTime, 0, "Swap the value of the node to be deleted with the smallest node in the right subtree");
+
+		animations.clear();
+		int par = AVLList.back().getParent(u);
+		deleteNode(animations, u);
+		if (par != -1) {
+			bool isLeft = AVLList.back().nodes[par].leftNode == u;
+			if (isLeft) {
+				setLeftEdgeColorType(animations, par, AVL::ColorType::highlight);
+				setLeftNode(animations, par, AVLList.back().nodes[u].rightNode);
+			}
+			else {
+				setRightEdgeColorType(animations, par, AVL::ColorType::highlight);
+				setRightNode(animations, par, AVLList.back().nodes[u].rightNode);
+			}
+		}
+		else {
+			setRoot(animations, AVLList.back().nodes[u].rightNode);
+		}
+		addAnimationStep(animations, stepTime, 0, "Delete node " + intToString(AVLList.back().nodes[u].value));
+	}
+
+	// for (int x : idList) {
+	// 	if (AVLList.back().nodes.find(x) == AVLList.back().nodes.end()) {
+	// 		assert(false);
+	// 	}
+	// 	std::cout << AVLList.back().nodes[x].value << " ";
+	// }
+
+	while (!idList.empty()) {
+		int id = idList.back();
+		idList.pop_back();
+		int par = idList.empty() ? -1 : idList.back();
+		animations.clear();
+		int bf = AVLList.back().getBalanceFactor(id);
+		insertVariable(animations, id, {"bf = " + intToString(bf)});
+		setColorType(animations, id, AVL::ColorType::highlight);
+		addAnimationStep(animations, stepTime, 1, "Calculate balance factor of " + intToString(AVLList.back().nodes[id].value));
+
+		AVLGraph& graph = AVLList.back();
+		int idLeft = graph.nodes[id].leftNode;
+		int idRight = graph.nodes[id].rightNode;
+		if (bf > 1) {
+			if (value < graph.nodes[idLeft].value) {//Left Left
+				animations.clear();
+				rightRotate(animations, id);
+				addAnimationStep(animations, stepTime, 2, "Left Left case, rotate right");
+			}
+			else {//Left Right
+				animations.clear();
+				int leftNode = AVLList.back().nodes[id].leftNode;
+				leftRotate(animations, leftNode);
+				addAnimationStep(animations, stepTime, 4, "Left Right case, rotate left " + intToString(AVLList.back().nodes[leftNode].value) + " first");
+				
+				animations.clear();
+				rightRotate(animations, id);
+				addAnimationStep(animations, stepTime, 4, "Then rotate right " + intToString(AVLList.back().nodes[id].value));
+			}
+		}
+		else if (graph.getBalanceFactor(id) < -1) {
+			if (value > graph.nodes[idRight].value) {//Right Right
+				animations.clear();
+				leftRotate(animations, id);
+				addAnimationStep(animations, stepTime, 3, "Right Right case, rotate left");
+			}
+			else {//Right Left
+				animations.clear();
+				int rightNode = AVLList.back().nodes[id].rightNode;
+				rightRotate(animations, rightNode);
+				addAnimationStep(animations, stepTime, 5, "Right Left case, rotate right " + intToString(AVLList.back().nodes[rightNode].value) + " first");
+				
+				animations.clear();
+				leftRotate(animations, id);
+				addAnimationStep(animations, stepTime, 5, "Then rotate left " + intToString(AVLList.back().nodes[id].value));
+			}
+		}
+		else {
+			animations.clear();
+			addAnimationStep(animations, stepTime, 6, "No need to rotate");
+		}
+		animations.clear();
+		deleteVariable(animations, id, AVLList.back().nodes[id].getVariables());
+		setColorType(animations, id, AVL::ColorType::normal);
+		if (par != -1) {
+			setLeftEdgeColorType(animations, par, AVL::ColorType::normal);
+			setRightEdgeColorType(animations, par, AVL::ColorType::normal);
+		}
+		if (!idList.empty()) {
+			addAnimationStep(animations, stepTime, -1, "Moving to its parent node");
+		}
+		else {
+			addAnimationStep(animations, stepTime, -1, "Finished");
+		}
+	}
+
+	setDefaultView();
 }
 
 void AVLStage::searchValue(int value) {
