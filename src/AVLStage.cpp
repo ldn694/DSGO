@@ -251,7 +251,7 @@ void AVLStage::insertValue(int value) {
 			int idLeft = graph.nodes[id].leftNode;
 			int idRight = graph.nodes[id].rightNode;
 			if (bf > 1) {
-				if (value < graph.nodes[idLeft].value) {//Left Left
+				if (graph.getBalanceFactor(idLeft) >= 0) {//Left Left
 					animations.clear();
 					rightRotate(animations, id);
 					addAnimationStep(animations, stepTime, 2, "Left Left case, rotate right");
@@ -268,7 +268,7 @@ void AVLStage::insertValue(int value) {
 				}
 			}
 			else if (graph.getBalanceFactor(id) < -1) {
-				if (value > graph.nodes[idRight].value) {//Right Right
+				if (graph.getBalanceFactor(idRight) <= 0) {//Right Right
 					animations.clear();
 					leftRotate(animations, id);
 					addAnimationStep(animations, stepTime, 3, "Right Right case, rotate left");
@@ -501,7 +501,7 @@ void AVLStage::deleteValue(int value) {
 		int idLeft = graph.nodes[id].leftNode;
 		int idRight = graph.nodes[id].rightNode;
 		if (bf > 1) {
-			if (value < graph.nodes[idLeft].value) {//Left Left
+			if (graph.getBalanceFactor(idLeft) >= 0) {//Left Left
 				animations.clear();
 				rightRotate(animations, id);
 				addAnimationStep(animations, stepTime, 2, "Left Left case, rotate right");
@@ -518,7 +518,7 @@ void AVLStage::deleteValue(int value) {
 			}
 		}
 		else if (graph.getBalanceFactor(id) < -1) {
-			if (value > graph.nodes[idRight].value) {//Right Right
+			if (graph.getBalanceFactor(idRight) <= 0) {//Right Right
 				animations.clear();
 				leftRotate(animations, id);
 				addAnimationStep(animations, stepTime, 3, "Right Right case, rotate left");
