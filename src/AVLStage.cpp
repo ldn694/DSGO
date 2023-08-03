@@ -96,13 +96,10 @@ AVLStage::AVLStage(sf::RenderWindow& window, ColorTheme theme) :
 			},
 			{
 				{
-					"int index = value % n, cnt = 0;",
-					"while (table[index].state != empty && cnt < n) {",
-    				"	if (table[index].state == full && table[index].value == value) {",
-        			"		return true;",
-    				"	}",
-    				"	index = (index + 1) % n; cnt++;",
-					"}"
+					"if this == null: return null",
+					"else if this.key == search value:return this",
+					"else if this.key < search value: search this.right",
+					"else search this.left"
 				}
 			}
 		},
@@ -331,7 +328,7 @@ void AVLStage::deleteValue(int value) {
 		idList.push_back(root);
 		animations.clear();
 		setColorType(animations, root, AVL::ColorType::highlight);
-		addAnimationStep(animations, stepTime, 0, "Compare " + intToString(value) + " with " + intToString(AVLList.back().nodes[root].value));
+		addAnimationStep(animations, stepTime, -1, "Compare " + intToString(value) + " with " + intToString(AVLList.back().nodes[root].value));
 
 		if (AVLList.back().nodes[root].value == value) {
 			animations.clear();
@@ -490,13 +487,6 @@ void AVLStage::deleteValue(int value) {
 		addAnimationStep(animations, stepTime, 0, "Delete node " + intToString(AVLList.back().nodes[u].value));
 	}
 
-	// for (int x : idList) {
-	// 	if (AVLList.back().nodes.find(x) == AVLList.back().nodes.end()) {
-	// 		assert(false);
-	// 	}
-	// 	std::cout << AVLList.back().nodes[x].value << " ";
-	// }
-
 	while (!idList.empty()) {
 		int id = idList.back();
 		idList.pop_back();
@@ -567,7 +557,58 @@ void AVLStage::deleteValue(int value) {
 }
 
 void AVLStage::searchValue(int value) {
+	resetAnimation();
+	setAnimatingDirection(Continuous);
+	std::vector <Animation> animations;
+	int root = AVLList.back().root;
+	while (true) {
+		animations.clear();
+		setColorType(animations, root, AVL::ColorType::highlight);
+		addAnimationStep(animations, stepTime, -1, "Compare " + intToString(value) + " with " + intToString(AVLList.back().nodes[root].value));
+
+		if (AVLList.back().nodes[root].value == value) {
+			animations.clear();
+			setColorType(animations, root, AVL::ColorType::highlight2);
+			addAnimationStep(animations, stepTime, 1, "Found " + intToString(value));
+			break;
+		}
+		else if (AVLList.back().nodes[root].value > value) {
+			if (AVLList.back().nodes[root].leftNode == -1) {
+				animations.clear();
+				addAnimationStep(animations, stepTime, 0, "Not found " + intToString(value) + ", so we stop here");
+
+				setDefaultView();
+				return;
+			}
+			else {
+				animations.clear();
+				setColorType(animations, root, AVL::ColorType::lowlight);
+				setColorType(animations, AVLList.back().nodes[root].leftNode, AVL::ColorType::highlight);
+				setLeftEdgeColorType(animations, root, AVL::ColorType::highlight);
+				addAnimationStep(animations, stepTime, 3, "Go to the left child of " + intToString(AVLList.back().nodes[root].value));
+				root = AVLList.back().nodes[root].leftNode;
+			}
+		}
+		else {
+			if (AVLList.back().nodes[root].rightNode == -1) {
+				animations.clear();
+				addAnimationStep(animations, stepTime, 0, "Not found " + intToString(value) + ", so we stop here");
+
+				setDefaultView();
+				return;
+			}
+			else {
+				animations.clear();
+				setColorType(animations, root, AVL::ColorType::lowlight);
+				setColorType(animations, AVLList.back().nodes[root].rightNode, AVL::ColorType::highlight);
+				setRightEdgeColorType(animations, root, AVL::ColorType::highlight);
+				addAnimationStep(animations, stepTime, 2, "Go to the right child of " + intToString(AVLList.back().nodes[root].value));
+				root = AVLList.back().nodes[root].rightNode;
+			}
+		}
+	}
 	
+	setDefaultView();
 }
 
 std::pair<bool, ColorTheme> AVLStage::processEvents() {

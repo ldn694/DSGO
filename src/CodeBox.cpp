@@ -23,7 +23,7 @@ void CodeBox::setLines(std::vector <std::string> lines) {
         float mid = (L + R) / 2;
         for (int j = 0; j < lines.size(); j++) {
             texts[j].setCharacterSize(mid);
-            totalHeight += texts[j].getLocalBounds().height;
+            totalHeight += texts[j].getLocalBounds().height * 1.5f;
             maxWidth = std::max(maxWidth, texts[j].getLocalBounds().width);
         }
         if (totalHeight > height * 0.9 || maxWidth > width * 1.9) {
@@ -39,8 +39,8 @@ void CodeBox::setLines(std::vector <std::string> lines) {
     }
     float curY = y + (height * 0.9 - finalTotalHeight) / 2;
     for (int i = 0; i < texts.size(); i++) {
-        texts[i].setPosition(x + width * 0.05, curY);
-        curY += texts[i].getLocalBounds().height;
+        texts[i].setPosition(x, curY + texts[i].getLocalBounds().height * 0.25f);
+        curY += texts[i].getLocalBounds().height * 1.5f;
     }
     slideBar.setBarWidth(width / (finalMaxWidth * (2.f/1.9f)));
 }
@@ -65,8 +65,8 @@ void CodeBox::draw(sf::RenderWindow& window, ColorTheme theme) {
     outerBox.draw(window, theme);
     if (highlightLine != -1) {
         sf::RectangleShape highlightRect;
-        highlightRect.setPosition(x, texts[highlightLine].getGlobalBounds().top);
-        highlightRect.setSize(sf::Vector2f(width, texts[highlightLine].getLocalBounds().height));
+        highlightRect.setPosition(x, texts[highlightLine].getGlobalBounds().top - texts[highlightLine].getLocalBounds().height * 0.25f);
+        highlightRect.setSize(sf::Vector2f(width, texts[highlightLine].getLocalBounds().height * 1.5f));
         highlightRect.setFillColor(codeHighlightBackGroundColor[theme]);
         window.draw(highlightRect);
     }
