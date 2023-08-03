@@ -109,7 +109,6 @@ AVLStage::AVLStage(sf::RenderWindow& window, ColorTheme theme) :
     rootPosition = sf::Vector2f((WIDTH_RES - 2 * widthBox) / 2 + 2 * widthBox, HEIGHT_RES / 4);
 	setDSName("AVL Tree");
 	AVLList.push_back(AVLGraph(rootPosition, font(fontType::Arial)));
-	size = 0;
 }
 
 void AVLStage::setDefaultView() {
@@ -168,10 +167,14 @@ void AVLStage::insertValue(int value) {
 	resetAnimation();
 	setAnimatingDirection(Continuous);
 	std::vector <Animation> animations;
+	if (AVLList.back().nodes.size() == maxSizeDataAVL) {
+		animations.clear();
+		addAnimationStep(animations, stepTime, 0, "Tree reached maximum nodes of " + intToString(maxSizeDataAVL) + ", can't insert more");
+		return;
+	}
 
 	int id = AVLList.back().getMexID();
-	if (size == 0) {
-		size++;
+	if (AVLList.back().nodes.size() == 0) {
 		animations.clear();
 		addNode(animations, id, value);
 		setColorType(animations, id, AVL::ColorType::highlight);
@@ -197,7 +200,6 @@ void AVLStage::insertValue(int value) {
 			}
 			else if (AVLList.back().nodes[root].value > value) {
 				if (AVLList.back().nodes[root].leftNode == -1) {
-					size++;
 					animations.clear();
 					addNode(animations, id, value);
 					setColorType(animations, id, AVL::ColorType::highlight);
@@ -217,7 +219,6 @@ void AVLStage::insertValue(int value) {
 			}
 			else {
 				if (AVLList.back().nodes[root].rightNode == -1) {
-					size++;
 					animations.clear();
 					addNode(animations, id, value);
 					setColorType(animations, id, AVL::ColorType::highlight);
@@ -310,8 +311,12 @@ void AVLStage::deleteValue(int value) {
 	resetAnimation();
 	setAnimatingDirection(Continuous);
 	std::vector <Animation> animations;
-	if (size == 1) {
-		size--;
+	if (AVLList.back().nodes.size() == 0) {
+		animations.clear();
+		addAnimationStep(animations, stepTime, -1, "Empty tree");
+		return;
+	}
+	if (AVLList.back().nodes.size() == 1) {
 		animations.clear();
 		setColorType(animations, AVLList.back().root, AVL::ColorType::highlight);
 		addAnimationStep(animations, stepTime, 0, "Empty tree");
@@ -641,7 +646,6 @@ std::pair<bool, ColorTheme> AVLStage::processEvents() {
 		if (operationName[curOperation] == "Create") {
 			if (modeString == "Random") {
 				int num = rand() % maxSizeDataAVL;
-				size = 0;
 				AVLList.clear();
 				AVLList.push_back(AVLGraph(rootPosition, font(fontType::Arial)));
 				for (int i = 0; i < num; i++) {
@@ -650,7 +654,6 @@ std::pair<bool, ColorTheme> AVLStage::processEvents() {
 				resetAnimation();
 			}
 			if (modeString == "Empty") {
-				size = 0;
 				AVLList.clear();
 				AVLList.push_back(AVLGraph(rootPosition, font(fontType::Arial)));
 				resetAnimation();
@@ -658,10 +661,9 @@ std::pair<bool, ColorTheme> AVLStage::processEvents() {
 			if (modeString == "Fixed Size") {
 				int v = valueTypingBox[0].getProperInt();
 				if (v != -1) {
-					size = 0;
 					AVLList.clear();
 					AVLList.push_back(AVLGraph(rootPosition, font(fontType::Arial)));
-					for (int i = 0; i < v; i++) {
+					while (AVLList.back().nodes.size() < v) {
 						insertValue(rand() % (maxValueDataAVL + 1));
 					}
 					resetAnimation();
@@ -670,7 +672,6 @@ std::pair<bool, ColorTheme> AVLStage::processEvents() {
 			if (modeString == "Manual") {
 				std::vector <int> values = valueTypingBox[0].getListInt();
 				if (values.empty() || values[0] != -1) {
-					size = 0;
 					AVLList.clear();
 					AVLList.push_back(AVLGraph(rootPosition, font(fontType::Arial)));
 					for (int i = 0; i < values.size(); i++) {
@@ -685,7 +686,6 @@ std::pair<bool, ColorTheme> AVLStage::processEvents() {
 					if (values[0] < 0) {
 						return { false, theme };
 					}
-					size = 0;
 					AVLList.clear();
 					AVLList.push_back(AVLGraph(rootPosition, font(fontType::Arial)));
 					for (int i = 0; i < values.size(); i++) {

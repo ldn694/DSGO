@@ -6,7 +6,6 @@
 struct AVLStage : public Stage {
 private:
     sf::Vector2f rootPosition;
-	int size;
 	std::pair<bool, ColorTheme> processEvents();
 	std::vector <AVLGraph> AVLList;
 	void setDefaultView();
