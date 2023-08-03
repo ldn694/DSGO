@@ -123,6 +123,8 @@ void AVLStage::setDefaultView() {
 		// deleteVariable(animations, i, variables);
 		// insertVariable(animations, i, { intToString(i) });
 		setColorType(animations, i, AVL::ColorType::normal);
+		setLeftEdgeColorType(animations, i, AVL::ColorType::normal);
+		setRightEdgeColorType(animations, i, AVL::ColorType::normal);
 	}
 	addAnimationStep(animations, stepTime, -1, "Reformat for visualization");
 }
@@ -203,6 +205,7 @@ void AVLStage::insertValue(int value) {
 					addNode(animations, id, value);
 					setColorType(animations, id, AVL::ColorType::highlight);
 					setLeftNode(animations, root, id);
+					setLeftEdgeColorType(animations, root, AVL::ColorType::highlight);
 					addAnimationStep(animations, stepTime, 0, "Insert " + intToString(value) + " to the left of " + intToString(AVLList.back().nodes[root].value));
 					break;
 				}
@@ -210,6 +213,7 @@ void AVLStage::insertValue(int value) {
 					animations.clear();
 					setColorType(animations, root, AVL::ColorType::lowlight);
 					setColorType(animations, AVLList.back().nodes[root].leftNode, AVL::ColorType::highlight);
+					setLeftEdgeColorType(animations, root, AVL::ColorType::highlight);
 					addAnimationStep(animations, stepTime, 0, "Go to the left child of " + intToString(AVLList.back().nodes[root].value));
 					root = AVLList.back().nodes[root].leftNode;
 				}
@@ -221,6 +225,7 @@ void AVLStage::insertValue(int value) {
 					addNode(animations, id, value);
 					setColorType(animations, id, AVL::ColorType::highlight);
 					setRightNode(animations, root, id);
+					setRightEdgeColorType(animations, root, AVL::ColorType::highlight);
 					addAnimationStep(animations, stepTime, 0, "Insert " + intToString(value) + " to the right of " + intToString(AVLList.back().nodes[root].value));
 					break;
 				}
@@ -228,6 +233,7 @@ void AVLStage::insertValue(int value) {
 					animations.clear();
 					setColorType(animations, root, AVL::ColorType::lowlight);
 					setColorType(animations, AVLList.back().nodes[root].rightNode, AVL::ColorType::highlight);
+					setRightEdgeColorType(animations, root, AVL::ColorType::highlight);
 					addAnimationStep(animations, stepTime, 0, "Go to the right child of " + intToString(AVLList.back().nodes[root].value));
 					root = AVLList.back().nodes[root].rightNode;
 				}
@@ -237,7 +243,7 @@ void AVLStage::insertValue(int value) {
 		while (!idList.empty()) {
 			int id = idList.back();
 			idList.pop_back();
-			
+			int par = idList.empty() ? -1 : idList.back();
 			animations.clear();
 			int bf = AVLList.back().getBalanceFactor(id);
 			insertVariable(animations, id, {"bf = " + intToString(bf)});
@@ -288,7 +294,11 @@ void AVLStage::insertValue(int value) {
 			animations.clear();
 			deleteVariable(animations, id, AVLList.back().nodes[id].getVariables());
 			setColorType(animations, id, AVL::ColorType::normal);
-			if (id != AVLList.back().root) {
+			if (par != -1) {
+				setLeftEdgeColorType(animations, par, AVL::ColorType::normal);
+				setRightEdgeColorType(animations, par, AVL::ColorType::normal);
+			}
+			if (!idList.empty()) {
 				addAnimationStep(animations, stepTime, -1, "Moving to its parent node");
 			}
 			else {

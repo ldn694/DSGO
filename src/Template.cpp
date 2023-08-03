@@ -40,8 +40,8 @@ const int maxHeightAVL = 6;
 const float sizeValueLetterAVL = 15;
 const float radiusAVL = 15;
 const float thicknessAVL = 3;
-const float minHorizontalDistAVL = 35;
-const float verticalDistAVL = 90;
+const float minHorizontalDistAVL = 37;
+const float verticalDistAVL = 100;
 int maxSizeDataAVL = 31;
 int maxValueDataAVL = 99;
 

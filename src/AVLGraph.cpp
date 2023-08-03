@@ -65,16 +65,24 @@ sf::RectangleShape AVLGraph::getEdgeLine(sf::Vector2f startPosition, sf::Vector2
 
 void AVLGraph::arrange(int id, sf::Vector2f position, int depth) {
     nodes[id].setPosition(position);
-    if (depth < maxHeightAVL) {
-        sf::Vector2f leftPosition = position + sf::Vector2f(-minHorizontalDistAVL / 2 * (1 << (maxHeightAVL - depth - 1)), verticalDistAVL);
-        sf::Vector2f rightPosition = position + sf::Vector2f(minHorizontalDistAVL / 2 * (1 << (maxHeightAVL - depth - 1)), verticalDistAVL);
+    if (depth <= maxHeightAVL) {
+        sf::Vector2f leftPosition;
+        sf::Vector2f rightPosition;
+        if (depth < maxHeightAVL) {
+            leftPosition = position + sf::Vector2f(-minHorizontalDistAVL / 2 * (1 << (maxHeightAVL - depth - 1)), verticalDistAVL);
+            rightPosition = position + sf::Vector2f(minHorizontalDistAVL / 2 * (1 << (maxHeightAVL - depth - 1)), verticalDistAVL);
+        }
+        else {
+            leftPosition = position + sf::Vector2f(-minHorizontalDistAVL / 2, verticalDistAVL);
+            rightPosition = position + sf::Vector2f(minHorizontalDistAVL / 2, verticalDistAVL);
+        }
         if (nodes[id].leftNode != -1) {
             arrange(nodes[id].leftNode, leftPosition, depth + 1);
         }
         if (nodes[id].rightNode != -1) {
             arrange(nodes[id].rightNode, rightPosition, depth + 1);
-        }
-    }    
+        } 
+    }
 }
 
 void AVLGraph::arrangeAVLTrees() {
@@ -125,10 +133,20 @@ AVLGraph AVLGraph::execAnimation(std::vector <Animation> animations) {
                 break;
             }
             case SetLeftEdgeColorType: {
+                if (tmp.nodes.find(animations[i].id1) == tmp.nodes.end()) {
+                    assert(false);
+                }
                 tmp.nodes[animations[i].id1].leftEdgeType = AVL::ColorType(animations[i].nextValue);
+                tmp.arrangeAVLTrees();
+                break;
             }
             case SetRightEdgeColorType: {
+                if (tmp.nodes.find(animations[i].id1) == tmp.nodes.end()) {
+                    assert(false);
+                }
                 tmp.nodes[animations[i].id1].rightEdgeType = AVL::ColorType(animations[i].nextValue);
+                tmp.arrangeAVLTrees();
+                break;
             }
             case SetRoot: {
                 tmp.root = animations[i].nextValue;
@@ -143,7 +161,6 @@ AVLGraph AVLGraph::execAnimation(std::vector <Animation> animations) {
 void AVLGraph::draw(sf::RenderWindow& window, ColorTheme theme, sf::Time totalTime, sf::Time timePassed, std::vector<Animation> animations) {
     if (timePassed < epsilonTime) {
         for (auto x = nodes.begin(); x != nodes.end(); x++) {
-            // std::cout << x->second.value << " " << x->second.leftNode << " " << x->second.rightNode << "\n";
             x->second.draw(window, theme);
             if (x->second.leftNode != -1) {
                 sf::RectangleShape line = getEdgeLine(x->second.getPosition(), nodes[x->second.leftNode].getPosition(), 1.f);
@@ -214,7 +231,12 @@ void AVLGraph::draw(sf::RenderWindow& window, ColorTheme theme, sf::Time totalTi
                 sf::Vector2f uPosition = startPositionU + (goalPositionU - startPositionU) * percent;
                 sf::Vector2f vPosition = startPositionV + (goalPositionV - startPositionV) * percent;
                 sf::RectangleShape line = getEdgeLine(uPosition, vPosition, 1 - percent);
-                line.setFillColor(AVL::color[theme][nodes[idU].leftEdgeType].outlineColor);
+                if (tmp.nodes.find(idU) == tmp.nodes.end()) {
+                    line.setFillColor(AVL::color[theme][nodes[idU].leftEdgeType].outlineColor);
+                }
+                else {
+                    line.setFillColor(AVL::color[theme][tmp.nodes[idU].leftEdgeType].outlineColor);
+                }
                 window.draw(line);
             }
         }
@@ -226,7 +248,12 @@ void AVLGraph::draw(sf::RenderWindow& window, ColorTheme theme, sf::Time totalTi
                 sf::Vector2f uPosition = startPositionU + (goalPositionU - startPositionU) * percent;
                 sf::Vector2f vPosition = startPositionV + (goalPositionV - startPositionV) * percent;
                 sf::RectangleShape line = getEdgeLine(uPosition, vPosition, 1 - percent);
-                line.setFillColor(AVL::color[theme][nodes[idU].rightEdgeType].outlineColor);
+                if (tmp.nodes.find(idU) == tmp.nodes.end()) {
+                    line.setFillColor(AVL::color[theme][nodes[idU].rightEdgeType].outlineColor);
+                }
+                else {
+                    line.setFillColor(AVL::color[theme][tmp.nodes[idU].rightEdgeType].outlineColor);
+                }
                 window.draw(line);
             }
         }
@@ -257,7 +284,7 @@ void AVLGraph::draw(sf::RenderWindow& window, ColorTheme theme, sf::Time totalTi
             sf::Vector2f uPosition = startPositionU + (goalPositionU - startPositionU) * percent;
             sf::Vector2f vPosition = startPositionV + (goalPositionV - startPositionV) * percent;
             sf::RectangleShape line = getEdgeLine(uPosition, vPosition, 1);
-            line.setFillColor(AVL::color[theme][nodes[idU].leftEdgeType].outlineColor);
+            line.setFillColor(AVL::color[theme][tmp.nodes[idU].leftEdgeType].outlineColor);
             window.draw(line);
         }
         if (tmp.nodes.find(idU) != tmp.nodes.end() && tmp.nodes[idU].rightNode == nodes[idU].rightNode && nodes[idU].rightNode != -1) {//same right edge
@@ -267,7 +294,7 @@ void AVLGraph::draw(sf::RenderWindow& window, ColorTheme theme, sf::Time totalTi
             sf::Vector2f uPosition = startPositionU + (goalPositionU - startPositionU) * percent;
             sf::Vector2f vPosition = startPositionV + (goalPositionV - startPositionV) * percent;
             sf::RectangleShape line = getEdgeLine(uPosition, vPosition, 1);
-            line.setFillColor(AVL::color[theme][nodes[idU].rightEdgeType].outlineColor);
+            line.setFillColor(AVL::color[theme][tmp.nodes[idU].rightEdgeType].outlineColor);
             window.draw(line);
         }
     }

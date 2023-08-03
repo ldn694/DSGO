@@ -29,6 +29,7 @@ circle(radiusAVL), value(value), leftNode(-1), rightNode(-1), type(AVL::ColorTyp
     valueText.setOrigin(valueText.getLocalBounds().left + valueText.getLocalBounds().width / 2, valueText.getLocalBounds().top + valueText.getLocalBounds().height / 2);
     valueText.setPosition(pos);
     variableText.setFont(*font);
+    variableText.setStyle(sf::Text::Bold);
     variableText.setString("");
     variableText.setCharacterSize(sizeValueLetterAVL);
     variableText.setOrigin(variableText.getLocalBounds().left + variableText.getLocalBounds().width / 2, variableText.getLocalBounds().top + variableText.getLocalBounds().height / 2);
