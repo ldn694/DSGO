@@ -671,7 +671,7 @@ std::pair<bool, ColorTheme> AVLStage::processEvents() {
 			}
 			if (modeString == "Manual") {
 				std::vector <int> values = valueTypingBox[0].getListInt();
-				if (values.empty() || values[0] != -1) {
+				if (values.empty() || values[0] >= 0) {
 					AVLList.clear();
 					AVLList.push_back(AVLGraph(rootPosition, font(fontType::Arial)));
 					for (int i = 0; i < values.size(); i++) {
