@@ -8,6 +8,8 @@ Game::Game(sf::ContextSettings settings) :
 {
 	hashTableBox = Box(410, 400, 360, 120, { CommandBoxNormal, CommandBoxSelected }, "Hash Table", font(fontType::Prototype), 30, NO_BORDER, 3);
 	AVLBox = Box(410, 550, 360, 120, { CommandBoxNormal, CommandBoxSelected }, "AVL Tree", font(fontType::Prototype), 30, NO_BORDER, 3);
+	minHeapBox = Box(800, 400, 360, 120, { CommandBoxNormal, CommandBoxSelected }, "Min Heap", font(fontType::Prototype), 30, NO_BORDER, 3);
+	maxHeapBox = Box(800, 550, 360, 120, { CommandBoxNormal, CommandBoxSelected }, "Max Heap", font(fontType::Prototype), 30, NO_BORDER, 3);
 	window.setMouseCursor(arrowCursor);
 	window.setFramerateLimit(60);
 	srand(time(NULL));
@@ -16,6 +18,8 @@ Game::Game(sf::ContextSettings settings) :
 void Game::handleMouseMove(float x, float y) {
 	if (hashTableBox.handleMouseMove(x, y, window)) return;
 	if (AVLBox.handleMouseMove(x, y, window)) return;
+	if (minHeapBox.handleMouseMove(x, y, window)) return;
+	if (maxHeapBox.handleMouseMove(x, y, window)) return;
 	if (themeBox.handleMouseMove(x, y, window)) return;
 	window.setMouseCursor(arrowCursor);
 }
@@ -36,6 +40,12 @@ void Game::processEvents()
 			}
 			else if (AVLBox.isInside(event.mouseButton.x, event.mouseButton.y)) {
 				runAVL();
+			}
+			else if (minHeapBox.isInside(event.mouseButton.x, event.mouseButton.y)) {
+				runMinHeap();
+			}
+			else if (maxHeapBox.isInside(event.mouseButton.x, event.mouseButton.y)) {
+				runMaxHeap();
 			}
 			else
 			if (themeBox.isMousePressed(event.mouseButton.x, event.mouseButton.y)) {
@@ -67,6 +77,8 @@ void Game::render() {
 	}
 	hashTableBox.draw(window, theme);
 	AVLBox.draw(window, theme);
+	minHeapBox.draw(window, theme);
+	maxHeapBox.draw(window, theme);
 	window.display();
 }
 
@@ -80,6 +92,18 @@ void Game::runAVL() {
 	window.setMouseCursor(waitCursor);
 	AVLStage AVL(window, theme);
 	theme = AVL.run();
+}
+
+void Game::runMinHeap() {
+	window.setMouseCursor(waitCursor);
+	HeapStage minHeap(window, theme, true);
+	theme = minHeap.run();
+}
+
+void Game::runMaxHeap() {
+	window.setMouseCursor(waitCursor);
+	HeapStage maxHeap(window, theme, false);
+	theme = maxHeap.run();
 }
 
 void Game::run() {

@@ -8,12 +8,13 @@
 #include "Template.h"
 #include "HashTableStage.h"
 #include "AVLStage.h"
+#include "HeapStage.h"
 
 struct Game {
 private:
 	ColorTheme theme;
     sf::RenderWindow window;
-	Box hashTableBox, AVLBox;
+	Box hashTableBox, AVLBox, minHeapBox, maxHeapBox;
 	MyShape lightBulb, darkBulb, themeBox;
 public:
 	Game(sf::ContextSettings settings);
@@ -27,5 +28,7 @@ public:
 	void update(sf::Time deltaT);
 	void runHashTable();
 	void runAVL();
+	void runMinHeap();
+	void runMaxHeap();
 	void run();
 };

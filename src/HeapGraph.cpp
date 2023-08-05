@@ -1,11 +1,11 @@
-#include "AVLGraph.h"
+#include "HeapGraph.h"
 
-AVLGraph::AVLGraph(sf::Vector2f startPosition, sf::Font* font) : startPosition(startPosition), font(font) {
+HeapGraph::HeapGraph(sf::Vector2f startPosition, sf::Font* font) : startPosition(startPosition), font(font) {
     nodes = std::map <int, AVLNode>();
     root = -1;
 }
 
-int AVLGraph::getMexID() {
+int HeapGraph::getMexID() {
     std::set <int> idSet;
     for (auto x = nodes.begin(); x != nodes.end(); x++) {
         idSet.insert(x->first);
@@ -20,38 +20,23 @@ int AVLGraph::getMexID() {
     assert(false);
 }
 
-int AVLGraph::getParent(int id) {
-    if (id == -1) {
+int HeapGraph::getParent(int id) {
+    if (id == 1) {
         return -1;
     }
-    for (auto x = nodes.begin(); x != nodes.end(); x++) {
-        if (x->second.leftNode == id || x->second.rightNode == id) {
-            return x->first;
-        }
-    }
-    return -1;
+    return id / 2;
 }
 
-int AVLGraph::getHeigth(int id) {
-    if (id == -1) {
-        return 0;
+int HeapGraph::getHeigth(int id) {
+    int h = 1;
+    while (id > 1) {
+        id /= 2;
+        h++;
     }
-    int trai = getHeigth(nodes[id].leftNode);
-    int phai = getHeigth(nodes[id].rightNode);
-    return std::max(trai, phai) + 1;
+    return h;
 }
 
-int AVLGraph::getBalanceFactor(int id) {
-    if (id == -1) {
-        return 0;
-    }
-    int trai = getHeigth(nodes[id].leftNode);
-    int phai = getHeigth(nodes[id].rightNode);
-    // std::cout << "bf " << id << " " << trai << " " << phai << "\n";
-    return trai - phai;
-}
-
-sf::RectangleShape AVLGraph::getEdgeLine(sf::Vector2f startPosition, sf::Vector2f endPosition, float percent) {
+sf::RectangleShape HeapGraph::getEdgeLine(sf::Vector2f startPosition, sf::Vector2f endPosition, float percent) {
     sf::Vector2f diff = endPosition - startPosition;
     if (length(diff) < 2 * (radiusAVL + thicknessAVL)) {
         return sf::RectangleShape();
@@ -63,7 +48,7 @@ sf::RectangleShape AVLGraph::getEdgeLine(sf::Vector2f startPosition, sf::Vector2
     return line;
 }
 
-void AVLGraph::arrange(int id, sf::Vector2f position, int depth) {
+void HeapGraph::arrange(int id, sf::Vector2f position, int depth) {
     nodes[id].setPosition(position);
     if (depth <= maxHeightAVL) {
         sf::Vector2f leftPosition;
@@ -85,7 +70,7 @@ void AVLGraph::arrange(int id, sf::Vector2f position, int depth) {
     }
 }
 
-void AVLGraph::arrangeAVLTrees() {
+void HeapGraph::arrangeAVLTrees() {
     if (root != -1) {
         if (nodes.find(root) != nodes.end()) {
             arrange(root, startPosition, 1);
@@ -93,8 +78,8 @@ void AVLGraph::arrangeAVLTrees() {
     }
 }
 
-AVLGraph AVLGraph::execAnimation(std::vector <Animation> animations) {
-    AVLGraph tmp = *this;
+HeapGraph HeapGraph::execAnimation(std::vector <Animation> animations) {
+    HeapGraph tmp = *this;
     std::sort(animations.begin(), animations.end());
     //std::cout << "------\n";
     for (int i = 0; i < animations.size(); i++) {
@@ -186,7 +171,7 @@ AVLGraph AVLGraph::execAnimation(std::vector <Animation> animations) {
     return tmp;
 }
 
-void AVLGraph::draw(sf::RenderWindow& window, ColorTheme theme, sf::Time totalTime, sf::Time timePassed, std::vector<Animation> animations) {
+void HeapGraph::draw(sf::RenderWindow& window, ColorTheme theme, sf::Time totalTime, sf::Time timePassed, std::vector<Animation> animations) {
     if (timePassed < epsilonTime) {
         for (auto x = nodes.begin(); x != nodes.end(); x++) {
             x->second.draw(window, theme);
@@ -207,7 +192,7 @@ void AVLGraph::draw(sf::RenderWindow& window, ColorTheme theme, sf::Time totalTi
         }
     }
     float percent = (totalTime < epsilonTime ? 1.f : timePassed / totalTime);
-    AVLGraph tmp = execAnimation(animations);
+    HeapGraph tmp = execAnimation(animations);
     std::map <int, std::vector <Animation> > animationMap;
     for (auto x = nodes.begin(); x != nodes.end(); x++) {
         animationMap[x->first] = std::vector <Animation>();
@@ -321,7 +306,7 @@ void AVLGraph::draw(sf::RenderWindow& window, ColorTheme theme, sf::Time totalTi
         }
     }
     //Draw nodes
-    for (auto x = animationMap.begin(); x != animationMap.end(); x++) {
+     for (auto x = animationMap.begin(); x != animationMap.end(); x++) {
         int id = x->first;
         if (nodes.find(id) == nodes.end()) { //New node
             tmp.nodes[id].draw(window, theme, totalTime, timePassed, x->second);

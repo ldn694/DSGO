@@ -45,6 +45,15 @@ const float verticalDistAVL = 100;
 int maxSizeDataAVL = 31;
 int maxValueDataAVL = 99;
 
+const int maxHeightHeap = 6;
+const float sizeValueLetterHeap = 15;
+const float radiusHeap = 15;
+const float thicknessHeap = 3;
+const float minHorizontalDistHeap = 37;
+const float verticalDistHeap = 100;
+int maxSizeDataHeap = 63;
+int maxValueDataHeap = 99;
+
 const int UNKOWN = -(1e9 + 7);
 
 const int maxLetter = 4;

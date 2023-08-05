@@ -29,7 +29,7 @@ circle(radiusAVL), value(value), leftNode(-1), rightNode(-1), type(AVL::ColorTyp
     valueText.setOrigin(valueText.getLocalBounds().left + valueText.getLocalBounds().width / 2, valueText.getLocalBounds().top + valueText.getLocalBounds().height / 2);
     valueText.setPosition(pos);
     variableText.setFont(*font);
-    variableText.setStyle(sf::Text::Bold);
+    //variableText.setStyle(sf::Text::Bold);
     variableText.setString("");
     variableText.setCharacterSize(sizeValueLetterAVL);
     variableText.setOrigin(variableText.getLocalBounds().left + variableText.getLocalBounds().width / 2, variableText.getLocalBounds().top + variableText.getLocalBounds().height / 2);
@@ -101,7 +101,7 @@ void AVLNode::insertVariable(std::string variable) {
 }
 
 void AVLNode::deleteVariable(std::string variable) {
-    variableList.erase(variable);
+    variableList.erase(variableList.find(variable));
     variableText.setString(getVariableString());
     variableText.setOrigin(variableText.getLocalBounds().left + variableText.getLocalBounds().width / 2, variableText.getLocalBounds().top + variableText.getLocalBounds().height / 2);
     variableText.setPosition(circle.getPosition().x, circle.getPosition().y + radiusAVL * 2);
@@ -118,7 +118,7 @@ void AVLNode::insertVariable(std::vector <std::string> variables) {
 
 void AVLNode::deleteVariable(std::vector <std::string> variables) {
     for (auto variable : variables) {
-        variableList.erase(variable);
+        variableList.erase(variableList.find(variable));
     }
     variableText.setString(getVariableString());
     variableText.setOrigin(variableText.getLocalBounds().left + variableText.getLocalBounds().width / 2, variableText.getLocalBounds().top + variableText.getLocalBounds().height / 2);

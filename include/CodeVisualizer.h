@@ -1,3 +1,4 @@
+#pragma once
 #include "Template.h"
 #include "Color.h"
 #include "CodeBox.h"

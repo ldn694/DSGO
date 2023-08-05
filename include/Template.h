@@ -62,6 +62,16 @@ extern const float verticalDistAVL;
 extern int maxSizeDataAVL;
 extern int maxValueDataAVL;
 
+
+extern const int maxHeightHeap;
+extern const float sizeValueLetterHeap;
+extern const float radiusHeap;
+extern const float thicknessHeap;
+extern const float minHorizontalDistHeap;
+extern const float verticalDistHeap;
+extern int maxSizeDataHeap;
+extern int maxValueDataHeap;
+
 extern const int UNKOWN;
 
 extern const int maxLetter;
@@ -116,7 +126,7 @@ sf::Text CompressWords(std::string cur, float x, float y, float width, float hei
 enum AnimationType {
 	AddNode, SetLeftNode, SetRightNode, SetRoot,
 	SetValue, SetState, SetSize,
-	SetColorType, Move, InsertVariable, DeleteVariable,
+	SetColorType, Move, DeleteVariable, InsertVariable,
 	SetLeftEdgeColorType, SetRightEdgeColorType,
 	DeleteNode
 };

@@ -61,6 +61,10 @@ add_executable(DSGO
 	include/AVLGraph.h
 	src/AVLStage.cpp
 	include/AVLStage.h
+	src/HeapGraph.cpp
+	include/HeapGraph.h
+	src/HeapStage.cpp
+	include/HeapStage.h
 	)
 
 target_link_libraries(DSGO PRIVATE sfml-graphics)
