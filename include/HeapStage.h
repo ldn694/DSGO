@@ -19,8 +19,9 @@ private:
 	void render();
 
 	void insertValue(int value);
-	void deleteValue(int value);
-	void getTop();
+	void deleteValue(int hID);
+	void getTop(bool isDelete = false);
+	void getSize();
 public:
 	HeapStage(sf::RenderWindow& window, ColorTheme theme = LightTheme, bool isMinHeap = true);
 	ColorTheme run();

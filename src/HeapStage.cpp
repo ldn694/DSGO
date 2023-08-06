@@ -3,11 +3,12 @@
 #include "Template.h"
 
 HeapStage::HeapStage(sf::RenderWindow& window, ColorTheme theme, bool isMinHeap) :
-	Stage(window, { "Create", "Insert", "Delete", "Get Top"},
+	Stage(window, { "Create", "Insert", "Delete", "Get Top", "Get Size"},
 		{
 			{"Random", "Empty", "Fixed Size", "Manual", "Upload File"},
 			{"v = ?"},
 			{"v = ?"},
+			{""},
 			{""}
 		},
 		{
@@ -23,6 +24,9 @@ HeapStage::HeapStage(sf::RenderWindow& window, ColorTheme theme, bool isMinHeap)
 			},
 			{
 				{"v ="}
+			},
+			{
+				{}
 			},
 			{
 				{}
@@ -44,6 +48,9 @@ HeapStage::HeapStage(sf::RenderWindow& window, ColorTheme theme, bool isMinHeap)
 			},
 			{
 				{}
+			},
+			{
+				{}
 			}
 		},
 		{
@@ -59,6 +66,9 @@ HeapStage::HeapStage(sf::RenderWindow& window, ColorTheme theme, bool isMinHeap)
 			},
 			{
 				{{&zeroInt, &maxValueDataHeap}}
+			},
+			{
+				{}
 			},
 			{
 				{}
@@ -82,7 +92,9 @@ HeapStage::HeapStage(sf::RenderWindow& window, ColorTheme theme, bool isMinHeap)
 			},
 			{
 				{
-					
+					"A[i] = A[1]+1;",
+					"shiftup(i);",
+					"getTop()"
 				}
 			},
 			{
@@ -93,6 +105,11 @@ HeapStage::HeapStage(sf::RenderWindow& window, ColorTheme theme, bool isMinHeap)
 					"while (i * 2 <= A.length)",
   					(isMinHeap ? "	if A[i] > (L = the smaller of i's children)" : "	if A[i] < (L = the larger of i's children)"),
     				"		swap(A[i], L); i = L's index"
+				}
+			},
+			{
+				{
+					"return A.length"
 				}
 			}
 		},
@@ -209,24 +226,11 @@ void HeapStage::insertValue(int value) {
 	setDefaultView();
 }
 
-void HeapStage::deleteValue(int value) {
-	resetAnimation();
-	setAnimatingDirection(Continuous);
-	
-	std::vector <Animation> animations;
-
-	animations.clear();
-	setColorType(animations, 1, Heap::ColorType::highlight);
-	addAnimationStep(animations, stepTime, 0, "Delete " + intToString(value));
-
-	animations.clear();
-	setColorType(animations, 1, Heap::ColorType::normal);
-	addAnimationStep(animations, stepTime, 1, "Set i = 1");
-}
-
-void HeapStage::getTop() {
-	resetAnimation();
-	setAnimatingDirection(Continuous);
+void HeapStage::getTop(bool isDelete) {
+	if (!isDelete) {
+		resetAnimation();
+		setAnimatingDirection(Continuous);
+	}
 
 	std::vector <Animation> animations;
 
@@ -239,26 +243,26 @@ void HeapStage::getTop() {
 	if (HeapList.back().nodes.size() == 1) {
 		animations.clear();
 		setColorType(animations, HeapList.back().getRealID(1), Heap::ColorType::highlight);
-		addAnimationStep(animations, stepTime, 0, "Get top");
+		addAnimationStep(animations, stepTime, isDelete ? 2 : 0, "Get top");
 
 		animations.clear();
 		int topRealID = HeapList.back().getRealID(1);
 		setColorType(animations, topRealID, Heap::ColorType::highlight);
-		addAnimationStep(animations, stepTime, 1, "Swap A[1] and A[length]");
+		addAnimationStep(animations, stepTime, isDelete ? 2 : 1, "Swap A[1] and A[length]");
 
 		animations.clear();
 		deleteNode(animations, topRealID);
-		addAnimationStep(animations, stepTime, 2, "Delete A[length] (which is previously the top), set i = 1");
+		addAnimationStep(animations, stepTime, isDelete ? 2 : 2, "Delete A[length] (which is previously the top), set i = 1");
 
 		animations.clear();
-		addAnimationStep(animations, stepTime, 3, "Empty heap, so stop loop");
+		addAnimationStep(animations, stepTime, isDelete ? 2 : 3, "Empty heap, so stop loop");
 
 		return;
 	}
 
 	animations.clear();
 	setColorType(animations, HeapList.back().getRealID(1), Heap::ColorType::highlight);
-	addAnimationStep(animations, stepTime, 0, "Get top");
+	addAnimationStep(animations, stepTime, isDelete ? 2 : 0, "Get top");
 
 	animations.clear();
 	int topRealID = HeapList.back().getRealID(1);
@@ -270,25 +274,25 @@ void HeapStage::getTop() {
 	deleteVariable(animations, botRealID, { intToString(HeapList.back().nodes.size()) });
 	insertVariable(animations, topRealID, { intToString(HeapList.back().nodes.size()) });
 	insertVariable(animations, botRealID, { intToString(1) });
-	addAnimationStep(animations, stepTime, 1, "Swap A[1] and A[length]");
+	addAnimationStep(animations, stepTime, isDelete ? 2 : 1, "Swap A[1] and A[length]");
 
 	animations.clear();
 	deleteNode(animations, topRealID);
 	insertVariable(animations, botRealID, { "i = " + intToString(1) });
-	addAnimationStep(animations, stepTime, 2, "Delete A[length] (which is previously the top), set i = 1");
+	addAnimationStep(animations, stepTime, isDelete ? 2 : 2, "Delete A[length] (which is previously the top), set i = 1");
 
 	int i = 1;
 	while (true) {
 		if (i * 2 > HeapList.back().nodes.size()) {
 			animations.clear();
-			addAnimationStep(animations, stepTime, 3, "Reached the leaf, so stop loop");
+			addAnimationStep(animations, stepTime, isDelete ? 2 : 3, "Reached the leaf, so stop loop");
 
 			setDefaultView();
 			return;
 		}
 		animations.clear();
 		setColorType(animations, HeapList.back().getRealID(i), Heap::ColorType::highlight);
-		addAnimationStep(animations, stepTime, 3, "Not the leaf, so continue loop");
+		addAnimationStep(animations, stepTime, isDelete ? 2 : 3, "Not the leaf, so continue loop");
 
 		animations.clear();
 		int realID = HeapList.back().getRealID(i);
@@ -302,7 +306,7 @@ void HeapStage::getTop() {
 			other = compare(HeapList.back().nodes[leftRealID].value, HeapList.back().nodes[rightRealID].value) ? rightRealID : leftRealID;
 			setColorType(animations, rightRealID, Heap::ColorType::lowlight);
 		}
-		addAnimationStep(animations, stepTime, 4, "Compare A[" + intToString(i) + "] to A[" + intToString(i * 2) + "] and A[" + intToString(i * 2 + 1) + "], choose the " + (isMinHeap ? "smaller" : "bigger") + " one");
+		addAnimationStep(animations, stepTime, isDelete ? 2 : 4, "Compare A[" + intToString(i) + "] to A[" + intToString(i * 2) + "] and A[" + intToString(i * 2 + 1) + "], choose the " + (isMinHeap ? "smaller" : "bigger") + " one");
 
 		if (!compare(HeapList.back().nodes[realID].value, HeapList.back().nodes[realP].value)) {
 			animations.clear();
@@ -314,7 +318,7 @@ void HeapStage::getTop() {
 			if (other != -1) {
 				setColorType(animations, other, Heap::ColorType::normal);
 			}
-			addAnimationStep(animations, stepTime, 5, "A[" + intToString(i) + "] " + (isMinHeap ? ">" : "<") + " A[" + intToString(p) + "], so swap them");
+			addAnimationStep(animations, stepTime, isDelete ? 2 : 5, "A[" + intToString(i) + "] " + (isMinHeap ? ">" : "<") + " A[" + intToString(p) + "], so swap them");
 			i = p;
 		}
 		else {
@@ -322,13 +326,76 @@ void HeapStage::getTop() {
 			if (other != -1) {
 				setColorType(animations, other, Heap::ColorType::normal);
 			}
-			addAnimationStep(animations, stepTime, 5, "A[" + intToString(i) + "] " + (isMinHeap ? "<=" : ">=") + " A[" + intToString(p) + "], so stop loop");
+			addAnimationStep(animations, stepTime, isDelete ? 2 : 5, "A[" + intToString(i) + "] " + (isMinHeap ? "<=" : ">=") + " A[" + intToString(p) + "], so stop loop");
 			
 			setDefaultView();
 			return;
 		}
 	}
 	setDefaultView();
+}
+
+void HeapStage::deleteValue(int hID) {
+	resetAnimation();
+	setAnimatingDirection(Continuous);
+
+	std::vector <Animation> animations;
+
+	if (hID > HeapList.back().nodes.size()) {
+		animations.clear();
+		addAnimationStep(animations, stepTime, 0, "Invalid index, so stop here");
+
+		return;
+	}
+
+	animations.clear();
+	int realID = HeapList.back().getRealID(hID);
+	int realTopID = HeapList.back().getRealID(1);
+	setValue(animations, realID, HeapList.back().nodes[realTopID].value + 1);
+	setColorType(animations, realID, Heap::ColorType::highlight);
+	addAnimationStep(animations, stepTime, 0, "Set A[" + intToString(hID) + "] = A[1] + 1");
+
+	animations.clear();
+	insertVariable(animations, realID, { intToString(hID) });
+	addAnimationStep(animations, stepTime, 1, "Set i = " + intToString(hID));
+	int i = hID;
+	while (true) {
+		if (i == 1) {
+			animations.clear();
+			addAnimationStep(animations, stepTime, 1, "Reached the top, so stop shifting");
+			break;
+		}
+		else {
+			animations.clear();
+			int par = i / 2;
+			int realID = HeapList.back().getRealID(i);
+			int realPar = HeapList.back().getRealID(par);
+			if (compare(HeapList.back().nodes[realID].value, HeapList.back().nodes[realPar].value)) {
+				swapNode(animations, realID, realPar);
+				deleteVariable(animations, realID, { intToString(i) });
+				deleteVariable(animations, realPar, { intToString(par) });
+				insertVariable(animations, realID, { intToString(par) });
+				insertVariable(animations, realPar, { intToString(i) });
+				addAnimationStep(animations, stepTime, 1, "A[" + intToString(i) + "] " + (isMinHeap ? "<" : ">") + " A[" + intToString(par) + "], so swap them");
+				i = par;
+			}
+			else {
+				addAnimationStep(animations, stepTime, 1, "A[" + intToString(i) + "] " + (isMinHeap ? ">=" : "<=") + " A[" + intToString(par) + "], so stop shifting");
+				break;
+			}
+		}
+	}
+	getTop(true);
+}
+
+void HeapStage::getSize() {
+	resetAnimation();
+	setAnimatingDirection(Continuous);
+
+	std::vector <Animation> animations;
+
+	animations.clear();
+	addAnimationStep(animations, stepTime, 0, "size = " + intToString(HeapList.back().nodes.size()));
 }
 
 std::pair<bool, ColorTheme> HeapStage::processEvents() {
@@ -424,6 +491,9 @@ std::pair<bool, ColorTheme> HeapStage::processEvents() {
 		}
 		if (operationName[curOperation] == "Get Top") {
 			getTop();
+		}
+		if (operationName[curOperation] == "Get Size") {
+			getSize();
 		}
 		operating = false;
 	}

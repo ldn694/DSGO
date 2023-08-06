@@ -33,6 +33,9 @@ void SlideBar::setBarPosition(float mouseX, float mouseY) {
 }
 
 float SlideBar::getPercent() {
+    if (width - barWidth < epsilonFloat) {
+        return 0.f;
+    }
     return (bar.getPosition().x - x - barWidth / 2) / (width - barWidth);
 }
 
