@@ -95,6 +95,7 @@ public:
 	void setRoot(std::vector <Animation> &animations, int value);
 	void addNode(std::vector <Animation> &animations, int index, int value);
 	void deleteNode(std::vector <Animation> &animations, int index);
+	void swapNode(std::vector <Animation> &animations, int index1, int index2);
 	void setLeftNode(std::vector <Animation> &animations, int index, int value);
 	void setRightNode(std::vector <Animation> &animations, int index, int value);
 	void setLeftEdgeColorType(std::vector <Animation> &animations, int index, int nextColorType);

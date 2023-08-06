@@ -20,14 +20,45 @@ int HeapGraph::getMexID() {
     assert(false);
 }
 
-int HeapGraph::getParent(int id) {
-    if (id == 1) {
-        return -1;
+int HeapGraph::getRealID(int hID) {
+    for (auto x = nodes.begin(); x != nodes.end(); x++) {
+        if (heapID.find(x->first) != heapID.end() && heapID[x->first] == hID) {
+            return x->first;
+        }
     }
-    return id / 2;
+    return -1;
 }
 
-int HeapGraph::getHeigth(int id) {
+int HeapGraph::getRealParent(int id) {
+    if (heapID.find(id) == heapID.end()) {
+        return -1;
+    }
+    int hID = heapID[id];
+    if (hID == 1) {
+        return -1;
+    }
+    return getRealID(hID / 2);
+}
+
+int HeapGraph::getHeapID(int id) {
+    if (heapID.find(id) == heapID.end()) {
+        return -1;
+    }
+    return heapID[id];
+}
+
+int HeapGraph::getHeapParent(int id) {
+    if (heapID.find(id) == heapID.end()) {
+        return -1;
+    }
+    int hID = heapID[id];
+    if (hID == 1) {
+        return -1;
+    }
+    return hID / 2;
+}
+
+int HeapGraph::getHeapHeigth(int id) {
     int h = 1;
     while (id > 1) {
         id /= 2;
@@ -36,44 +67,58 @@ int HeapGraph::getHeigth(int id) {
     return h;
 }
 
+sf::Vector2f HeapGraph::getPosition(int id) {
+    if (id == 1) {
+        return startPosition;
+    }
+    if (id % 2 == 0) {
+        return getPosition(id / 2) + sf::Vector2f(-minHorizontalDistHeap / 2 * (1 << (maxHeightHeap - getHeapHeigth(id))), verticalDistHeap);
+    }
+    else {
+        return getPosition(id / 2) + sf::Vector2f(minHorizontalDistHeap / 2 * (1 << (maxHeightHeap - getHeapHeigth(id))), verticalDistHeap);
+    }
+}
+
 sf::RectangleShape HeapGraph::getEdgeLine(sf::Vector2f startPosition, sf::Vector2f endPosition, float percent) {
     sf::Vector2f diff = endPosition - startPosition;
-    if (length(diff) < 2 * (radiusAVL + thicknessAVL)) {
+    if (length(diff) < 2 * (radiusHeap + thicknessHeap)) {
         return sf::RectangleShape();
     }
-    sf::RectangleShape line(sf::Vector2f((length(diff) - 2 * (radiusAVL + thicknessAVL)) * percent, thicknessAVL));
-    line.setOrigin(0, thicknessAVL / 2);
-    line.setPosition(startPosition + normalize(diff) * (radiusAVL + thicknessAVL));
+    sf::RectangleShape line(sf::Vector2f((length(diff) - 2 * (radiusHeap + thicknessHeap)) * percent, thicknessHeap));
+    line.setOrigin(0, thicknessHeap / 2);
+    line.setPosition(startPosition + normalize(diff) * (radiusHeap + thicknessHeap));
     line.setRotation(atan2(diff.y, diff.x) * 180 / PI);
     return line;
 }
 
 void HeapGraph::arrange(int id, sf::Vector2f position, int depth) {
-    nodes[id].setPosition(position);
-    if (depth <= maxHeightAVL) {
+    nodes[getRealID(id)].setPosition(position);
+    if (depth <= maxHeightHeap) {
         sf::Vector2f leftPosition;
         sf::Vector2f rightPosition;
-        if (depth < maxHeightAVL) {
-            leftPosition = position + sf::Vector2f(-minHorizontalDistAVL / 2 * (1 << (maxHeightAVL - depth - 1)), verticalDistAVL);
-            rightPosition = position + sf::Vector2f(minHorizontalDistAVL / 2 * (1 << (maxHeightAVL - depth - 1)), verticalDistAVL);
+        if (depth < maxHeightHeap) {
+            leftPosition = position + sf::Vector2f(-minHorizontalDistHeap / 2 * (1 << (maxHeightHeap - depth - 1)), verticalDistHeap);
+            rightPosition = position + sf::Vector2f(minHorizontalDistHeap / 2 * (1 << (maxHeightHeap - depth - 1)), verticalDistHeap);
         }
         else {
-            leftPosition = position + sf::Vector2f(-minHorizontalDistAVL / 2, verticalDistAVL);
-            rightPosition = position + sf::Vector2f(minHorizontalDistAVL / 2, verticalDistAVL);
+            leftPosition = position + sf::Vector2f(-minHorizontalDistHeap / 2, verticalDistHeap);
+            rightPosition = position + sf::Vector2f(minHorizontalDistHeap / 2, verticalDistHeap);
         }
-        if (nodes[id].leftNode != -1 && nodes.find(nodes[id].leftNode) != nodes.end()) {
-            arrange(nodes[id].leftNode, leftPosition, depth + 1);
+        int idLeft = id * 2;
+        if (idLeft <= nodes.size()) {
+            arrange(idLeft, leftPosition, depth + 1);
         }
-        if (nodes[id].rightNode != -1 && nodes.find(nodes[id].rightNode) != nodes.end()) {
-            arrange(nodes[id].rightNode, rightPosition, depth + 1);
+        int idRight = id * 2 + 1;
+        if (idRight <= nodes.size()) {
+            arrange(idRight, rightPosition, depth + 1);
         } 
     }
 }
 
-void HeapGraph::arrangeAVLTrees() {
+void HeapGraph::arrangeHeapTrees() {
     if (root != -1) {
         if (nodes.find(root) != nodes.end()) {
-            arrange(root, startPosition, 1);
+            arrange(1, startPosition, 1);
         }
     }
 }
@@ -81,9 +126,10 @@ void HeapGraph::arrangeAVLTrees() {
 HeapGraph HeapGraph::execAnimation(std::vector <Animation> animations) {
     HeapGraph tmp = *this;
     std::sort(animations.begin(), animations.end());
-    //std::cout << "------\n";
+    // std::cout << "------\n";
+    // std::cout << "size = " << animations.size() << "\n";
     for (int i = 0; i < animations.size(); i++) {
-        //std::cout << "before " << i << ":" << animations[i].animationType << " " << animations[i].id1 << "\n";
+        //  std::cout << "before " << i << ":" << animations[i].animationType << " " << animations[i].id1 << " " << animations[i].id2 << "\n";
         switch (animations[i].animationType) {
             case SetValue: {
                 if (tmp.nodes.find(animations[i].id1) == tmp.nodes.end()) {
@@ -113,9 +159,24 @@ HeapGraph HeapGraph::execAnimation(std::vector <Animation> animations) {
                 tmp.nodes[animations[i].id1].setColorType(AVL::ColorType(animations[i].nextValue));
                 break;
             }
+            case SwapNode: {
+                if (tmp.nodes.find(animations[i].id1) == tmp.nodes.end() || tmp.nodes.find(animations[i].id2) == tmp.nodes.end()) {
+                    assert(false);
+                }
+                sf::Vector2f pos1 = tmp.nodes[animations[i].id1].getPosition();
+                sf::Vector2f pos2 = tmp.nodes[animations[i].id2].getPosition();
+                tmp.nodes[animations[i].id1].setPosition(pos2);
+                tmp.nodes[animations[i].id2].setPosition(pos1);
+                int backupID = tmp.heapID[animations[i].id1];
+                tmp.heapID[animations[i].id1] = tmp.heapID[animations[i].id2];
+                tmp.heapID[animations[i].id2] = backupID;
+                tmp.arrangeHeapTrees();
+                break;
+            }
             case AddNode: {
                 tmp.nodes[animations[i].id1] = AVLNode({0, 0}, animations[i].nextValue, font);
-                tmp.arrangeAVLTrees();
+                tmp.heapID[animations[i].id1] = tmp.nodes.size();
+                tmp.arrangeHeapTrees();
                 tmp.nodes[animations[i].id1].setSize(1.f);
                 break;
             }
@@ -124,8 +185,8 @@ HeapGraph HeapGraph::execAnimation(std::vector <Animation> animations) {
                     assert(false);
                 }
                 tmp.nodes.erase(animations[i].id1);
-                //std::cout << "HAHA! " << tmp.nodes.size() << "\n";
-                tmp.arrangeAVLTrees();
+                tmp.heapID.erase(animations[i].id1);
+                tmp.arrangeHeapTrees();
                 break;
             }
             case SetLeftNode: {
@@ -133,7 +194,7 @@ HeapGraph HeapGraph::execAnimation(std::vector <Animation> animations) {
                     assert(false);
                 }
                 tmp.nodes[animations[i].id1].leftNode = animations[i].nextValue;
-                tmp.arrangeAVLTrees();
+                tmp.arrangeHeapTrees();
                 break;
             }
             case SetRightNode: {
@@ -141,7 +202,7 @@ HeapGraph HeapGraph::execAnimation(std::vector <Animation> animations) {
                     assert(false);
                 }
                 tmp.nodes[animations[i].id1].rightNode = animations[i].nextValue;
-                tmp.arrangeAVLTrees();
+                tmp.arrangeHeapTrees();
                 break;
             }
             case SetLeftEdgeColorType: {
@@ -149,7 +210,7 @@ HeapGraph HeapGraph::execAnimation(std::vector <Animation> animations) {
                     assert(false);
                 }
                 tmp.nodes[animations[i].id1].leftEdgeType = AVL::ColorType(animations[i].nextValue);
-                tmp.arrangeAVLTrees();
+                tmp.arrangeHeapTrees();
                 break;
             }
             case SetRightEdgeColorType: {
@@ -157,16 +218,16 @@ HeapGraph HeapGraph::execAnimation(std::vector <Animation> animations) {
                     assert(false);
                 }
                 tmp.nodes[animations[i].id1].rightEdgeType = AVL::ColorType(animations[i].nextValue);
-                tmp.arrangeAVLTrees();
+                tmp.arrangeHeapTrees();
                 break;
             }
             case SetRoot: {
                 tmp.root = animations[i].nextValue;
-                tmp.arrangeAVLTrees();
+                tmp.arrangeHeapTrees();
                 break;
             }
         }
-        //std::cout << "after " << i << ":" << animations[i].animationType << " " << tmp.nodes.size() << "\n";
+        // std::cout << "after " << i << ":" << animations[i].animationType << " " << animations[i].id1 << " " << animations[i].id2 << "\n";
     }
     return tmp;
 }
@@ -175,17 +236,19 @@ void HeapGraph::draw(sf::RenderWindow& window, ColorTheme theme, sf::Time totalT
     if (timePassed < epsilonTime) {
         for (auto x = nodes.begin(); x != nodes.end(); x++) {
             x->second.draw(window, theme);
-            if (x->second.leftNode != -1) {
-                sf::RectangleShape line = getEdgeLine(x->second.getPosition(), nodes[x->second.leftNode].getPosition(), 1.f);
+            int idLeft = heapID[x->first] * 2;
+            if (idLeft <= nodes.size() && nodes.find(idLeft) != nodes.end()) {
+                sf::RectangleShape line = getEdgeLine(x->second.getPosition(), nodes[getRealID(idLeft)].getPosition(), 1.f);
                 if (line.getSize() != sf::Vector2f()) {
-                    line.setFillColor(AVL::color[theme][x->second.leftEdgeType].outlineColor);
+                    line.setFillColor(Heap::color[theme][x->second.leftEdgeType].outlineColor);
                     window.draw(line);
                 }
             }
-            if (x->second.rightNode != -1) {
-                sf::RectangleShape line = getEdgeLine(x->second.getPosition(), nodes[x->second.rightNode].getPosition(), 1.f);
+            int idRight = heapID[x->first] * 2 + 1;
+            if (idRight <= nodes.size() && nodes.find(idRight) != nodes.end()) {
+                sf::RectangleShape line = getEdgeLine(x->second.getPosition(), nodes[getRealID(idRight)].getPosition(), 1.f);
                 if (line.getSize() != sf::Vector2f()) {
-                    line.setFillColor(AVL::color[theme][x->second.rightEdgeType].outlineColor);
+                    line.setFillColor(Heap::color[theme][x->second.rightEdgeType].outlineColor);
                     window.draw(line);
                 }
             }
@@ -218,100 +281,64 @@ void HeapGraph::draw(sf::RenderWindow& window, ColorTheme theme, sf::Time totalT
             animationMap[animations[i].id1].push_back(animations[i]);
         }
     }
-    // std::cout << animationMap.size() << " " << nodes.size() << " " << tmp.nodes.size() << "\n";
     //Edges
-    for (auto x = nodes.begin(); x != nodes.end(); x++) {
-        int idU = x->first;
-        sf::Vector2f startPositionU = x->second.getPosition();
-        sf::Vector2f goalPositionU;
-        if (tmp.nodes.find(idU) == tmp.nodes.end()) {
-            goalPositionU = x->second.getPosition();
-        }
-        else {
-            goalPositionU = tmp.nodes[idU].getPosition();
-        }
-        if (nodes[idU].leftNode != -1) {//old left edge disappear
-            int idV = nodes[idU].leftNode;
-            sf::Vector2f startPositionV = nodes[idV].getPosition();
-            sf::Vector2f goalPositionV = tmp.nodes.find(idV) == tmp.nodes.end() ? nodes[idV].getPosition() : tmp.nodes[idV].getPosition();
-            if (tmp.nodes.find(idU) == tmp.nodes.end() || tmp.nodes[idU].leftNode != nodes[idU].leftNode) {
-                sf::Vector2f uPosition = startPositionU + (goalPositionU - startPositionU) * percent;
-                sf::Vector2f vPosition = startPositionV + (goalPositionV - startPositionV) * percent;
-                sf::RectangleShape line = getEdgeLine(uPosition, vPosition, 1 - percent);
-                if (tmp.nodes.find(idU) == tmp.nodes.end()) {
-                    line.setFillColor(AVL::color[theme][nodes[idU].leftEdgeType].outlineColor);
-                }
-                else {
-                    line.setFillColor(AVL::color[theme][tmp.nodes[idU].leftEdgeType].outlineColor);
-                }
+    for (int i = 1; i <= nodes.size(); i++) {
+        int idLeft = i * 2;
+        if (idLeft <= nodes.size() && idLeft > tmp.nodes.size()) {//left edge disappear
+            sf::RectangleShape line = getEdgeLine(getPosition(i), getPosition(idLeft), 1 - percent);
+            if (line.getSize() != sf::Vector2f()) {
+                line.setFillColor(Heap::color[theme][nodes[getRealID(i)].leftEdgeType].outlineColor);
                 window.draw(line);
             }
         }
-        if (nodes[idU].rightNode != -1) {//old right edge disappear
-            int idV = nodes[idU].rightNode;
-            sf::Vector2f startPositionV = nodes[idV].getPosition();
-            sf::Vector2f goalPositionV = tmp.nodes.find(idV) == tmp.nodes.end() ? nodes[idV].getPosition() : tmp.nodes[idV].getPosition();
-            if (tmp.nodes.find(idU) == tmp.nodes.end() || tmp.nodes[idU].rightNode != nodes[idU].rightNode) {
-                sf::Vector2f uPosition = startPositionU + (goalPositionU - startPositionU) * percent;
-                sf::Vector2f vPosition = startPositionV + (goalPositionV - startPositionV) * percent;
-                sf::RectangleShape line = getEdgeLine(uPosition, vPosition, 1 - percent);
-                if (tmp.nodes.find(idU) == tmp.nodes.end()) {
-                    line.setFillColor(AVL::color[theme][nodes[idU].rightEdgeType].outlineColor);
-                }
-                else {
-                    line.setFillColor(AVL::color[theme][tmp.nodes[idU].rightEdgeType].outlineColor);
-                }
+        if (idLeft > nodes.size() && idLeft <= tmp.nodes.size()) {//left edge appear
+            sf::RectangleShape line = getEdgeLine(getPosition(i), getPosition(idLeft), percent);
+            if (line.getSize() != sf::Vector2f()) {
+                line.setFillColor(Heap::color[theme][tmp.nodes[tmp.getRealID(i)].leftEdgeType].outlineColor);
                 window.draw(line);
             }
         }
-        if (tmp.nodes.find(idU) != tmp.nodes.end() && tmp.nodes[idU].leftNode != nodes[idU].leftNode && tmp.nodes[idU].leftNode != -1) {//new left edge appear
-            int idV = tmp.nodes[idU].leftNode;
-            sf::Vector2f startPositionV = nodes.find(idV) == nodes.end() ? tmp.nodes[idV].getPosition() : nodes[idV].getPosition();
-            sf::Vector2f goalPositionV = tmp.nodes[idV].getPosition();
-            sf::Vector2f uPosition = startPositionU + (goalPositionU - startPositionU) * percent;
-            sf::Vector2f vPosition = startPositionV + (goalPositionV - startPositionV) * percent;
-            sf::RectangleShape line = getEdgeLine(uPosition, vPosition, percent);
-            line.setFillColor(AVL::color[theme][tmp.nodes[idU].leftEdgeType].outlineColor);
-            window.draw(line);
+        if (idLeft <= nodes.size() && idLeft <= tmp.nodes.size()) {//same left edge
+            sf::RectangleShape line = getEdgeLine(getPosition(i), getPosition(idLeft), 1.f);
+            if (line.getSize() != sf::Vector2f()) {
+                line.setFillColor(Heap::color[theme][tmp.nodes[tmp.getRealID(i)].leftEdgeType].outlineColor);
+                window.draw(line);
+            }
         }
-        if (tmp.nodes.find(idU) != tmp.nodes.end() && tmp.nodes[idU].rightNode != nodes[idU].rightNode && tmp.nodes[idU].rightNode != -1) {//new right edge appear
-            int idV = tmp.nodes[idU].rightNode;
-            sf::Vector2f startPositionV = nodes.find(idV) == nodes.end() ? tmp.nodes[idV].getPosition() : nodes[idV].getPosition();
-            sf::Vector2f goalPositionV = tmp.nodes[idV].getPosition();
-            sf::Vector2f uPosition = startPositionU + (goalPositionU - startPositionU) * percent;
-            sf::Vector2f vPosition = startPositionV + (goalPositionV - startPositionV) * percent;
-            sf::RectangleShape line = getEdgeLine(uPosition, vPosition, percent);
-            line.setFillColor(AVL::color[theme][tmp.nodes[idU].rightEdgeType].outlineColor);
-            window.draw(line);
+        int idRight = i * 2 + 1;
+        if (idRight <= nodes.size() && idRight > tmp.nodes.size()) {//right edge disappear
+            sf::RectangleShape line = getEdgeLine(getPosition(i), getPosition(idRight), 1 - percent);
+            if (line.getSize() != sf::Vector2f()) {
+                line.setFillColor(Heap::color[theme][nodes[getRealID(i)].rightEdgeType].outlineColor);
+                window.draw(line);
+            }
         }
-        if (tmp.nodes.find(idU) != tmp.nodes.end() && tmp.nodes[idU].leftNode == nodes[idU].leftNode && nodes[idU].leftNode != -1) {//same left edge
-            int idV = nodes[idU].leftNode;
-            sf::Vector2f startPositionV = nodes[idV].getPosition();
-            sf::Vector2f goalPositionV = tmp.nodes[idV].getPosition();
-            sf::Vector2f uPosition = startPositionU + (goalPositionU - startPositionU) * percent;
-            sf::Vector2f vPosition = startPositionV + (goalPositionV - startPositionV) * percent;
-            sf::RectangleShape line = getEdgeLine(uPosition, vPosition, 1);
-            line.setFillColor(AVL::color[theme][tmp.nodes[idU].leftEdgeType].outlineColor);
-            window.draw(line);
+        if (idRight > nodes.size() && idRight <= tmp.nodes.size()) {//right edge appear
+            sf::RectangleShape line = getEdgeLine(getPosition(i), getPosition(idRight), percent);
+            if (line.getSize() != sf::Vector2f()) {
+                line.setFillColor(Heap::color[theme][tmp.nodes[tmp.getRealID(i)].rightEdgeType].outlineColor);
+                window.draw(line);
+            }
         }
-        if (tmp.nodes.find(idU) != tmp.nodes.end() && tmp.nodes[idU].rightNode == nodes[idU].rightNode && nodes[idU].rightNode != -1) {//same right edge
-            int idV = nodes[idU].rightNode;
-            sf::Vector2f startPositionV = nodes[idV].getPosition();
-            sf::Vector2f goalPositionV = tmp.nodes[idV].getPosition();
-            sf::Vector2f uPosition = startPositionU + (goalPositionU - startPositionU) * percent;
-            sf::Vector2f vPosition = startPositionV + (goalPositionV - startPositionV) * percent;
-            sf::RectangleShape line = getEdgeLine(uPosition, vPosition, 1);
-            line.setFillColor(AVL::color[theme][tmp.nodes[idU].rightEdgeType].outlineColor);
-            window.draw(line);
+        if (idRight <= nodes.size() && idRight <= tmp.nodes.size()) {//same right edge
+            sf::RectangleShape line = getEdgeLine(getPosition(i), getPosition(idRight), 1.f);
+            if (line.getSize() != sf::Vector2f()) {
+                line.setFillColor(Heap::color[theme][tmp.nodes[tmp.getRealID(i)].rightEdgeType].outlineColor);
+                window.draw(line);
+            }
         }
     }
     //Draw nodes
+    //system("cls");
+    // std::cout << "---\n";
      for (auto x = animationMap.begin(); x != animationMap.end(); x++) {
         int id = x->first;
         if (nodes.find(id) == nodes.end()) { //New node
+            // std::cout << "Drawing new node " << id << "\n";
             tmp.nodes[id].draw(window, theme, totalTime, timePassed, x->second);
         }
         else { //Old node
+            // std::cout << "Drawing old node " << id << "\n";
             nodes[id].draw(window, theme, totalTime, timePassed, x->second);
         }
     }

@@ -51,7 +51,7 @@ const float radiusHeap = 15;
 const float thicknessHeap = 3;
 const float minHorizontalDistHeap = 37;
 const float verticalDistHeap = 100;
-int maxSizeDataHeap = 63;
+int maxSizeDataHeap = 31;
 int maxValueDataHeap = 99;
 
 const int UNKOWN = -(1e9 + 7);

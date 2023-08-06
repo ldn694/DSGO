@@ -506,6 +506,14 @@ void Stage::deleteNode(std::vector <Animation> &animations, int index) {
 	animations.push_back(tmp);
 }
 
+void Stage::swapNode(std::vector <Animation> &animations, int index1, int index2) {
+	Animation tmp;
+	tmp.animationType = SwapNode;
+	tmp.id1 = index1;
+	tmp.id2 = index2;
+	animations.push_back(tmp);
+}
+
 void Stage::setLeftNode(std::vector <Animation> &animations, int index, int nextValue) {
 	Animation tmp;
 	tmp.animationType = SetLeftNode;

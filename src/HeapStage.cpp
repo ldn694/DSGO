@@ -125,7 +125,7 @@ void HeapStage::setDefaultView() {
 		int id = x->first;
 		std::vector <std::string> variables = HeapList.back().nodes[id].getVariables();
 		deleteVariable(animations, id, variables);
-		insertVariable(animations, id, { intToString(id) });
+		insertVariable(animations, id, { intToString(HeapList.back().heapID[id]) });
 		setColorType(animations, id, Heap::ColorType::normal);
 		setLeftEdgeColorType(animations, id, Heap::ColorType::normal);
 		setRightEdgeColorType(animations, id, Heap::ColorType::normal);
@@ -155,33 +155,19 @@ void HeapStage::insertValue(int value) {
 
 		return;
 	}
-	int id = size + 1;
-	int par = HeapList.back().getParent(id);
-	if (id % 2 == 0) {// Left node
-		animations.clear();
-		addNode(animations, id, value);
-		insertVariable(animations, id, { intToString(id) });
-		setColorType(animations, id, Heap::ColorType::highlight);
-		if (par != -1) {
-			setLeftNode(animations, par, id);
-		}
-		addAnimationStep(animations, stepTime, 0, "Insert " + intToString(value));
-	}
-	else {//Right node
-		animations.clear();
-		addNode(animations, id, value);
-		insertVariable(animations, id, { intToString(id) });
-		setColorType(animations, id, Heap::ColorType::highlight);
-		if (par != -1) {
-			setRightNode(animations, par, id);
-		}
-		addAnimationStep(animations, stepTime, 0, "Insert " + intToString(value));
-	}
+	HeapGraph& graph = HeapList.back();
+	int id = graph.getMexID();
 	animations.clear();
-	insertVariable(animations, id, {"i = " + intToString(id)});
-	addAnimationStep(animations, stepTime, 1, "Set i = " + intToString(id));
+	addNode(animations, id, value);
+	insertVariable(animations, id, { intToString(graph.nodes.size() + 1) });
+	setColorType(animations, id, Heap::ColorType::highlight);
+	addAnimationStep(animations, stepTime, 0, "Insert " + intToString(value));
 
-	int i = id;
+	animations.clear();
+	insertVariable(animations, id, {"i = " + intToString(HeapList.back().nodes.size())});
+	addAnimationStep(animations, stepTime, 1, "Set i = " + intToString(HeapList.back().nodes.size()));
+
+	int i = HeapList.back().nodes.size();
 	while (true) {
 		if (i == 1) {
 			animations.clear();
@@ -191,32 +177,33 @@ void HeapStage::insertValue(int value) {
 			return;
 		}
 		animations.clear();
+		HeapGraph& graph = HeapList.back();
 		int par = i / 2;
-		setColorType(animations, i, Heap::ColorType::highlight);
-		setColorType(animations, par, Heap::ColorType::highlight2);
+		int realI = graph.getRealID(i);
+		int realPar = graph.getRealID(par);
+		setColorType(animations, realPar, AVL::ColorType::lowlight);
 		addAnimationStep(animations, stepTime, 2, "Comparing A[" + intToString(i) + "] and A[" + intToString(par) + "]");
 
-		if (compare(HeapList.back().nodes[i].value, HeapList.back().nodes[par].value)) {
+		graph = HeapList.back();
+		if (compare(graph.nodes[realI].value, graph.nodes[realPar].value)) {
 			animations.clear();
-			setValue(animations, i, HeapList.back().nodes[par].value);
-			setValue(animations, par, HeapList.back().nodes[i].value);
-			setColorType(animations, i, Heap::ColorType::highlight2);
-			setColorType(animations, par, Heap::ColorType::highlight);
-			deleteVariable(animations, i, {"i = " + intToString(i) });
-			insertVariable(animations, par, {"i = " + intToString(par)});
+			swapNode(animations, realI, realPar);
+			deleteVariable(animations, realI, {"i = " + intToString(i), intToString(i) });
+			deleteVariable(animations, realPar, {intToString(par)});
+			insertVariable(animations, realI, {"i = " + intToString(par), intToString(par)});
+			insertVariable(animations, realPar, {intToString(i)});
 			addAnimationStep(animations, stepTime, 2, "A[" + intToString(i) + "] " + comparisonStr + " A[" + intToString(par) + "], so swap them");
+			
 
 			animations.clear();
-			setColorType(animations, i, Heap::ColorType::normal);
+			setColorType(animations, realPar, Heap::ColorType::normal);
 			addAnimationStep(animations, stepTime, 3, "Continue loop");
 
 			i = par;
 		}
 		else {
 			animations.clear();
-			setColorType(animations, i, Heap::ColorType::normal);
-			setColorType(animations, par, Heap::ColorType::normal);
-			addAnimationStep(animations, stepTime, 3, intToString(i) + " " + negativeComparisonStr + " " + intToString(par) + ", so stop loop");
+			addAnimationStep(animations, stepTime, 2, "A[" + intToString(i) + "] " + negativeComparisonStr + " A[" + intToString(par) + "], so stop loop");
 
 			setDefaultView();
 			return;

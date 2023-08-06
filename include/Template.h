@@ -124,7 +124,7 @@ sf::Font* font(fontType id);
 sf::Text CompressWords(std::string cur, float x, float y, float width, float height, sf::Font* font, float characterSize, sf::Color color); //return cur with \n so that the width of sf::Text is not greater than width
 
 enum AnimationType {
-	AddNode, SetLeftNode, SetRightNode, SetRoot,
+	AddNode, SwapNode, SetLeftNode, SetRightNode, SetRoot,
 	SetValue, SetState, SetSize,
 	SetColorType, Move, DeleteVariable, InsertVariable,
 	SetLeftEdgeColorType, SetRightEdgeColorType,
