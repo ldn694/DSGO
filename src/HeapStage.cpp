@@ -7,7 +7,7 @@ HeapStage::HeapStage(sf::RenderWindow& window, ColorTheme theme, bool isMinHeap)
 		{
 			{"Random", "Empty", "Fixed Size", "Manual", "Upload File"},
 			{"v = ?"},
-			{"v = ?"},
+			{"i = ?"},
 			{""},
 			{""}
 		},
@@ -23,7 +23,7 @@ HeapStage::HeapStage(sf::RenderWindow& window, ColorTheme theme, bool isMinHeap)
 				{"v ="}
 			},
 			{
-				{"v ="}
+				{"i ="}
 			},
 			{
 				{}
@@ -65,7 +65,7 @@ HeapStage::HeapStage(sf::RenderWindow& window, ColorTheme theme, bool isMinHeap)
 				{{&zeroInt, &maxValueDataHeap}}
 			},
 			{
-				{{&zeroInt, &maxValueDataHeap}}
+				{{&oneInt, &maxValueDataHeap}}
 			},
 			{
 				{}
