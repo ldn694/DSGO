@@ -78,12 +78,12 @@ std::vector <int> BTreeGraph::getMexGroupIDs(int size) {
 
 sf::RectangleShape BTreeGraph::getEdgeLine(sf::Vector2f startPosition, sf::Vector2f endPosition, float percent) {
     sf::Vector2f diff = endPosition - startPosition;
-    if (length(diff) < 2 * (edgeBTree + thicknessBTree)) {
+    if (length(diff) < epsilonFloat) {
         return sf::RectangleShape();
     }
-    sf::RectangleShape line(sf::Vector2f((length(diff) - 2 * (edgeBTree + thicknessBTree)) * percent, thicknessBTree));
+    sf::RectangleShape line(sf::Vector2f(length(diff) * percent, thicknessBTree));
     line.setOrigin(0, thicknessBTree / 2);
-    line.setPosition(startPosition + normalize(diff) * (edgeBTree + thicknessBTree));
+    line.setPosition(startPosition);
     line.setRotation(atan2(diff.y, diff.x) * 180 / PI);
     return line;
 }
@@ -219,6 +219,36 @@ int BTreeGraph::findEdgePos(int idGroup, int value) {
         }
     }
     return group.nodes.size();
+}
+
+sf::Vector2f BTreeGraph::getStartEdgePosition(int idGroup, int pos, sf::Vector2f curPosition) {
+    if (groups.find(idGroup) == groups.end()) {
+        assert(false);
+    }
+    auto& group = groups[idGroup];
+    if (pos < 0 || pos > group.nodes.size()) {
+        assert(false);
+    }
+    sf::Vector2f diff = curPosition - getPosition(idGroup);
+    if (pos == 0) {
+        return nodes[group.nodes[0]].getPosition() + sf::Vector2f(-edgeBTree / 2, edgeBTree / 2) + diff;
+    }
+    else if (pos == group.nodes.size()) {
+        return nodes[group.nodes.back()].getPosition() + sf::Vector2f(edgeBTree / 2, edgeBTree / 2) + diff;
+    }
+    else {
+        return (nodes[group.nodes[pos - 1]].getPosition() + nodes[group.nodes[pos]].getPosition()) / 2.f + sf::Vector2f(0, edgeBTree / 2) + diff;
+    }
+}
+
+sf::Vector2f BTreeGraph::getEndEdgePosition(int idGroup, sf::Vector2f curPosition) {
+    if (groups.find(idGroup) == groups.end()) {
+        assert(false);
+    }
+    if (groups[idGroup].nodes.empty()) {
+        return {0, 0};
+    }
+    return curPosition + sf::Vector2f(0, -edgeBTree / 2); 
 }
 
 void BTreeGraph::DFS(int id, int height, std::vector <std::vector <std::vector <int> > > &tour) {
@@ -405,6 +435,18 @@ void BTreeGraph::draw(sf::RenderWindow& window, ColorTheme theme, sf::Time total
         for (auto x = nodes.begin(); x != nodes.end(); x++) {
             x->second.draw(window, theme);
         }
+        for (auto x = groups.begin(); x != groups.end(); x++) {
+            int idU = x->first;
+            sf::Vector2f curPositionU = getPosition(idU);
+            for (int i = 0; i < 4; i++) {
+                if (x->second.listEdge.size() <= i || x->second.listEdge[i] == -1) continue;
+                int idV = x->second.listEdge[i];
+                sf::Vector2f curPositionV = getPosition(idV);
+                sf::RectangleShape line = getEdgeLine(getStartEdgePosition(idU, i, curPositionU), getEndEdgePosition(idV, curPositionV), 1.0f);
+                line.setFillColor(BTree::color[theme][BTree::ColorType::normal].outlineColor);
+                window.draw(line);
+            }
+        }
     }
     float percent = (totalTime < epsilonTime ? 1.f : timePassed / totalTime);
     BTreeGraph tmp = execAnimation(animations);
@@ -454,7 +496,50 @@ void BTreeGraph::draw(sf::RenderWindow& window, ColorTheme theme, sf::Time total
         }
     }
     //Edges
-    
+    for (auto x = tmp.groups.begin(); x != tmp.groups.end(); x++) {
+        int idU = x->first;
+        if (groups.find(idU) == groups.end()) {//new node U
+            for (int i = 0; i < x->second.listEdge.size(); i++) {
+                int idV = x->second.listEdge[i];
+                if (idV == -1) continue;
+                if (groups.find(idV) == groups.end()) {//new node V
+                    sf::Vector2f curPositionU = tmp.getPosition(idU);
+                    sf::Vector2f curPositionV = tmp.getPosition(idV);
+                    sf::RectangleShape line = getEdgeLine(tmp.getStartEdgePosition(idU, i, curPositionU), tmp.getEndEdgePosition(idV, curPositionV), percent);
+                    line.setFillColor(BTree::color[theme][BTree::ColorType::normal].outlineColor);
+                    window.draw(line);
+                }
+                else {//old node V
+                    sf::Vector2f curPositionU = tmp.getPosition(idU);
+                    sf::Vector2f curPositionV = getPosition(idV) + (tmp.getPosition(idV) - getPosition(idV)) * percent;
+                    sf::RectangleShape line = getEdgeLine(tmp.getStartEdgePosition(idU, i, curPositionU), getEndEdgePosition(idV, curPositionV), percent);
+                    line.setFillColor(BTree::color[theme][BTree::ColorType::normal].outlineColor);
+                    window.draw(line);
+                }
+            }
+        }
+        else {//old node U
+            for (int i = 0; i < x->second.listEdge.size(); i++) {
+                int idV = x->second.listEdge[i];
+                if (idV == -1) continue;
+                if (groups.find(idV) == groups.end()) {//new node V
+                    sf::Vector2f curPositionU = getPosition(idU) + (tmp.getPosition(idU) - getPosition(idU)) * percent;
+                    sf::Vector2f curPositionV = tmp.getPosition(idV);
+                    sf::RectangleShape line = getEdgeLine(tmp.getStartEdgePosition(idU, i, curPositionU), tmp.getEndEdgePosition(idV, curPositionV), percent);
+                    line.setFillColor(BTree::color[theme][BTree::ColorType::normal].outlineColor);
+                    window.draw(line);
+                }
+                else {//old node V
+                    sf::Vector2f curPositionU = getPosition(idU) + (tmp.getPosition(idU) - getPosition(idU)) * percent;
+                    sf::Vector2f curPositionV = getPosition(idV) + (tmp.getPosition(idV) - getPosition(idV)) * percent;
+                    sf::RectangleShape line = getEdgeLine(tmp.getStartEdgePosition(idU, i, curPositionU), getEndEdgePosition(idV, curPositionV), 1.0f);
+                    line.setFillColor(BTree::color[theme][BTree::ColorType::normal].outlineColor);
+                    window.draw(line);
+                }
+            }
+        }
+    }
+        
     //Draw nodes
     for (auto x = animationMap.begin(); x != animationMap.end(); x++) {
         int id = x->first;
