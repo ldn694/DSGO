@@ -9,12 +9,13 @@
 #include "HashTableStage.h"
 #include "AVLStage.h"
 #include "HeapStage.h"
+#include "BTreeStage.h"
 
 struct Game {
 private:
 	ColorTheme theme;
     sf::RenderWindow window;
-	Box hashTableBox, AVLBox, minHeapBox, maxHeapBox;
+	Box hashTableBox, AVLBox, minHeapBox, maxHeapBox, BTreeBox;
 	MyShape lightBulb, darkBulb, themeBox;
 public:
 	Game(sf::ContextSettings settings);
@@ -30,5 +31,6 @@ public:
 	void runAVL();
 	void runMinHeap();
 	void runMaxHeap();
+	void runBTree();
 	void run();
 };

@@ -529,3 +529,43 @@ void Stage::setRightNode(std::vector <Animation> &animations, int index, int nex
 	tmp.nextValue = nextValue;
 	animations.push_back(tmp);
 }
+
+void Stage::insertNodeToGroup(std::vector <Animation> &animations, int idGroup, int idNode) {
+	Animation tmp;
+	tmp.animationType = InsertNodeToGroup;
+	tmp.id1 = idGroup;
+	tmp.id2 = idNode;
+	animations.push_back(tmp);
+}
+
+void Stage::deleteNodeFromGroup(std::vector <Animation> &animations, int idGroup, int idNode) {
+	Animation tmp;
+	tmp.animationType = DeleteNodeFromGroup;
+	tmp.id1 = idGroup;
+	tmp.id2 = idNode;
+	animations.push_back(tmp);
+}
+
+void Stage::addGroup(std::vector <Animation> &animations, int idGroup) {
+	Animation tmp;
+	tmp.animationType = AddGroup;
+	tmp.id1 = idGroup;
+	animations.push_back(tmp);
+}
+
+void Stage::deleteGroup(std::vector <Animation> &animations, int idGroup) {
+	Animation tmp;
+	tmp.animationType = DeleteGroup;
+	tmp.id1 = idGroup;
+	animations.push_back(tmp);
+}
+
+void Stage::setEdge(std::vector <Animation> &animations, int idGroup, int idPos, int value) {
+	Animation tmp;
+	tmp.animationType = SetEdge;
+	tmp.id1 = idGroup;
+	tmp.id2 = idPos;
+	tmp.nextValue = value;
+	animations.push_back(tmp);
+}
+

@@ -10,6 +10,7 @@ Game::Game(sf::ContextSettings settings) :
 	AVLBox = Box(410, 550, 360, 120, { CommandBoxNormal, CommandBoxSelected }, "AVL Tree", font(fontType::Prototype), 30, NO_BORDER, 3);
 	minHeapBox = Box(800, 400, 360, 120, { CommandBoxNormal, CommandBoxSelected }, "Min Heap", font(fontType::Prototype), 30, NO_BORDER, 3);
 	maxHeapBox = Box(800, 550, 360, 120, { CommandBoxNormal, CommandBoxSelected }, "Max Heap", font(fontType::Prototype), 30, NO_BORDER, 3);
+	BTreeBox = Box(1190, 400, 360, 120, { CommandBoxNormal, CommandBoxSelected }, "B-Tree", font(fontType::Prototype), 30, NO_BORDER, 3);
 	window.setMouseCursor(arrowCursor);
 	window.setFramerateLimit(60);
 	srand(time(NULL));
@@ -20,6 +21,7 @@ void Game::handleMouseMove(float x, float y) {
 	if (AVLBox.handleMouseMove(x, y, window)) return;
 	if (minHeapBox.handleMouseMove(x, y, window)) return;
 	if (maxHeapBox.handleMouseMove(x, y, window)) return;
+	if (BTreeBox.handleMouseMove(x, y, window)) return;
 	if (themeBox.handleMouseMove(x, y, window)) return;
 	window.setMouseCursor(arrowCursor);
 }
@@ -47,8 +49,10 @@ void Game::processEvents()
 			else if (maxHeapBox.isInside(event.mouseButton.x, event.mouseButton.y)) {
 				runMaxHeap();
 			}
-			else
-			if (themeBox.isMousePressed(event.mouseButton.x, event.mouseButton.y)) {
+			else if (BTreeBox.isInside(event.mouseButton.x, event.mouseButton.y)) {
+				runBTree();
+			}
+			else if (themeBox.isMousePressed(event.mouseButton.x, event.mouseButton.y)) {
 				theme = ColorTheme((theme + 1) % numColorTheme);
 			}
 			else {
@@ -79,6 +83,7 @@ void Game::render() {
 	AVLBox.draw(window, theme);
 	minHeapBox.draw(window, theme);
 	maxHeapBox.draw(window, theme);
+	BTreeBox.draw(window, theme);
 	window.display();
 }
 
@@ -104,6 +109,12 @@ void Game::runMaxHeap() {
 	window.setMouseCursor(waitCursor);
 	HeapStage maxHeap(window, theme, false);
 	theme = maxHeap.run();
+}
+
+void Game::runBTree() {
+	window.setMouseCursor(waitCursor);
+	BTreeStage BTree(window, theme);
+	theme = BTree.run();
 }
 
 void Game::run() {

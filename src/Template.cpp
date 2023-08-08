@@ -54,6 +54,15 @@ const float verticalDistHeap = 100;
 int maxSizeDataHeap = 31;
 int maxValueDataHeap = 99;
 
+const float sizeValueLetterBTree = 20;
+const float edgeBTree = 30;
+const float thicknessBTree = 3;
+const float minHorizontalDistBTree = 37;
+const float verticalDistBTree = 100;
+const int maxDegreeBTree = 4;
+int maxSizeDataBTree = 31;
+int maxValueDataBTree = 99;
+
 const int UNKOWN = -(1e9 + 7);
 
 const int maxLetter = 4;

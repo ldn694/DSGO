@@ -47,7 +47,6 @@ int AVLGraph::getBalanceFactor(int id) {
     }
     int trai = getHeigth(nodes[id].leftNode);
     int phai = getHeigth(nodes[id].rightNode);
-    // std::cout << "bf " << id << " " << trai << " " << phai << "\n";
     return trai - phai;
 }
 
@@ -96,9 +95,7 @@ void AVLGraph::arrangeAVLTrees() {
 AVLGraph AVLGraph::execAnimation(std::vector <Animation> animations) {
     AVLGraph tmp = *this;
     std::sort(animations.begin(), animations.end());
-    //std::cout << "------\n";
     for (int i = 0; i < animations.size(); i++) {
-        //std::cout << "before " << i << ":" << animations[i].animationType << " " << animations[i].id1 << "\n";
         switch (animations[i].animationType) {
             case SetValue: {
                 if (tmp.nodes.find(animations[i].id1) == tmp.nodes.end()) {
@@ -139,7 +136,6 @@ AVLGraph AVLGraph::execAnimation(std::vector <Animation> animations) {
                     assert(false);
                 }
                 tmp.nodes.erase(animations[i].id1);
-                //std::cout << "HAHA! " << tmp.nodes.size() << "\n";
                 tmp.arrangeAVLTrees();
                 break;
             }
@@ -181,7 +177,6 @@ AVLGraph AVLGraph::execAnimation(std::vector <Animation> animations) {
                 break;
             }
         }
-        //std::cout << "after " << i << ":" << animations[i].animationType << " " << tmp.nodes.size() << "\n";
     }
     return tmp;
 }
@@ -233,7 +228,6 @@ void AVLGraph::draw(sf::RenderWindow& window, ColorTheme theme, sf::Time totalTi
             animationMap[animations[i].id1].push_back(animations[i]);
         }
     }
-    // std::cout << animationMap.size() << " " << nodes.size() << " " << tmp.nodes.size() << "\n";
     //Edges
     for (auto x = nodes.begin(); x != nodes.end(); x++) {
         int idU = x->first;

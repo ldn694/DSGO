@@ -14,6 +14,7 @@ ColorNode::ColorNode(sf::Color _fillColor, sf::Color _outlineColor, sf::Color _v
 ColorBox::ColorBox(sf::Color _fillColor, sf::Color _outlineColor, sf::Color _textColor) :
 	fillColor(_fillColor), outlineColor(_outlineColor), textColor(_textColor) {}
 
+//-----------------------------------------------------------------------------------
 
 Hash::Color::Color(sf::Color _fillColor, sf::Color _outlineColor, sf::Color _valueColor, sf::Color _variableColor) :
     fillColor(_fillColor), outlineColor(_outlineColor), valueColor(_valueColor), variableColor(_variableColor) {}
@@ -43,33 +44,7 @@ const Hash::Color Hash::color[numColorTheme][numColorType] =
 	}
 };
 
-Heap::Color::Color(sf::Color _fillColor, sf::Color _outlineColor, sf::Color _valueColor, sf::Color _variableColor) :
-    fillColor(_fillColor), outlineColor(_outlineColor), valueColor(_valueColor), variableColor(_variableColor) {}
-
-Heap::Color Heap::fadingColorType(Heap::ColorType before, Heap::ColorType after, ColorTheme theme, float percent) {
-	return Heap::Color(
-		fadingColor(Hash::color[theme][before].fillColor, Hash::color[theme][after].fillColor, percent),
-		fadingColor(Hash::color[theme][before].outlineColor, Hash::color[theme][after].outlineColor, percent),
-		fadingColor(Hash::color[theme][before].valueColor, Hash::color[theme][after].valueColor, percent),
-		fadingColor(Hash::color[theme][before].variableColor, Hash::color[theme][after].variableColor, percent)
-	);
-}
-
-const Heap::Color Heap::color[numColorTheme][numColorType] =
-{
-	{
-		Color(LavenderBushColor, BlackColor, BlackColor, RedColor),
-		Color(OrangeColor, OrangeColor, LavenderBushColor, RedColor),
-		Color(LavenderBushColor, OrangeColor, OrangeColor, RedColor),
-		Color(LightGreenColor, LightGreenColor, LavenderBushColor, RedColor)
-	} ,
-	{
-		Color(EerieBlackColor, WhiteColor, WhiteColor, WhiteColor),
-		Color(MediumSlateBlueColor, MediumSlateBlueColor, EerieBlackColor, WhiteColor),
-		Color(EerieBlackColor, MediumSlateBlueColor, MediumSlateBlueColor, WhiteColor),
-		Color(VistaBlueColor, VistaBlueColor, EerieBlackColor, WhiteColor)
-	}
-};
+//-----------------------------------------------------------------------------------
 
 AVL::Color::Color(sf::Color _fillColor, sf::Color _outlineColor, sf::Color _valueColor, sf::Color _variableColor) :
     fillColor(_fillColor), outlineColor(_outlineColor), valueColor(_valueColor), variableColor(_variableColor) {}
@@ -98,6 +73,68 @@ const AVL::Color AVL::color[numColorTheme][numColorType] =
 		Color(VistaBlueColor, VistaBlueColor, EerieBlackColor, WhiteColor)
 	}
 };
+
+//-----------------------------------------------------------------------------------
+
+Heap::Color::Color(sf::Color _fillColor, sf::Color _outlineColor, sf::Color _valueColor, sf::Color _variableColor) :
+    fillColor(_fillColor), outlineColor(_outlineColor), valueColor(_valueColor), variableColor(_variableColor) {}
+
+Heap::Color Heap::fadingColorType(Heap::ColorType before, Heap::ColorType after, ColorTheme theme, float percent) {
+	return Heap::Color(
+		fadingColor(Hash::color[theme][before].fillColor, Hash::color[theme][after].fillColor, percent),
+		fadingColor(Hash::color[theme][before].outlineColor, Hash::color[theme][after].outlineColor, percent),
+		fadingColor(Hash::color[theme][before].valueColor, Hash::color[theme][after].valueColor, percent),
+		fadingColor(Hash::color[theme][before].variableColor, Hash::color[theme][after].variableColor, percent)
+	);
+}
+
+const Heap::Color Heap::color[numColorTheme][numColorType] =
+{
+	{
+		Color(LavenderBushColor, BlackColor, BlackColor, RedColor),
+		Color(OrangeColor, OrangeColor, LavenderBushColor, RedColor),
+		Color(LavenderBushColor, OrangeColor, OrangeColor, RedColor),
+		Color(LightGreenColor, LightGreenColor, LavenderBushColor, RedColor)
+	} ,
+	{
+		Color(EerieBlackColor, WhiteColor, WhiteColor, WhiteColor),
+		Color(MediumSlateBlueColor, MediumSlateBlueColor, EerieBlackColor, WhiteColor),
+		Color(EerieBlackColor, MediumSlateBlueColor, MediumSlateBlueColor, WhiteColor),
+		Color(VistaBlueColor, VistaBlueColor, EerieBlackColor, WhiteColor)
+	}
+};
+
+//-----------------------------------------------------------------------------------
+
+BTree::Color::Color(sf::Color _fillColor, sf::Color _outlineColor, sf::Color _valueColor, sf::Color _variableColor) :
+    fillColor(_fillColor), outlineColor(_outlineColor), valueColor(_valueColor), variableColor(_variableColor) {}
+
+BTree::Color BTree::fadingColorType(BTree::ColorType before, BTree::ColorType after, ColorTheme theme, float percent) {
+	return BTree::Color(
+		fadingColor(BTree::color[theme][before].fillColor, BTree::color[theme][after].fillColor, percent),
+		fadingColor(BTree::color[theme][before].outlineColor, BTree::color[theme][after].outlineColor, percent),
+		fadingColor(BTree::color[theme][before].valueColor, BTree::color[theme][after].valueColor, percent),
+		fadingColor(BTree::color[theme][before].variableColor, BTree::color[theme][after].variableColor, percent)
+	);
+}
+
+const BTree::Color BTree::color[numColorTheme][numColorType] =
+{
+	{
+		Color(LavenderBushColor, BlackColor, BlackColor, RedColor),
+		Color(OrangeColor, OrangeColor, LavenderBushColor, RedColor),
+		Color(LavenderBushColor, OrangeColor, OrangeColor, RedColor),
+		Color(LightGreenColor, LightGreenColor, LavenderBushColor, RedColor)
+	} ,
+	{
+		Color(EerieBlackColor, WhiteColor, WhiteColor, WhiteColor),
+		Color(MediumSlateBlueColor, MediumSlateBlueColor, EerieBlackColor, WhiteColor),
+		Color(EerieBlackColor, MediumSlateBlueColor, MediumSlateBlueColor, WhiteColor),
+		Color(VistaBlueColor, VistaBlueColor, EerieBlackColor, WhiteColor)
+	}
+};
+
+//-----------------------------------------------------------------------------------
 
 const sf::Color toolBoxColor[numColorTheme] = { AntiFlashWhiteColor, DimGrayColor };
 

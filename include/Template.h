@@ -72,6 +72,15 @@ extern const float verticalDistHeap;
 extern int maxSizeDataHeap;
 extern int maxValueDataHeap;
 
+extern const float sizeValueLetterBTree;
+extern const float edgeBTree;
+extern const float thicknessBTree;
+extern const float minHorizontalDistBTree;
+extern const float verticalDistBTree;
+extern const int maxDegreeBTree;
+extern int maxSizeDataBTree;
+extern int maxValueDataBTree;
+
 extern const int UNKOWN;
 
 extern const int maxLetter;
@@ -124,11 +133,13 @@ sf::Font* font(fontType id);
 sf::Text CompressWords(std::string cur, float x, float y, float width, float height, sf::Font* font, float characterSize, sf::Color color); //return cur with \n so that the width of sf::Text is not greater than width
 
 enum AnimationType {
-	AddNode, SwapNode, SetLeftNode, SetRightNode, SetRoot,
-	SetValue, SetState, SetSize,
+	AddNode, SwapNode, SetLeftNode, SetRightNode,
+	AddGroup, InsertNodeToGroup, SetEdgeType,
+	SetRoot, SetValue, SetState, SetSize,
 	SetColorType, Move, DeleteVariable, InsertVariable,
 	SetLeftEdgeColorType, SetRightEdgeColorType,
-	DeleteNode
+	DeleteNode, DeleteNodeFromGroup, DeleteGroup,
+	SetEdge
 };
 struct Animation {
 	AnimationType animationType;

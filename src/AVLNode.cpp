@@ -138,7 +138,6 @@ std::vector <std::string> AVLNode::getVariables() {
 }
 
 void AVLNode::draw(sf::RenderWindow& window, ColorTheme theme, sf::Time totalTime, sf::Time timePassed, std::vector<Animation> animations) {
-    //std::cout << "size = " << animations.size() << " type = " << type << "\n";
     circle.setFillColor(AVL::color[theme][type].fillColor);
     circle.setOutlineColor(AVL::color[theme][type].outlineColor);
     valueText.setFillColor(AVL::color[theme][type].valueColor);
@@ -158,15 +157,9 @@ void AVLNode::draw(sf::RenderWindow& window, ColorTheme theme, sf::Time totalTim
         }
         AVLNode tmp = *this;
         for (int i = 0; i < animations.size(); i++) {
-            // std::cout << animations[i].animationType << " " << animations[i].nextValue << " ";
-            // for (auto x : animations[i].variableList) {
-            //     std::cout << "\"" << x << "\" ";
-            // }
             switch (animations[i].animationType) {
                 case SetColorType: {
-                    //std::cout << timePassed.asSeconds() / totalTime.asSeconds() << " ";
                     AVL::Color newColor = AVL::fadingColorType(type, AVL::ColorType(animations[i].nextValue), theme, timePassed.asSeconds() / totalTime.asSeconds());
-                    // std::cout << type << " " << animations[i].nextValue;
                     tmp.circle.setFillColor(newColor.fillColor);
                     tmp.circle.setOutlineColor(newColor.outlineColor);
                     tmp.valueText.setFillColor(newColor.valueColor);
@@ -223,7 +216,6 @@ void AVLNode::draw(sf::RenderWindow& window, ColorTheme theme, sf::Time totalTim
         window.draw(tmp.circle);
         window.draw(tmp.variableText);
         window.draw(tmp.valueText);
-        // std::cout << "\n";
     }
 }
 

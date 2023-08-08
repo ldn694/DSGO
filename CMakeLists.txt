@@ -65,6 +65,14 @@ add_executable(DSGO
 	include/HeapGraph.h
 	src/HeapStage.cpp
 	include/HeapStage.h
+	src/BTreeNode.cpp
+	include/BTreeNode.h
+	src/BTreeGroup.cpp
+	include/BTreeGroup.h
+	src/BTreeGraph.cpp
+	include/BTreeGraph.h
+	src/BTreeStage.cpp
+	include/BTreeStage.h
 	)
 
 target_link_libraries(DSGO PRIVATE sfml-graphics)
