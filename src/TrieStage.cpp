@@ -81,10 +81,11 @@ TrieStage::TrieStage(sf::RenderWindow& window, ColorTheme theme) :
 			{
 				{
 					"if depth == str.size():",
-    				"	cur->isWord = false",
+    				"	if !cur->isWord: return",
+					"	cur->isWord = false",
     				"	if cur->next.empty():",
         			"		delete cur",
-    				"return",
+    				"	return",
 					"char x = str[depth]",
 					"if (cur->next[x] == NULL): return",
 					"erase(cur->next[x], str, depth + 1)",
@@ -98,7 +99,7 @@ TrieStage::TrieStage(sf::RenderWindow& window, ColorTheme theme) :
 					"for (char x : str):",
     				"	if (cur->next[x] == NULL): return false;",
     				"	cur = cur->next[x]",
-					"return true"
+					"return cur->isWord"
 				}
 			}
 		},
@@ -166,28 +167,71 @@ void TrieStage::insertString(std::string str) {
 		setColorType(animations, cur, Trie::ColorType::lowlight);
 		deleteVariable(animations, cur, {"cur"});
 		insertVariable(animations, id, {"cur"});
-		addAnimationStep(animations, stepTime, 3, "Go to node " + charToString(x));
+		addAnimationStep(animations, stepTime, 4, "Go to node " + charToString(x));
 		cur = id;
 	}
 	animations.clear();
 	setState(animations, cur, ISWORD);
-	addAnimationStep(animations, stepTime, 4, "Set cur->isWord = true");
+	addAnimationStep(animations, stepTime, 5, "Set cur->isWord = true");
 
 	setDefaultView();
 }
 
 void TrieStage::deleteString(std::string str) {
-	resetAnimation();
-	setAnimatingDirection(Continuous);
-	std::vector <Animation> animations;
 	
+
 }
 
 void TrieStage::searchString(std::string str) {
 	resetAnimation();
 	setAnimatingDirection(Continuous);
 	std::vector <Animation> animations;
-	
+
+	TrieGraph& graph = TrieList.back();
+	int cur = graph.root;
+	animations.clear();
+	setColorType(animations, cur, Trie::ColorType::highlight);
+	insertVariable(animations, cur, {"cur"});
+	addAnimationStep(animations, stepTime, 0, "Start from root");
+
+	for (char x : str) {
+		animations.clear();
+		addAnimationStep(animations, stepTime, 1, "Searching " + charToString(x));
+
+		int id;
+		if (TrieList.back().findEdge(cur, charToString(x)) == -1) {// no edge
+			animations.clear();
+			addAnimationStep(animations, stepTime, 2, "cur has no edge " + charToString(x) + ", no such string found");
+
+			setDefaultView();
+		}
+		else {//have edge
+			animations.clear();
+			addAnimationStep(animations, stepTime, 2, "cur has edge " + charToString(x));
+
+			id = graph.findEdge(cur, charToString(x));
+		}
+		animations.clear();
+		setColorType(animations, id, Trie::ColorType::highlight);
+		setColorType(animations, cur, Trie::ColorType::lowlight);
+		deleteVariable(animations, cur, {"cur"});
+		insertVariable(animations, id, {"cur"});
+		addAnimationStep(animations, stepTime, 3, "Go to node " + charToString(x));
+		cur = id;
+	}
+
+	if (TrieList.back().nodes[cur].getState() == ISWORD) {
+		animations.clear();
+		setColorType(animations, cur, Trie::ColorType::highlight2);
+		addAnimationStep(animations, stepTime, 4, "Found string" + str);
+	}
+	else {
+		animations.clear();
+		setColorType(animations, cur, Trie::ColorType::highlight);
+		addAnimationStep(animations, stepTime, 4, str + " is not found, but it is a prefix of a string in the trie");
+	}
+
+	setDefaultView();
 }
 
 std::pair<bool, ColorTheme> TrieStage::processEvents() {
@@ -282,7 +326,7 @@ std::pair<bool, ColorTheme> TrieStage::processEvents() {
 		if (operationName[curOperation] == "Search") {
 			std::string str = valueTypingBox[0].getText();
 			if (!str.empty()) {
-                deleteString(str);
+                searchString(str);
             }
 		}
 		operating = false;
