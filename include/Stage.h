@@ -105,4 +105,6 @@ public:
 	void addGroup(std::vector <Animation> &animations, int idGroup);
 	void deleteGroup(std::vector <Animation> &animations, int idGroup);
 	void setEdge(std::vector <Animation> &animations, int idGroup, int idPos, int value);
+	void insertEdge(std::vector <Animation> &animations, int idU, int idV);
+	void deleteEdge(std::vector <Animation> &animations, int idU, int idV);
 };

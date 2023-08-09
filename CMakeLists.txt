@@ -73,6 +73,12 @@ add_executable(DSGO
 	include/BTreeGraph.h
 	src/BTreeStage.cpp
 	include/BTreeStage.h
+	src/TrieNode.cpp
+	include/TrieNode.h
+	src/TrieGraph.cpp
+	include/TrieGraph.h
+	src/TrieStage.cpp
+	include/TrieStage.h
 	)
 
 target_link_libraries(DSGO PRIVATE sfml-graphics)

@@ -272,12 +272,6 @@ void BTreeGraph::arrangeBTree() {
     if (root == -1) {
         return;
     }
-    // std::cout << "----\n";
-    // for (auto& group : groups) {
-    //     for (auto& edges : group.second.listEdge) {
-    //         std::cout << group.first << "->" << edges << "\n";
-    //     }
-    // }
     std::vector <std::vector <std::vector <int> > > tour(groups.size() + 1);
     tour[0].push_back({root});
     DFS(root, 0, tour);

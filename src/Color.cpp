@@ -136,6 +136,36 @@ const BTree::Color BTree::color[numColorTheme][numColorType] =
 
 //-----------------------------------------------------------------------------------
 
+Trie::Color::Color(sf::Color _fillColor, sf::Color _outlineColor, sf::Color _valueColor, sf::Color _variableColor) :
+    fillColor(_fillColor), outlineColor(_outlineColor), valueColor(_valueColor), variableColor(_variableColor) {}
+
+Trie::Color Trie::fadingColorType(Trie::ColorType before, Trie::ColorType after, ColorTheme theme, float percent) {
+	return Trie::Color(
+		fadingColor(Trie::color[theme][before].fillColor, Trie::color[theme][after].fillColor, percent),
+		fadingColor(Trie::color[theme][before].outlineColor, Trie::color[theme][after].outlineColor, percent),
+		fadingColor(Trie::color[theme][before].valueColor, Trie::color[theme][after].valueColor, percent),
+		fadingColor(Trie::color[theme][before].variableColor, Trie::color[theme][after].variableColor, percent)
+	);
+}
+
+const Trie::Color Trie::color[numColorTheme][numColorType] =
+{
+	{
+		Color(LavenderBushColor, BlackColor, BlackColor, RedColor),
+		Color(OrangeColor, OrangeColor, LavenderBushColor, RedColor),
+		Color(LavenderBushColor, OrangeColor, OrangeColor, RedColor),
+		Color(LightGreenColor, LightGreenColor, LavenderBushColor, RedColor)
+	} ,
+	{
+		Color(EerieBlackColor, WhiteColor, WhiteColor, WhiteColor),
+		Color(MediumSlateBlueColor, MediumSlateBlueColor, EerieBlackColor, WhiteColor),
+		Color(EerieBlackColor, MediumSlateBlueColor, MediumSlateBlueColor, WhiteColor),
+		Color(VistaBlueColor, VistaBlueColor, EerieBlackColor, WhiteColor)
+	}
+};
+
+//-----------------------------------------------------------------------------------
+
 const sf::Color toolBoxColor[numColorTheme] = { AntiFlashWhiteColor, DimGrayColor };
 
 const ColorBox colorBox[numColorBoxType][numColorTheme] =

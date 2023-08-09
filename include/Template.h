@@ -45,6 +45,13 @@ extern const float speedList[];
 extern const float sizeLetterDescription;
 extern const float sizeLetterError;
 
+enum TypingBoxMode {
+	singleNumber, multipleNumber, string
+};
+const int numTypingBoxMode = 3;
+
+const int  typingModeMaxCharacter[numTypingBoxMode] = { 3, 20, 20 };
+
 extern const float sizeValueLetterHash;
 extern const float radiusHash;
 extern const float thicknessHash;
@@ -80,6 +87,14 @@ extern const float verticalDistBTree;
 extern const int maxDegreeBTree;
 extern int maxSizeDataBTree;
 extern int maxValueDataBTree;
+
+extern const float sizeValueLetterTrie;
+extern const float radiusTrie;
+extern const float thicknessTrie;
+extern const float minHorizontalDistTrie;
+extern const float verticalDistTrie;
+extern int maxSizeDataTrie;
+extern int maxLengthDataTrie;
 
 extern const int UNKOWN;
 
@@ -139,12 +154,13 @@ enum AnimationType {
 	SetColorType, Move, DeleteVariable, InsertVariable,
 	SetLeftEdgeColorType, SetRightEdgeColorType,
 	DeleteNode, DeleteNodeFromGroup, DeleteGroup,
-	SetEdge
+	SetEdge, InsertEdge, DeleteEdge
 };
 struct Animation {
 	AnimationType animationType;
 	int id1 = -1, id2 = 0;
 	int nextValue = 0;
+	std::string nextString = "";
 	float nextPercent = 0.f;
 	std::vector <std::string> variableList;
 	sf::Vector2f nextPosition;

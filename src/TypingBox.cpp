@@ -131,11 +131,9 @@ void TypingBox::insert(int key) {
 	char x;
 	if (key < 26) {
 		x = char(key + 'a'); 
-	}
-	if (key <= 35) {
+	} else if (key <= 35) {
 		x = char(key - 26 + '0');
-	}
-	if (key == int(sf::Keyboard::Comma)) {
+	} else if (key == int(sf::Keyboard::Comma)) {
 		x = ',';
 	}
 	text.push_back(x);
@@ -214,6 +212,7 @@ void TypingBox::draw(sf::RenderWindow& window, ColorTheme theme) {
 	sf::Text Text;
 	Text.setFont(*font);
 	Text.setString(text);
+	//std::cout << text << "\n";
 	Text.setCharacterSize(height * 0.6);
 	Text.setFillColor(colorBox[ColorBoxType::Typing_Box][theme].textColor);
 	Text.setPosition(x + 10, y + height * 0.1);

@@ -569,3 +569,18 @@ void Stage::setEdge(std::vector <Animation> &animations, int idGroup, int idPos,
 	animations.push_back(tmp);
 }
 
+void Stage::insertEdge(std::vector <Animation> &animations, int idU, int idV) {
+	Animation tmp;
+	tmp.animationType = InsertEdge;
+	tmp.id1 = idU;
+	tmp.id2 = idV;
+	animations.push_back(tmp);
+}
+
+void Stage::deleteEdge(std::vector <Animation> &animations, int idU, int idV) {
+	Animation tmp;
+	tmp.animationType = DeleteEdge;
+	tmp.id1 = idU;
+	tmp.id2 = idV;
+	animations.push_back(tmp);
+}

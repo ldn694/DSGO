@@ -251,7 +251,49 @@ void BTreeStage::deleteValue(int value) {
 }
 
 void BTreeStage::searchValue(int value) {
-	
+	resetAnimation();
+	setAnimatingDirection(Continuous);
+
+	std::vector <Animation> animations;
+
+	int idGroup = BTreeList.back().root;
+	if (idGroup == -1) {
+		animations.clear();
+		addAnimationStep(animations, stepTime, -1, "Tree is empty");
+		return;
+	}
+	while (true) {
+		if (idGroup == -1) {
+			animations.clear();
+			addAnimationStep(animations, stepTime, -1, "Value not found");
+
+			setDefaultView();
+			return;
+		}
+		animations.clear();
+		setColorType(animations, idGroup, BTree::ColorType::highlight);
+		addAnimationStep(animations, stepTime, -1, "Searching " + intToString(value));
+
+		BTreeGraph& graph = BTreeList.back();
+		for (auto x : graph.groups[idGroup].nodes) {
+			if (graph.nodes[x].getValue() == value) {
+				animations.clear();
+				setColorType(animations, idGroup, BTree::ColorType::highlight2);
+				addAnimationStep(animations, stepTime, -1, "Found " + intToString(value));
+				
+				setDefaultView();
+				return;
+			}
+		}
+		int nextIDGroup = graph.findEdge(idGroup, value);
+		animations.clear();
+		setColorType(animations, idGroup, BTree::ColorType::lowlight);
+		if (nextIDGroup != -1) {
+			setColorType(animations, nextIDGroup, BTree::ColorType::highlight);
+		}
+		addAnimationStep(animations, stepTime, -1, "Go to next node");
+		idGroup = nextIDGroup;
+	}
 }
 
 std::pair<bool, ColorTheme> BTreeStage::processEvents() {

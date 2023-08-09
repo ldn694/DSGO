@@ -124,17 +124,31 @@ namespace BTree {
 
 //-----------------------------------------------------------------------------------
 
+namespace Trie {
+
+    enum ColorType {
+        normal, highlight, lowlight, highlight2
+    };
+
+    const int numColorType = 4;
+    
+    struct Color {
+        sf::Color fillColor, outlineColor, valueColor, variableColor;
+        Color(sf::Color fillColor, sf::Color outlineColor, sf::Color valueColor, sf::Color variableColor);
+    };
+	
+	Color fadingColorType(ColorType before, ColorType after, ColorTheme theme, float percent);
+
+    extern const Color color[numColorTheme][numColorType];
+}
+
+//-----------------------------------------------------------------------------------
+
 enum ColorNodeType {
 	normal, highlight, lowlight, highlight2, highlight3, faded
 };
 
-enum TypingBoxMode {
-	singleNumber, multipleNumber, string
-};
 const int numColorNodeType = 6;
-const int numTypingBoxMode = 3;
-
-const int  typingModeMaxCharacter[numTypingBoxMode] = { 3, 20, 20 };
 
 struct ColorNode {
 	sf::Color fillColor, outlineColor, valueColor, variableColor;

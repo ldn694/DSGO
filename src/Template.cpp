@@ -63,6 +63,14 @@ const int maxDegreeBTree = 4;
 int maxSizeDataBTree = 31;
 int maxValueDataBTree = 99;
 
+extern const float sizeValueLetterTrie = 20;
+extern const float radiusTrie = 30;
+extern const float thicknessTrie = 3;
+extern const float minHorizontalDistTrie = 37;
+extern const float verticalDistTrie = 100;
+extern int maxSizeDataTrie = 31;
+extern int maxLengthDataTrie = 99;
+
 const int UNKOWN = -(1e9 + 7);
 
 const int maxLetter = 4;
