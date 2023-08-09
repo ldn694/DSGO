@@ -126,40 +126,38 @@ void AVLStage::setDefaultView() {
 }
 
 void AVLStage::leftRotate(std::vector <Animation>& animations, int id) {
-	AVLGraph& graph = AVLList.back();
-	int par = graph.getParent(id);
+	int par = AVLList.back().getParent(id);
 	if (par == -1) {
-		setRoot(animations, graph.nodes[id].rightNode);
+		setRoot(animations, AVLList.back().nodes[id].rightNode);
 	}
 	else {
 		if (AVLList.back().nodes[par].leftNode == id) {
-			setLeftNode(animations, par, graph.nodes[id].rightNode);
+			setLeftNode(animations, par, AVLList.back().nodes[id].rightNode);
 		}
 		else {
-			setRightNode(animations, par, graph.nodes[id].rightNode);
+			setRightNode(animations, par, AVLList.back().nodes[id].rightNode);
 		}
 	}
-	int rightNode = graph.nodes[id].rightNode;
-	setRightNode(animations, id, graph.nodes[rightNode].leftNode);
+	int rightNode = AVLList.back().nodes[id].rightNode;
+	setRightNode(animations, id, AVLList.back().nodes[rightNode].leftNode);
 	setLeftNode(animations, rightNode, id);
 }
 
 void AVLStage::rightRotate(std::vector <Animation>& animations, int id) {
-	AVLGraph& graph = AVLList.back();
-	int par = graph.getParent(id);
+	int par = AVLList.back().getParent(id);
 	if (par == -1) {
-		setRoot(animations, graph.nodes[id].leftNode);
+		setRoot(animations, AVLList.back().nodes[id].leftNode);
 	}
 	else {
 		if (AVLList.back().nodes[par].leftNode == id) {
-			setLeftNode(animations, par, graph.nodes[id].leftNode);
+			setLeftNode(animations, par, AVLList.back().nodes[id].leftNode);
 		}
 		else {
-			setRightNode(animations, par, graph.nodes[id].leftNode);
+			setRightNode(animations, par, AVLList.back().nodes[id].leftNode);
 		}
 	}
-	int leftNode = graph.nodes[id].leftNode;
-	setLeftNode(animations, id, graph.nodes[leftNode].rightNode);
+	int leftNode = AVLList.back().nodes[id].leftNode;
+	setLeftNode(animations, id, AVLList.back().nodes[leftNode].rightNode);
 	setRightNode(animations, leftNode, id);
 }
 
@@ -248,11 +246,10 @@ void AVLStage::insertValue(int value) {
 			setColorType(animations, id, AVL::ColorType::highlight);
 			addAnimationStep(animations, stepTime, 1, "Calculate balance factor of " + intToString(AVLList.back().nodes[id].value));
 
-			AVLGraph& graph = AVLList.back();
-			int idLeft = graph.nodes[id].leftNode;
-			int idRight = graph.nodes[id].rightNode;
+			int idLeft = AVLList.back().nodes[id].leftNode;
+			int idRight = AVLList.back().nodes[id].rightNode;
 			if (bf > 1) {
-				if (graph.getBalanceFactor(idLeft) >= 0) {//Left Left
+				if (AVLList.back().getBalanceFactor(idLeft) >= 0) {//Left Left
 					animations.clear();
 					rightRotate(animations, id);
 					addAnimationStep(animations, stepTime, 2, "Left Left case, rotate right");
@@ -268,8 +265,8 @@ void AVLStage::insertValue(int value) {
 					addAnimationStep(animations, stepTime, 4, "Then rotate right " + intToString(AVLList.back().nodes[id].value));
 				}
 			}
-			else if (graph.getBalanceFactor(id) < -1) {
-				if (graph.getBalanceFactor(idRight) <= 0) {//Right Right
+			else if (AVLList.back().getBalanceFactor(id) < -1) {
+				if (AVLList.back().getBalanceFactor(idRight) <= 0) {//Right Right
 					animations.clear();
 					leftRotate(animations, id);
 					addAnimationStep(animations, stepTime, 3, "Right Right case, rotate left");
@@ -502,11 +499,10 @@ void AVLStage::deleteValue(int value) {
 		setColorType(animations, id, AVL::ColorType::highlight);
 		addAnimationStep(animations, stepTime, 1, "Calculate balance factor of " + intToString(AVLList.back().nodes[id].value));
 
-		AVLGraph& graph = AVLList.back();
-		int idLeft = graph.nodes[id].leftNode;
-		int idRight = graph.nodes[id].rightNode;
+		int idLeft = AVLList.back().nodes[id].leftNode;
+		int idRight = AVLList.back().nodes[id].rightNode;
 		if (bf > 1) {
-			if (graph.getBalanceFactor(idLeft) >= 0) {//Left Left
+			if (AVLList.back().getBalanceFactor(idLeft) >= 0) {//Left Left
 				animations.clear();
 				rightRotate(animations, id);
 				addAnimationStep(animations, stepTime, 2, "Left Left case, rotate right");
@@ -522,8 +518,8 @@ void AVLStage::deleteValue(int value) {
 				addAnimationStep(animations, stepTime, 4, "Then rotate right " + intToString(AVLList.back().nodes[id].value));
 			}
 		}
-		else if (graph.getBalanceFactor(id) < -1) {
-			if (graph.getBalanceFactor(idRight) <= 0) {//Right Right
+		else if (AVLList.back().getBalanceFactor(id) < -1) {
+			if (AVLList.back().getBalanceFactor(idRight) <= 0) {//Right Right
 				animations.clear();
 				leftRotate(animations, id);
 				addAnimationStep(animations, stepTime, 3, "Right Right case, rotate left");

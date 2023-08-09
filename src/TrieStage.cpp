@@ -133,8 +133,7 @@ void TrieStage::insertString(std::string str) {
 	setAnimatingDirection(Continuous);
 	std::vector <Animation> animations;
 
-	TrieGraph& graph = TrieList.back();
-	int cur = graph.root;
+	int cur = TrieList.back().root;
 	animations.clear();
 	setColorType(animations, cur, Trie::ColorType::highlight);
 	insertVariable(animations, cur, {"cur"});
@@ -160,7 +159,7 @@ void TrieStage::insertString(std::string str) {
 			animations.clear();
 			addAnimationStep(animations, stepTime, 2, "cur has edge " + charToString(x));
 
-			id = graph.findEdge(cur, charToString(x));
+			id = TrieList.back().findEdge(cur, charToString(x));
 		}
 		animations.clear();
 		setColorType(animations, id, Trie::ColorType::highlight);
@@ -178,7 +177,94 @@ void TrieStage::insertString(std::string str) {
 }
 
 void TrieStage::deleteString(std::string str) {
+	resetAnimation();
+	setAnimatingDirection(Continuous);
+	std::vector <Animation> animations;
 	
+	int cur = TrieList.back().root;
+	animations.clear();
+	setColorType(animations, cur, Trie::ColorType::highlight);
+	insertVariable(animations, cur, {"cur"});
+	addAnimationStep(animations, stepTime, 0, "Start from root");
+
+	std::vector <int> path;
+	for (int i = 0; i < str.size(); i++) {
+		path.push_back(cur);
+		char x = str[i];
+		animations.clear();
+		addAnimationStep(animations, stepTime, 6, "Searching " + charToString(x));
+
+		int id = TrieList.back().findEdge(cur, charToString(x));
+
+		if (id == -1) {// no edge
+			animations.clear();
+			addAnimationStep(animations, stepTime, 7, "cur has no edge " + charToString(x) + ", no such string found");
+
+			setDefaultView();
+			return;
+		}
+		else {//have edge
+			animations.clear();
+			addAnimationStep(animations, stepTime, 7, "cur has edge " + charToString(x));
+
+			animations.clear();
+			setColorType(animations, id, Trie::ColorType::highlight);
+			setColorType(animations, cur, Trie::ColorType::lowlight);
+			addAnimationStep(animations, stepTime, 8, "Go to node " + charToString(x));
+		}
+		cur = id;
+	}
+	animations.clear();
+	addAnimationStep(animations, stepTime, 0, "Traversed to the end of string");
+	if (TrieList.back().nodes[cur].getState() == NOTWORD) {
+		animations.clear();
+		addAnimationStep(animations, stepTime, 1, "cur->isWord = false, no such string found");
+
+		setDefaultView();
+		return;
+	}
+	else {
+		animations.clear();
+		addAnimationStep(animations, stepTime, 1, "cur->isWord = true, start deleting string");
+
+		animations.clear();
+		setState(animations, cur, NOTWORD);
+		setColorType(animations, cur, Trie::ColorType::normal);
+		addAnimationStep(animations, stepTime, 2, "Set cur->isWord = false");
+
+		if (TrieList.back().nodes[cur].edges.empty()) {
+			animations.clear();
+			addAnimationStep(animations, stepTime, 3, "cur has no edge, deleting cur");
+
+			animations.clear();
+			deleteEdge(animations, path.back(), cur);
+			deleteNode(animations, cur);
+			setColorType(animations, path.back(), Trie::ColorType::highlight);
+			addAnimationStep(animations, stepTime, 4, "Delete cur, backtracking to parent");
+		}
+	}
+	while (true) {
+		cur = path.back();
+		path.pop_back();
+		if (TrieList.back().nodes[cur].getState() == NOTWORD && TrieList.back().nodes[cur].edges.empty()) {
+			animations.clear();
+			addAnimationStep(animations, stepTime, 9, "cur has no edge and not a word, deleting cur");
+
+			animations.clear();
+			deleteEdge(animations, path.back(), cur);
+			deleteNode(animations, cur);
+			setColorType(animations, path.back(), Trie::ColorType::highlight);
+			addAnimationStep(animations, stepTime, 10, "Delete cur, backtracking to parent");
+		}
+		else {
+			animations.clear();
+			addAnimationStep(animations, stepTime, 9, "Deleting completed");
+
+			setDefaultView();
+			return;
+		}
+	}
+	assert(false);
 
 }
 
@@ -187,8 +273,7 @@ void TrieStage::searchString(std::string str) {
 	setAnimatingDirection(Continuous);
 	std::vector <Animation> animations;
 
-	TrieGraph& graph = TrieList.back();
-	int cur = graph.root;
+	int cur = TrieList.back().root;
 	animations.clear();
 	setColorType(animations, cur, Trie::ColorType::highlight);
 	insertVariable(animations, cur, {"cur"});
@@ -209,7 +294,7 @@ void TrieStage::searchString(std::string str) {
 			animations.clear();
 			addAnimationStep(animations, stepTime, 2, "cur has edge " + charToString(x));
 
-			id = graph.findEdge(cur, charToString(x));
+			id = TrieList.back().findEdge(cur, charToString(x));
 		}
 		animations.clear();
 		setColorType(animations, id, Trie::ColorType::highlight);
@@ -344,7 +429,7 @@ void TrieStage::resetAnimation() {
 }
 
 void TrieStage::addAnimationStep(std::vector <Animation> animations, sf::Time time, int line, std::string description) {
-	// std::cout << description << "\n";
+	std::cout << description << "\n";
 	sort(animations.begin(), animations.end());
 	if (!ingameSettings.getSkipAnimation()) {
 		animationList.push_back(AnimationStep(animations, time, line, description));

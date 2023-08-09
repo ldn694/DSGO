@@ -168,11 +168,10 @@ void HeapStage::insertValue(int value) {
 
 		return;
 	}
-	HeapGraph& graph = HeapList.back();
-	int id = graph.getMexID();
+	int id = HeapList.back().getMexID();
 	animations.clear();
 	addNode(animations, id, value);
-	insertVariable(animations, id, { intToString(graph.nodes.size() + 1) });
+	insertVariable(animations, id, { intToString(HeapList.back().nodes.size() + 1) });
 	setColorType(animations, id, Heap::ColorType::highlight);
 	addAnimationStep(animations, stepTime, 0, "Insert " + intToString(value));
 
@@ -189,17 +188,15 @@ void HeapStage::insertValue(int value) {
 			setDefaultView();
 			return;
 		}
-		HeapGraph& graph = HeapList.back();
 		int par = i / 2;
-		int realI = graph.getRealID(i);
-		int realPar = graph.getRealID(par);
+		int realI = HeapList.back().getRealID(i);
+		int realPar = HeapList.back().getRealID(par);
 		
 		animations.clear();
 		setColorType(animations, realPar, AVL::ColorType::lowlight);
 		addAnimationStep(animations, stepTime, 2, "Comparing A[" + intToString(i) + "] and A[" + intToString(par) + "]");
 
-		graph = HeapList.back();
-		if (compare(graph.nodes[realI].value, graph.nodes[realPar].value)) {
+		if (compare(HeapList.back().nodes[realI].value, HeapList.back().nodes[realPar].value)) {
 			animations.clear();
 			swapNode(animations, realI, realPar);
 			deleteVariable(animations, realI, {"i = " + intToString(i), intToString(i) });

@@ -145,12 +145,11 @@ void BTreeStage::insertValue(int value) {
 	}
 	int idGroup = BTreeList.back().root, par = - 1;
 	while (true) {
-		BTreeGraph& graph = BTreeList.back();
-		if (graph.groups[idGroup].nodes.size() < 3 && idGroup != par) {
-			int nextIDGroup = graph.findEdge(idGroup, value);
+		if (BTreeList.back().groups[idGroup].nodes.size() < 3 && idGroup != par) {
+			int nextIDGroup = BTreeList.back().findEdge(idGroup, value);
 			if (nextIDGroup == -1) {
 				animations.clear();
-				int idNode = graph.getMexNodeID();
+				int idNode = BTreeList.back().getMexNodeID();
 				addNode(animations, idNode, value);
 				insertNodeToGroup(animations, idGroup, idNode);
 				setColorType(animations, idGroup, BTree::ColorType::highlight);
@@ -171,15 +170,15 @@ void BTreeStage::insertValue(int value) {
 		}
 		else if (par == -1) {
 			animations.clear();
-			std::vector <int> newGroupID = graph.getMexGroupIDs(2);
+			std::vector <int> newGroupID = BTreeList.back().getMexGroupIDs(2);
 			int idLeftGroup = newGroupID[0], idRightGroup = newGroupID[1];
-			std::vector <int> edges = graph.getEdges(idGroup);
+			std::vector <int> edges = BTreeList.back().getEdges(idGroup);
 			addGroup(animations, idLeftGroup);
 			addGroup(animations, idRightGroup);
-			deleteNodeFromGroup(animations, idGroup, graph.groups[idGroup].nodes[0]);
-			deleteNodeFromGroup(animations, idGroup, graph.groups[idGroup].nodes[2]);
-			insertNodeToGroup(animations, idLeftGroup, graph.groups[idGroup].nodes[0]);
-			insertNodeToGroup(animations, idRightGroup, graph.groups[idGroup].nodes[2]);
+			deleteNodeFromGroup(animations, idGroup, BTreeList.back().groups[idGroup].nodes[0]);
+			deleteNodeFromGroup(animations, idGroup, BTreeList.back().groups[idGroup].nodes[2]);
+			insertNodeToGroup(animations, idLeftGroup, BTreeList.back().groups[idGroup].nodes[0]);
+			insertNodeToGroup(animations, idRightGroup, BTreeList.back().groups[idGroup].nodes[2]);
 			setEdge(animations, idGroup, 0, idLeftGroup);
 			setEdge(animations, idGroup, 1, idRightGroup);
 			setEdge(animations, idLeftGroup, 0, edges[0]);
@@ -199,17 +198,17 @@ void BTreeStage::insertValue(int value) {
 		}
 		else if (idGroup != par) {
 			animations.clear();
-			std::vector <int> newGroupID = graph.getMexGroupIDs(2);
+			std::vector <int> newGroupID = BTreeList.back().getMexGroupIDs(2);
 			int idLeftGroup = newGroupID[0], idRightGroup = newGroupID[1];
-			std::vector <int> edges = graph.getEdges(idGroup);
-			std::vector <int> parEdges = graph.getEdges(par);
-			int idEdgePos = graph.findEdgePos(par, value);
+			std::vector <int> edges = BTreeList.back().getEdges(idGroup);
+			std::vector <int> parEdges = BTreeList.back().getEdges(par);
+			int idEdgePos = BTreeList.back().findEdgePos(par, value);
 			addGroup(animations, idLeftGroup);
 			addGroup(animations, idRightGroup);
 			deleteGroup(animations, idGroup);
-			insertNodeToGroup(animations, par, graph.groups[idGroup].nodes[1]);
-			insertNodeToGroup(animations, idLeftGroup, graph.groups[idGroup].nodes[0]);
-			insertNodeToGroup(animations, idRightGroup, graph.groups[idGroup].nodes[2]);
+			insertNodeToGroup(animations, par, BTreeList.back().groups[idGroup].nodes[1]);
+			insertNodeToGroup(animations, idLeftGroup, BTreeList.back().groups[idGroup].nodes[0]);
+			insertNodeToGroup(animations, idRightGroup, BTreeList.back().groups[idGroup].nodes[2]);
 			parEdges[idEdgePos] = idLeftGroup;
 			parEdges.insert(parEdges.begin() + idEdgePos + 1, idRightGroup);
 			for (int i = 0; i < parEdges.size(); i++) {
@@ -231,7 +230,7 @@ void BTreeStage::insertValue(int value) {
 			addAnimationStep(animations, stepTime, -1, "Continuing");
 			idGroup = par;
 		} else {
-			int nextIDGroup = graph.findEdge(idGroup, value);
+			int nextIDGroup = BTreeList.back().findEdge(idGroup, value);
 			animations.clear();
 			setColorType(animations, idGroup, BTree::ColorType::highlight);
 			addAnimationStep(animations, stepTime, -1, "Inserting " + intToString(value));
@@ -274,9 +273,8 @@ void BTreeStage::searchValue(int value) {
 		setColorType(animations, idGroup, BTree::ColorType::highlight);
 		addAnimationStep(animations, stepTime, -1, "Searching " + intToString(value));
 
-		BTreeGraph& graph = BTreeList.back();
-		for (auto x : graph.groups[idGroup].nodes) {
-			if (graph.nodes[x].getValue() == value) {
+		for (auto x : BTreeList.back().groups[idGroup].nodes) {
+			if (BTreeList.back().nodes[x].getValue() == value) {
 				animations.clear();
 				setColorType(animations, idGroup, BTree::ColorType::highlight2);
 				addAnimationStep(animations, stepTime, -1, "Found " + intToString(value));
@@ -285,7 +283,7 @@ void BTreeStage::searchValue(int value) {
 				return;
 			}
 		}
-		int nextIDGroup = graph.findEdge(idGroup, value);
+		int nextIDGroup = BTreeList.back().findEdge(idGroup, value);
 		animations.clear();
 		setColorType(animations, idGroup, BTree::ColorType::lowlight);
 		if (nextIDGroup != -1) {
