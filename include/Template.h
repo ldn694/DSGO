@@ -88,6 +88,8 @@ extern const int maxDegreeBTree;
 extern int maxSizeDataBTree;
 extern int maxValueDataBTree;
 
+extern const bool ISWORD;
+extern const bool NOTWORD;
 extern const float sizeValueLetterTrie;
 extern const float radiusTrie;
 extern const float thicknessTrie;
@@ -95,6 +97,7 @@ extern const float minHorizontalDistTrie;
 extern const float verticalDistTrie;
 extern int maxSizeDataTrie;
 extern int maxLengthDataTrie;
+extern int maxAlphabetSizeTrie;
 
 extern const int UNKOWN;
 
@@ -111,6 +114,8 @@ enum EdgeType {
 
 std::string intToString(int a);
 int stringToInt(std::string a);
+
+std::string charToString(char a);
 
 float dist2p(float x1, float y1, float x2, float y2);
 

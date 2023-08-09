@@ -12,9 +12,9 @@ TrieStage::TrieStage(sf::RenderWindow& window, ColorTheme theme) :
 		},
 		{
 			{
+				{"a ="},
 				{},
-				{},
-				{"n =", "l ="},
+				{"n =", "l =", "a ="},
 				{}
 			},
 			{
@@ -29,9 +29,9 @@ TrieStage::TrieStage(sf::RenderWindow& window, ColorTheme theme) :
 		},
 		{
 			{
+				{singleNumber},
 				{},
-				{},
-				{singleNumber, singleNumber},
+				{singleNumber, singleNumber, singleNumber},
 				{}
 			},
 			{
@@ -46,9 +46,9 @@ TrieStage::TrieStage(sf::RenderWindow& window, ColorTheme theme) :
 		},
 		{
 			{
+				{{&oneInt, &maxAlphabetSizeTrie}},
 				{},
-				{},
-				{{&zeroInt, &maxSizeDataTrie}, {&oneInt, &maxSizeDataTrie}}, 
+				{{&zeroInt, &maxSizeDataTrie}, {&oneInt, &maxLengthDataTrie}, {&oneInt, &maxAlphabetSizeTrie}},
 				{}
 			},
 			{
@@ -70,39 +70,42 @@ TrieStage::TrieStage(sf::RenderWindow& window, ColorTheme theme) :
 			},
 			{
 				{
-					"insert value",
-					"check balance factor of this node",
-    				"	case LL: rotateRight(this)",
-    				"	case RR: rotateLeft(this)",
-    				"	case LR: rotateLeft(this.left); rotateRight(this)",
-    				"	case RL: rotateRight(this.right); rotateLeft(this)",
-					"	case OK: continue"
+					"cur = root",
+					"for (char x : str):",
+    				"	if (cur->next[x] == NULL):",
+        			"		cur->next[x] = new TrieNode()",
+    				"	cur = cur->next[x]",
+					"cur->isWord = true"
 				}
 			},
 			{
 				{
-					"delete value",
-					"check balance factor of this node",
-    				"	case LL: rotateRight(this)",
-    				"	case RR: rotateLeft(this)",
-    				"	case LR: rotateLeft(this.left); rotateRight(this)",
-    				"	case RL: rotateRight(this.right); rotateLeft(this)",
-					"	case OK: continue"
+					"if depth == str.size():",
+    				"	cur->isWord = false",
+    				"	if cur->next.empty():",
+        			"		delete cur",
+    				"return",
+					"char x = str[depth]",
+					"if (cur->next[x] == NULL): return",
+					"erase(cur->next[x], str, depth + 1)",
+					"if (!cur->isWord && cur->next.empty()):",
+    				"	delete cur"
 				}
 			},
 			{
 				{
-					"if this == null: return null",
-					"else if this.key == search value:return this",
-					"else if this.key < search value: search this.right",
-					"else search this.left"
+					"cur = root",
+					"for (char x : str):",
+    				"	if (cur->next[x] == NULL): return false;",
+    				"	cur = cur->next[x]",
+					"return true"
 				}
 			}
 		},
 		&maxSizeDataTrie, &maxLengthDataTrie, ListInput,
 		theme)
 {
-    rootPosition = sf::Vector2f((WIDTH_RES - 2 * widthBox) / 2 + 2 * widthBox, HEIGHT_RES / 4);
+    rootPosition = sf::Vector2f((WIDTH_RES - 2 * widthBox) / 2 + 2 * widthBox, HEIGHT_RES / 6);
 	setDSName("Trie Tree");
 	TrieList.push_back(TrieGraph(rootPosition, font(fontType::Arial)));
 }
@@ -111,12 +114,15 @@ void TrieStage::setDefaultView() {
 	std::vector <Animation> animations;
 	for (auto x = TrieList.back().nodes.begin(); x != TrieList.back().nodes.end(); x++) {
 		int id = x->first;
-		// std::vector <std::string> variables = TrieList.back().nodes[i].getVariables();
-		// deleteVariable(animations, i, variables);
+		std::vector <std::string> variables = TrieList.back().nodes[id].getVariables();
+		deleteVariable(animations, id, variables);
 		// insertVariable(animations, i, { intToString(i) });
-		setColorType(animations, id, Trie::ColorType::normal);
-		setLeftEdgeColorType(animations, id, Trie::ColorType::normal);
-		setRightEdgeColorType(animations, id, Trie::ColorType::normal);
+		if (x->second.getState() == NOTWORD) {
+			setColorType(animations, id, Trie::ColorType::normal);
+		}
+		else {
+			setColorType(animations, id, Trie::ColorType::highlight2);
+		}
 	}
 	addAnimationStep(animations, stepTime, -1, "Reformat for visualization");
 }
@@ -125,7 +131,49 @@ void TrieStage::insertString(std::string str) {
 	resetAnimation();
 	setAnimatingDirection(Continuous);
 	std::vector <Animation> animations;
-	
+
+	TrieGraph& graph = TrieList.back();
+	int cur = graph.root;
+	animations.clear();
+	setColorType(animations, cur, Trie::ColorType::highlight);
+	insertVariable(animations, cur, {"cur"});
+	addAnimationStep(animations, stepTime, 0, "Start from root");
+
+	for (char x : str) {
+		animations.clear();
+		addAnimationStep(animations, stepTime, 1, "Inserting " + charToString(x));
+
+		int id;
+		if (TrieList.back().findEdge(cur, charToString(x)) == -1) {// no edge
+			animations.clear();
+			addAnimationStep(animations, stepTime, 2, "cur has no edge " + charToString(x));
+
+			id = TrieList.back().getMexID();
+			animations.clear();
+			addNode(animations, id, charToString(x));
+			setColorType(animations, id, Trie::ColorType::highlight);
+			insertEdge(animations, cur, id, charToString(x));
+			addAnimationStep(animations, stepTime, 3, "Create new node " + charToString(x));
+		}
+		else {//have edge
+			animations.clear();
+			addAnimationStep(animations, stepTime, 2, "cur has edge " + charToString(x));
+
+			id = graph.findEdge(cur, charToString(x));
+		}
+		animations.clear();
+		setColorType(animations, id, Trie::ColorType::highlight);
+		setColorType(animations, cur, Trie::ColorType::lowlight);
+		deleteVariable(animations, cur, {"cur"});
+		insertVariable(animations, id, {"cur"});
+		addAnimationStep(animations, stepTime, 3, "Go to node " + charToString(x));
+		cur = id;
+	}
+	animations.clear();
+	setState(animations, cur, ISWORD);
+	addAnimationStep(animations, stepTime, 4, "Set cur->isWord = true");
+
+	setDefaultView();
 }
 
 void TrieStage::deleteString(std::string str) {
@@ -171,19 +219,23 @@ std::pair<bool, ColorTheme> TrieStage::processEvents() {
 		std::string modeString = modeName[curOperation][curMode];
 		if (operationName[curOperation] == "Create") {
 			if (modeString == "Random") {
-				int num = rand() % maxSizeDataTrie;
-                int len = rand() % maxLengthDataTrie;
-				TrieList.clear();
-				TrieList.push_back(TrieGraph(rootPosition, font(fontType::Arial)));
-				for (int i = 0; i < num; i++) {
-					std::string tmp;
-                    int l = rand() % len + 1;
-                    for (int j = 0; j < l; j++) {
-                        tmp += char(rand() % 26 + 'a');
-                    }
-                    insertString(tmp);
+				int alphabetSize = valueTypingBox[0].getProperInt();
+				if (alphabetSize != -1) {
+					int num = rand() % (maxSizeDataTrie + 1);
+					int len = rand() % maxLengthDataTrie + 1;
+					TrieList.clear();
+					TrieList.push_back(TrieGraph(rootPosition, font(fontType::Arial)));
+					for (int i = 0; i < num; i++) {
+						std::string tmp;
+						int l = rand() % len + 1;
+						for (int j = 0; j < l; j++) {
+							tmp += char(rand() % alphabetSize + 'a');
+						}
+						insertString(tmp);
+					}
+					resetAnimation();	
 				}
-				resetAnimation();
+				
 			}
 			if (modeString == "Empty") {
 				TrieList.clear();
@@ -193,14 +245,15 @@ std::pair<bool, ColorTheme> TrieStage::processEvents() {
 			if (modeString == "Fixed Size") {
 				int num = valueTypingBox[0].getProperInt();
                 int len = valueTypingBox[1].getProperInt();
-				if (num != -1 && len != -1) {
+				int alphabetSize = valueTypingBox[2].getProperInt();
+				if (num != -1 && len != -1 && alphabetSize != -1) {
                     TrieList.clear();
                     TrieList.push_back(TrieGraph(rootPosition, font(fontType::Arial)));
                     for (int i = 0; i < num; i++) {
                         std::string tmp;
                         int l = rand() % len + 1;
                         for (int j = 0; j < l; j++) {
-                            tmp += char(rand() % 26 + 'a');
+                            tmp += char(rand() % alphabetSize + 'a');
                         }
                         insertString(tmp);
                     }
@@ -247,6 +300,7 @@ void TrieStage::resetAnimation() {
 }
 
 void TrieStage::addAnimationStep(std::vector <Animation> animations, sf::Time time, int line, std::string description) {
+	// std::cout << description << "\n";
 	sort(animations.begin(), animations.end());
 	if (!ingameSettings.getSkipAnimation()) {
 		animationList.push_back(AnimationStep(animations, time, line, description));

@@ -1,0 +1,32 @@
+//insert
+
+cur = root
+for (char x : str):
+	if (cur->next[x] == NULL):
+		cur->next[x] = new TrieNode()
+	cur = cur->next[x]
+cur->isWord = true
+
+//delete
+
+if depth == str.size():
+    cur->isWord = false
+    if cur->next.empty():
+        delete cur
+    return
+char x = str[depth]
+if (cur->next[x] == NULL): return
+erase(cur->next[x], str, depth + 1)
+if (!cur->isWord && cur->next.empty()): 
+    delete cur
+
+
+//search
+
+cur = root
+for (char x : str):
+    if (cur->next[x] == NULL): return false;
+    cur = cur->next[x]
+return true
+
+

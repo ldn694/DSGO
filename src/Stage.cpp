@@ -499,6 +499,14 @@ void Stage::addNode(std::vector <Animation> &animations, int index, int value) {
 	animations.push_back(tmp);
 }
 
+void Stage::addNode(std::vector <Animation> &animations, int index, std::string value) {
+	Animation tmp;
+	tmp.animationType = AddNode;
+	tmp.id1 = index;
+	tmp.nextString = value;
+	animations.push_back(tmp);
+}
+
 void Stage::deleteNode(std::vector <Animation> &animations, int index) {
 	Animation tmp;
 	tmp.animationType = DeleteNode;
@@ -569,11 +577,12 @@ void Stage::setEdge(std::vector <Animation> &animations, int idGroup, int idPos,
 	animations.push_back(tmp);
 }
 
-void Stage::insertEdge(std::vector <Animation> &animations, int idU, int idV) {
+void Stage::insertEdge(std::vector <Animation> &animations, int idU, int idV, std::string weight) {
 	Animation tmp;
 	tmp.animationType = InsertEdge;
 	tmp.id1 = idU;
 	tmp.id2 = idV;
+	tmp.nextString = weight;
 	animations.push_back(tmp);
 }
 

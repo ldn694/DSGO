@@ -44,6 +44,7 @@ const float minHorizontalDistAVL = 37;
 const float verticalDistAVL = 100;
 int maxSizeDataAVL = 31;
 int maxValueDataAVL = 99;
+int maxAlphabetSizeTrie = 26;
 
 const int maxHeightHeap = 6;
 const float sizeValueLetterHeap = 15;
@@ -63,13 +64,15 @@ const int maxDegreeBTree = 4;
 int maxSizeDataBTree = 31;
 int maxValueDataBTree = 99;
 
-extern const float sizeValueLetterTrie = 20;
-extern const float radiusTrie = 30;
-extern const float thicknessTrie = 3;
-extern const float minHorizontalDistTrie = 37;
-extern const float verticalDistTrie = 100;
-extern int maxSizeDataTrie = 31;
-extern int maxLengthDataTrie = 99;
+const bool ISWORD = true;
+const bool NOTWORD = false;
+const float sizeValueLetterTrie = 15;
+const float radiusTrie = 15;
+const float thicknessTrie = 3;
+const float minHorizontalDistTrie = 15;
+const float verticalDistTrie = 25;
+int maxSizeDataTrie = 20;
+int maxLengthDataTrie = 7;
 
 const int UNKOWN = -(1e9 + 7);
 
@@ -104,6 +107,12 @@ std::string intToString(int a) {
 	if (negative) {
 		res = "-" + res;
 	}
+	return res;
+}
+
+std::string charToString(char a) {
+	std::string res;
+	res.push_back(a);
 	return res;
 }
 

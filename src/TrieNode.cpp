@@ -2,18 +2,17 @@
 
 
 TrieNode::TrieNode(sf::Vector2f pos, std::string value, sf::Font* font) :
-circle(radiusTrie), value(value), type(Trie::ColorType::normal) {
-    circle.setOrigin(radiusTrie / 2, radiusTrie / 2);
-    circle.setPosition(pos);
+circle(radiusTrie), value(value), type(Trie::ColorType::normal), state(NOTWORD) {
     circle.setOutlineThickness(thicknessTrie);
+    circle.setOrigin(circle.getLocalBounds().left + circle.getLocalBounds().width / 2, circle.getLocalBounds().top + circle.getLocalBounds().height / 2);
+    circle.setPosition(pos);
     valueText.setFont(*font);
-    valueText.setStyle(sf::Text::Bold);
     valueText.setString(value);
     valueText.setCharacterSize(sizeValueLetterTrie);
+    valueText.setStyle(sf::Text::Bold);
     valueText.setOrigin(valueText.getLocalBounds().left + valueText.getLocalBounds().width / 2, valueText.getLocalBounds().top + valueText.getLocalBounds().height / 2);
     valueText.setPosition(pos);
     variableText.setFont(*font);
-    variableText.setStyle(sf::Text::Bold);
     variableText.setString("");
     variableText.setCharacterSize(sizeValueLetterTrie);
     variableText.setOrigin(variableText.getLocalBounds().left + variableText.getLocalBounds().width / 2, variableText.getLocalBounds().top + variableText.getLocalBounds().height / 2);
@@ -21,6 +20,7 @@ circle(radiusTrie), value(value), type(Trie::ColorType::normal) {
 }
 
 void TrieNode::setPosition(sf::Vector2f newPosition) {
+    //std::cout << "set position" << newPosition.x << " " << newPosition.y << "\n";
     circle.setPosition(newPosition);
     valueText.setPosition(newPosition);
     variableText.setPosition(newPosition.x, newPosition.y + radiusTrie * 2);
@@ -39,15 +39,15 @@ void TrieNode::setSize(float percent) {
     variableText.setPosition(circle.getPosition() + sf::Vector2f(0, radiusTrie * 2 * percent));
 }
 
-void TrieNode::insertEdge(int id) {
-    edges.insert(id);
+void TrieNode::insertEdge(int id, std::string weight) {
+    edges[id] = weight;
 }
 
 void TrieNode::deleteEdge(int id) {
     if (edges.find(id) == edges.end()) {
         assert(false);
     }
-    edges.erase(edges.find(id));
+    edges.erase(id);
 }
 
 void TrieNode::setValue(std::string newValue) {
@@ -72,6 +72,10 @@ std::string TrieNode::getVariableString() {
         res.pop_back();
     }
     return res;
+}
+
+bool TrieNode::getState() {
+    return state;
 }
 
 void TrieNode::insertVariable(std::string variable) {
@@ -106,6 +110,10 @@ void TrieNode::deleteVariable(std::vector <std::string> variables) {
     variableText.setPosition(circle.getPosition().x, circle.getPosition().y + radiusTrie * 2);
 }
 
+void TrieNode::setState(bool newState) {
+    state = newState;
+}
+
 sf::Vector2f TrieNode::getPosition() {
     return circle.getPosition();
 }
@@ -119,6 +127,9 @@ std::vector <std::string> TrieNode::getVariables() {
 }
 
 void TrieNode::draw(sf::RenderWindow& window, ColorTheme theme, sf::Time totalTime, sf::Time timePassed, std::vector<Animation> animations) {
+    if (state == ISWORD && type == Trie::ColorType::normal) {
+        type = Trie::ColorType::highlight2;
+    }
     circle.setFillColor(Trie::color[theme][type].fillColor);
     circle.setOutlineColor(Trie::color[theme][type].outlineColor);
     valueText.setFillColor(Trie::color[theme][type].valueColor);
@@ -174,6 +185,24 @@ void TrieNode::draw(sf::RenderWindow& window, ColorTheme theme, sf::Time totalTi
                 }
                 case SetValue: {
                     tmp.setValue(animations[i].nextString);
+                    break;
+                }
+                case InsertEdge: {
+                    tmp.insertEdge(animations[i].id2, animations[i].nextString);
+                    break;
+                }
+                case DeleteEdge: {
+                    tmp.deleteEdge(animations[i].id2);
+                    break;
+                }
+                case SetState: {
+                    int nextState = animations[i].nextValue;
+                    Trie::ColorType newType = ((nextState == ISWORD) ? Trie::ColorType::highlight2 : Trie::ColorType::normal);
+                    Trie::Color newColor = Trie::fadingColorType(type, newType, theme, timePassed.asSeconds() / totalTime.asSeconds());
+                    tmp.circle.setFillColor(newColor.fillColor);
+                    tmp.circle.setOutlineColor(newColor.outlineColor);
+                    tmp.valueText.setFillColor(newColor.valueColor);
+                    tmp.variableText.setFillColor(newColor.variableColor);
                     break;
                 }
             }

@@ -94,6 +94,7 @@ public:
 	void setColorType(std::vector <Animation> &animations, int index, int nextColorType);
 	void setRoot(std::vector <Animation> &animations, int value);
 	void addNode(std::vector <Animation> &animations, int index, int value);
+	void addNode(std::vector <Animation> &animations, int index, std::string value);
 	void deleteNode(std::vector <Animation> &animations, int index);
 	void swapNode(std::vector <Animation> &animations, int index1, int index2);
 	void setLeftNode(std::vector <Animation> &animations, int index, int value);
@@ -105,6 +106,6 @@ public:
 	void addGroup(std::vector <Animation> &animations, int idGroup);
 	void deleteGroup(std::vector <Animation> &animations, int idGroup);
 	void setEdge(std::vector <Animation> &animations, int idGroup, int idPos, int value);
-	void insertEdge(std::vector <Animation> &animations, int idU, int idV);
+	void insertEdge(std::vector <Animation> &animations, int idU, int idV, std::string weight);
 	void deleteEdge(std::vector <Animation> &animations, int idU, int idV);
 };

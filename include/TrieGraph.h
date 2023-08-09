@@ -1,4 +1,5 @@
 #pragma once
+#include <functional>
 #include "TrieNode.h"
 
 struct TrieGraph{
@@ -10,9 +11,11 @@ struct TrieGraph{
 
     int getParent(int id);
     int getMexID();
-    sf::RectangleShape getEdgeLine(sf::Vector2f startPosition, sf::Vector2f endPosition, float percent);
+    int findEdge(int id, std::string weight);
+    std::pair <sf::RectangleShape, sf::Text> getEdgeLine(sf::Vector2f startPosition, sf::Vector2f endPosition, std::string weight, float percent);
+    void setThemeEdge(std::pair <sf::RectangleShape, sf::Text> &edge, Trie::ColorType type, ColorTheme theme);
 
-    void DFS(int id, int height, std::vector <std::vector <int> > &tour);
+    void DFS(int id, int height, std::vector <std::pair<int, int> > &tour);
     void arrangeTrieTree();
 
     //backend
