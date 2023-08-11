@@ -229,7 +229,7 @@ void TrieStage::deleteString(std::string str) {
 
 		animations.clear();
 		setState(animations, cur, NOTWORD);
-		setColorType(animations, cur, Trie::ColorType::normal);
+		setColorType(animations, cur, Trie::ColorType::normal); 
 		addAnimationStep(animations, stepTime, 2, "Set cur->isWord = false");
 
 		if (TrieList.back().nodes[cur].edges.empty()) {
@@ -429,7 +429,6 @@ void TrieStage::resetAnimation() {
 }
 
 void TrieStage::addAnimationStep(std::vector <Animation> animations, sf::Time time, int line, std::string description) {
-	std::cout << description << "\n";
 	sort(animations.begin(), animations.end());
 	if (!ingameSettings.getSkipAnimation()) {
 		animationList.push_back(AnimationStep(animations, time, line, description));

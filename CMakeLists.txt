@@ -79,6 +79,10 @@ add_executable(DSGO
 	include/TrieGraph.h
 	src/TrieStage.cpp
 	include/TrieStage.h
+	src/GraphStage.cpp
+	include/GraphStage.h
+	src/GraphMatrixInput.cpp
+	include/GraphMatrixInput.h
 	)
 
 target_link_libraries(DSGO PRIVATE sfml-graphics)

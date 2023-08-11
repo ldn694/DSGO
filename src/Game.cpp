@@ -12,6 +12,7 @@ Game::Game(sf::ContextSettings settings) :
 	maxHeapBox = Box(800, 550, 360, 120, { CommandBoxNormal, CommandBoxSelected }, "Max Heap", font(fontType::Prototype), 30, NO_BORDER, 3);
 	BTreeBox = Box(1190, 400, 360, 120, { CommandBoxNormal, CommandBoxSelected }, "2-3-4 Tree", font(fontType::Prototype), 30, NO_BORDER, 3);
 	TrieBox = Box(1190, 550, 360, 120, { CommandBoxNormal, CommandBoxSelected }, "Trie", font(fontType::Prototype), 30, NO_BORDER, 3);
+	GraphBox = Box(800, 700, 360, 120, { CommandBoxNormal, CommandBoxSelected }, "Graph", font(fontType::Prototype), 30, NO_BORDER, 3);
 	window.setMouseCursor(arrowCursor);
 	window.setFramerateLimit(60);
 	srand(time(NULL));
@@ -24,6 +25,7 @@ void Game::handleMouseMove(float x, float y) {
 	if (maxHeapBox.handleMouseMove(x, y, window)) return;
 	if (BTreeBox.handleMouseMove(x, y, window)) return;
 	if (TrieBox.handleMouseMove(x, y, window)) return;
+	if (GraphBox.handleMouseMove(x, y, window)) return;
 	if (themeBox.handleMouseMove(x, y, window)) return;
 	window.setMouseCursor(arrowCursor);
 }
@@ -56,6 +58,9 @@ void Game::processEvents()
 			}
 			else if (TrieBox.isInside(event.mouseButton.x, event.mouseButton.y)) {
 				runTrie();
+			}
+			else if (GraphBox.isInside(event.mouseButton.x, event.mouseButton.y)) {
+				runGraph();
 			}
 			else if (themeBox.isMousePressed(event.mouseButton.x, event.mouseButton.y)) {
 				theme = ColorTheme((theme + 1) % numColorTheme);
@@ -90,6 +95,7 @@ void Game::render() {
 	maxHeapBox.draw(window, theme);
 	BTreeBox.draw(window, theme);
 	TrieBox.draw(window, theme);
+	GraphBox.draw(window, theme);
 	window.display();
 }
 
@@ -127,6 +133,12 @@ void Game::runTrie() {
 	window.setMouseCursor(waitCursor);
 	TrieStage Trie(window, theme);
 	theme = Trie.run();
+}
+
+void Game::runGraph() {
+	window.setMouseCursor(waitCursor);
+	GraphStage Graph(window, theme);
+	theme = Graph.run();
 }
 
 void Game::run() {

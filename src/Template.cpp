@@ -74,6 +74,12 @@ const float verticalDistTrie = 25;
 int maxSizeDataTrie = 20;
 int maxLengthDataTrie = 7;
 
+const float sizeValueLetterGraph = 15;
+const float edgeGraph = 20;
+const float thicknessGraph = 3;
+int maxSizeDataGraph = 10;
+int maxValueDataGraph = 99;
+
 const int UNKOWN = -(1e9 + 7);
 
 const int maxLetter = 4;

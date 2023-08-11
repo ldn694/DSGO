@@ -209,6 +209,14 @@ const ColorBox colorBox[numColorBoxType][numColorTheme] =
 	{ //UploadBox
 		ColorBox(AntiFlashWhiteColor, BlackColor, BlackColor),
 		ColorBox(AntiFlashWhiteColor, BlackColor, BlackColor)
+	},
+	{ //MatrixHeaderBox
+		ColorBox(LightRedColor , toolBoxColor[0], BlackColor),
+		ColorBox(RoyalPurpleColor, toolBoxColor[1], LavenderBushColor)
+	},
+	{ //TypingBoxNotDrawable
+		ColorBox(BlackColor, WhiteColor, WhiteColor),
+		ColorBox(EerieBlackColor, LavenderBushColor, WhiteColor)
 	}
 };
 

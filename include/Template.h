@@ -99,6 +99,12 @@ extern int maxSizeDataTrie;
 extern int maxLengthDataTrie;
 extern int maxAlphabetSizeTrie;
 
+extern const float sizeValueLetterGraph;
+extern const float edgeGraph;
+extern const float thicknessGraph;
+extern int maxSizeDataGraph;
+extern int maxValueDataGraph;
+
 extern const int UNKOWN;
 
 extern const int maxLetter;

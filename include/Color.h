@@ -176,10 +176,10 @@ const ColorNode colorNode[numColorTheme][numColorNodeType] =
 };
 
 enum ColorBoxType {
-	CommandBoxNormal, CommandBoxSelected, GoBoxNormal, GoBoxSelected, TriangleButtonNormal, TriangleButtonSelected, Typing_Box, MediaBox, CodeOuterBox, UploadBox
+	CommandBoxNormal, CommandBoxSelected, GoBoxNormal, GoBoxSelected, TriangleButtonNormal, TriangleButtonSelected, Typing_Box, MediaBox, CodeOuterBox, UploadBox, MatrixHeaderBox, TypingBoxNotDrawable
 };
 
-const int numColorBoxType = 10;
+const int numColorBoxType = 12;
 
 struct ColorBox {
 	sf::Color fillColor, outlineColor, textColor;

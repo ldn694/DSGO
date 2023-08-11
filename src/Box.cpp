@@ -60,6 +60,16 @@ void Box::setPosition(float _x1, float _y1) {
 	Text.setPosition(x1 + width / 2.0f, y1 + height / 2.0f);
 }
 
+void Box::setSize(float newWidth, float newHeight) {
+	width = newWidth;
+	height = newHeight;
+	float tmpOutlineSize = (isBorder ? outlineSize : 0.f);
+	outerRect.setSize(sf::Vector2f(width - tmpOutlineSize, height - tmpOutlineSize));
+	sf::FloatRect textRect = Text.getLocalBounds();
+	Text.setOrigin(textRect.left + textRect.width / 2.0f, textRect.top + textRect.height / 2.0f);
+	Text.setPosition(x1 + width / 2.0f, y1 + height / 2.0f);
+}
+
 void Box::setDrawable(bool drawable) {
 	isDrawable = drawable;
 }

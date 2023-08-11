@@ -23,6 +23,7 @@ public:
 		bool isBorder = true, float outlineSize = outlineBox);
 	float getOutlineSize();
 	void setPosition(float x1, float y1);
+	void setSize(float width, float height);
 	void setText(std::string newText);
 	void setTextSize(float newSize);
 	int getWidth();

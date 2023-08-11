@@ -11,12 +11,13 @@
 #include "HeapStage.h"
 #include "BTreeStage.h"
 #include "TrieStage.h"
+#include "GraphStage.h"
 
 struct Game {
 private:
 	ColorTheme theme;
     sf::RenderWindow window;
-	Box hashTableBox, AVLBox, minHeapBox, maxHeapBox, BTreeBox, TrieBox;
+	Box hashTableBox, AVLBox, minHeapBox, maxHeapBox, BTreeBox, TrieBox, GraphBox;
 	MyShape lightBulb, darkBulb, themeBox;
 public:
 	Game(sf::ContextSettings settings);
@@ -34,5 +35,6 @@ public:
 	void runMaxHeap();
 	void runBTree();
 	void runTrie();
+	void runGraph();
 	void run();
 };

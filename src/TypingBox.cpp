@@ -4,10 +4,11 @@
 
 TypingBox::TypingBox(float _x, float _y, float _width, float _height, 
 	float _xWarning, float _yWarning, float _widthWarning, float _heightWarning,
-	TypingBoxMode _typingMode, sf::Font* _font, int _maxCharacter, int _minValue, int _maxValue) :
+	TypingBoxMode _typingMode, sf::Font* _font, int _maxCharacter, int _minValue, int _maxValue, bool _centerAligned) :
 	x(_x), y(_y), width(_width), height(_height), 
 	xWarning(_xWarning), yWarning(_yWarning), widthWarning(_widthWarning), heightWarning(_heightWarning),
-	typingMode(_typingMode), font(_font), maxCharacter(_maxCharacter), minValue(_minValue), maxValue(_maxValue)
+	typingMode(_typingMode), font(_font), maxCharacter(_maxCharacter), minValue(_minValue), maxValue(_maxValue), centerAligned(_centerAligned),
+	drawable(true)
 {
 	reading = false;
 	displayingLine = true;
@@ -19,6 +20,14 @@ TypingBox::TypingBox(float _x, float _y, float _width, float _height,
 
 bool TypingBox::isReading() {
 	return reading;
+}
+
+bool TypingBox::isDrawable() {
+	return drawable;
+}
+
+void TypingBox::setDrawable(bool newDrawable) {
+	drawable = newDrawable;
 }
 
 void TypingBox::setWarning() {
@@ -52,7 +61,7 @@ void TypingBox::setWarning() {
 }
 
 std::string TypingBox::getText() {
-	if (typingMode == singleNumber) {
+	if (typingMode == singleNumber && !isReading()) {
 		return (text.empty() ? "0" : text);
 	}
 	return text;
@@ -140,7 +149,7 @@ void TypingBox::insert(int key) {
 	sf::Text Text;
 	Text.setFont(*font);
 	Text.setString(text);
-	Text.setCharacterSize(height * 0.6);
+	Text.setCharacterSize(std::min(height * 0.6, width * 0.4));
 	sf::FloatRect textRect = Text.getLocalBounds();
 	if (textRect.width > width - 15) {
 		text.pop_back();
@@ -166,6 +175,7 @@ void TypingBox::update(sf::Time deltaT) {
 }
 
 void TypingBox::clickOn(float hereX, float hereY) {
+	if (!drawable) return;
 	if (hereX < x || hereX > x + width || hereY < y || hereY > y + height) {
 		reading = false;
 		if (typingMode == singleNumber) {
@@ -181,6 +191,7 @@ void TypingBox::clickOn(float hereX, float hereY) {
 }
 
 bool TypingBox::handleMouseMove(float hereX, float hereY, sf::RenderWindow& window) {
+	if (!drawable) return false;
 	if (x <= hereX && hereX <= x + width && y <= hereY && hereY <= y + height) {
 		window.setMouseCursor(textCursor);
 		return true;
@@ -204,6 +215,26 @@ void TypingBox::readKey(int key) {
 }
 
 void TypingBox::draw(sf::RenderWindow& window, ColorTheme theme) {
+	if (!drawable) {
+		sf::RectangleShape rect(sf::Vector2f(width, height));	
+		rect.setPosition(x, y);
+		rect.setFillColor(colorBox[ColorBoxType::TypingBoxNotDrawable][theme].fillColor);
+		rect.setOutlineThickness(0.f);
+		window.draw(rect);
+		sf::RectangleShape diagonal(sf::Vector2f(sqrt(width * width + height * height) * 0.5, 2));
+		diagonal.setPosition(x + width * 0.25, y + height * 0.25);
+		diagonal.setOrigin(0, 1);
+		diagonal.setFillColor(colorBox[ColorBoxType::TypingBoxNotDrawable][theme].textColor);
+		diagonal.setRotation(45);
+		window.draw(diagonal);
+		sf::RectangleShape antiDiagonal(sf::Vector2f(sqrt(width * width + height * height) * 0.5, 2));
+		antiDiagonal.setPosition(x + width * 0.75, y + height * 0.25);
+		antiDiagonal.setOrigin(0, 1);
+		antiDiagonal.setFillColor(colorBox[ColorBoxType::TypingBoxNotDrawable][theme].textColor);
+		antiDiagonal.setRotation(135);
+		window.draw(antiDiagonal);
+		return;
+	}
 	sf::RectangleShape rect(sf::Vector2f(width, height));
 	rect.setPosition(x, y);
 	rect.setFillColor(colorBox[ColorBoxType::Typing_Box][theme].fillColor);
@@ -211,17 +242,27 @@ void TypingBox::draw(sf::RenderWindow& window, ColorTheme theme) {
 	window.draw(rect);
 	sf::Text Text;
 	Text.setFont(*font);
-	Text.setString(text);
+	Text.setString(getText());
 	//std::cout << text << "\n";
 	Text.setCharacterSize(height * 0.6);
 	Text.setFillColor(colorBox[ColorBoxType::Typing_Box][theme].textColor);
-	Text.setPosition(x + 10, y + height * 0.1);
-	sf::FloatRect textRect = Text.getLocalBounds();
+	if (!centerAligned) {
+		Text.setOrigin(Text.getLocalBounds().left, Text.getLocalBounds().top + Text.getLocalBounds().height / 2.f);
+		Text.setPosition(x + 10, y + height * 0.5f);
+	}
+	else {
+		Text.setOrigin(Text.getLocalBounds().left + Text.getLocalBounds().width / 2.f, Text.getLocalBounds().top + Text.getLocalBounds().height / 2.f);
+		Text.setPosition(x + width * 0.5f, y + height * 0.5f);
+	}
+	sf::FloatRect textRect = Text.getGlobalBounds();
 	window.draw(Text);
 	if (reading && displayingLine) {
 		sf::Vertex vtx[4]; 
 		float textHeight = height * 0.6;
-		float lineX = textRect.width < epsilonFloat ? x + 10 : x + textRect.width + 15;
+		float lineX = textRect.width < epsilonFloat ? x + 10 : textRect.left + textRect.width;
+		if (centerAligned) {
+			lineX = textRect.width < epsilonFloat ? x + width * 0.5f : textRect.left + textRect.width;
+		}
 		vtx[0] = sf::Vertex(sf::Vector2f(lineX, y + (height - textHeight) * 0.5f), colorBox[Typing_Box][theme].textColor);
 		vtx[1] = sf::Vertex(sf::Vector2f(lineX, y + (height - textHeight) * 0.5f + textHeight), colorBox[Typing_Box][theme].textColor);
 		window.draw(vtx, 2, sf::Lines);
@@ -266,7 +307,7 @@ void BigTypingBox::drawAll(sf::RenderWindow& window, ColorTheme theme) {
 		sf::Text Text;
 		Text.setFont(*font);
 		Text.setString(name);
-		Text.setCharacterSize(height * 0.6);
+		Text.setCharacterSize(valueWidth * 0.5);
 		Text.setFillColor(colorBox[ColorBoxType::CommandBoxNormal][theme].textColor);
 		sf::FloatRect textRect = Text.getLocalBounds();
 		Text.setOrigin(textRect.left + textRect.width / 2.0f, textRect.top + textRect.height / 2.0f);

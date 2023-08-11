@@ -6,9 +6,11 @@
 
 struct TypingBox {
 protected:
+	bool drawable;
 	float x, y, width, height;
 	float xWarning, yWarning, widthWarning, heightWarning;
 	bool displayingWarning;
+	bool centerAligned;
 	TypingBoxMode typingMode;
 	bool reading;
 	std::string text, warning; 
@@ -19,7 +21,9 @@ protected:
 public:
 	TypingBox(float x = 0.f, float y = 0.f, float width = 0.f, float height = 0.f, 
 		float xWarning = 0.f, float yWarning = 0.f, float widthWarning = 0.f, float heightWarning = 0.f,
-		TypingBoxMode typingMode = singleNumber, sf::Font *font = nullptr, int maxCharacter = 5, int minValue = 0, int maxValue = 10);
+		TypingBoxMode typingMode = singleNumber, sf::Font *font = nullptr, int maxCharacter = 5, int minValue = 0, int maxValue = 10, bool centerAligned = false);
+	bool isDrawable();
+	void setDrawable(bool drawable);
 	bool isReading();
 	std::string getText();
 	void setWarning();
