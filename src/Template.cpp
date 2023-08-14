@@ -80,6 +80,9 @@ const float radiusGraph = 15;
 const float thicknessGraph = 3;
 int maxSizeDataGraph = 10;
 int maxValueDataGraph = 99;
+const float idealLength = 50;
+const float damperingConst = 0.975;
+const int maxStep = 10000;
 
 const int UNKOWN = -(1e9 + 7);
 

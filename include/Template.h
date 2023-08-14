@@ -105,6 +105,9 @@ extern const float radiusGraph;
 extern const float thicknessGraph;
 extern int maxSizeDataGraph;
 extern int maxValueDataGraph;
+extern const float idealLength;
+extern const float damperingConst;
+extern const int maxStep;
 
 extern const int UNKOWN;
 

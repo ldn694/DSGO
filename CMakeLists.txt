@@ -85,6 +85,10 @@ add_executable(DSGO
 	include/GraphMatrixInput.h
 	src/GeneralNode.cpp
 	include/GeneralNode.h
+	src/GeneralEdge.cpp
+	include/GeneralEdge.h
+	src/GeneralGraph.cpp
+	include/GeneralGraph.h
 	)
 
 target_link_libraries(DSGO PRIVATE sfml-graphics)
