@@ -76,6 +76,7 @@ int maxLengthDataTrie = 7;
 
 const float sizeValueLetterGraph = 15;
 const float edgeGraph = 20;
+const float radiusGraph = 15;
 const float thicknessGraph = 3;
 int maxSizeDataGraph = 10;
 int maxValueDataGraph = 99;

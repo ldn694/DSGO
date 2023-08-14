@@ -166,6 +166,36 @@ const Trie::Color Trie::color[numColorTheme][numColorType] =
 
 //-----------------------------------------------------------------------------------
 
+General::Color::Color(sf::Color _fillColor, sf::Color _outlineColor, sf::Color _valueColor, sf::Color _variableColor) :
+    fillColor(_fillColor), outlineColor(_outlineColor), valueColor(_valueColor), variableColor(_variableColor) {}
+
+General::Color General::fadingColorType(General::ColorType before, General::ColorType after, ColorTheme theme, float percent) {
+	return General::Color(
+		fadingColor(General::color[theme][before].fillColor, General::color[theme][after].fillColor, percent),
+		fadingColor(General::color[theme][before].outlineColor, General::color[theme][after].outlineColor, percent),
+		fadingColor(General::color[theme][before].valueColor, General::color[theme][after].valueColor, percent),
+		fadingColor(General::color[theme][before].variableColor, General::color[theme][after].variableColor, percent)
+	);
+}
+
+const General::Color General::color[numColorTheme][numColorType] =
+{
+	{
+		Color(LavenderBushColor, BlackColor, BlackColor, RedColor),
+		Color(OrangeColor, OrangeColor, LavenderBushColor, RedColor),
+		Color(LavenderBushColor, OrangeColor, OrangeColor, RedColor),
+		Color(LightGreenColor, LightGreenColor, LavenderBushColor, RedColor)
+	} ,
+	{
+		Color(EerieBlackColor, WhiteColor, WhiteColor, WhiteColor),
+		Color(MediumSlateBlueColor, MediumSlateBlueColor, EerieBlackColor, WhiteColor),
+		Color(EerieBlackColor, MediumSlateBlueColor, MediumSlateBlueColor, WhiteColor),
+		Color(VistaBlueColor, VistaBlueColor, EerieBlackColor, WhiteColor)
+	}
+};
+
+//-----------------------------------------------------------------------------------
+
 const sf::Color toolBoxColor[numColorTheme] = { AntiFlashWhiteColor, DimGrayColor };
 
 const ColorBox colorBox[numColorBoxType][numColorTheme] =

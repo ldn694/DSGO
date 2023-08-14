@@ -101,6 +101,7 @@ extern int maxAlphabetSizeTrie;
 
 extern const float sizeValueLetterGraph;
 extern const float edgeGraph;
+extern const float radiusGraph;
 extern const float thicknessGraph;
 extern int maxSizeDataGraph;
 extern int maxValueDataGraph;
