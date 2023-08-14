@@ -1,6 +1,7 @@
 #include "GeneralEdge.h"
 
 GeneralEdge::GeneralEdge(int from, int to, int weight): from(from), to(to), weight(weight) {
+    type = General::ColorType::normal;
 }
 
 bool GeneralEdge::operator<(const GeneralEdge& other) const {

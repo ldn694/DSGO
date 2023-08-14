@@ -1,10 +1,15 @@
 #include "GeneralGraph.h"
 
-GeneralGraph::GeneralGraph(std::vector <GeneralEdge> edges, sf::RectangleShape viewRect, sf::Font* font) : font(font), viewRect(viewRect) {
+GeneralGraph::GeneralGraph(std::vector <GeneralEdge> edges, sf::FloatRect viewRect, sf::Font* font) : font(font), viewRect(viewRect) {
     setEdges(edges);
 }
 
-void GeneralGraph::setEdges(std::vector <GeneralEdge> edges) {
+void GeneralGraph::setEdges(std::vector <GeneralEdge> edges, bool directed) {
+    this->isDirected = directed;
+    // std::cout << "------------\n";
+    // for (auto x : edges) {
+    //     std::cout << x.from << " " << x.to << " " << x.weight << "\n";
+    // }
     this->edges.clear();
     for (auto x : edges) {
         this->edges.insert(x);
@@ -17,69 +22,82 @@ void GeneralGraph::setEdges(std::vector <GeneralEdge> edges) {
     int numNode = nodes.size();
     int numRow = std::max(int(sqrt(numNode)), 1);
     int numCol = (numNode + numRow - 1) / numRow;
+    // std::cout << "numRow = " << numRow << " numCol = " << numCol << "\n";
     float distX = viewRect.getSize().x / (numCol + 1);
     float distY = viewRect.getSize().y / (numRow + 1);
+    // std::cout << "distX = " << distX << " distY = " << distY << "\n";
     int cnt = 0;
-    for (auto x : nodes) {
+    for (auto &x : nodes) {
         int row = cnt / numCol;
         int col = cnt % numCol;
         x.second.setPosition(viewRect.getPosition() + sf::Vector2f(distX * (col + 1), distY * (row + 1)));
+        // std::cout << "cnt = " << cnt << " row = " << row << " col = " << col << " " << x.second.getPosition().x << " " << x.second.getPosition().y << "\n";
         cnt++;
     }
     arrangeGraph();
 }
 
-sf::Vector2f GeneralGraph::fAttract(int u, int v, std::map <int, sf::Vector2f>& pos) {
-    return idealLength / length(pos[v] - pos[u]) * (pos[u] - pos[v]);
+float GeneralGraph::fAttract(float x) {
+    return x * x / idealLength;
+}
+float GeneralGraph::fRepel(float x) {
+    return idealLength * idealLength / x;
 }
 
-sf::Vector2f GeneralGraph::fRepel(int u, int v, std::map <int, sf::Vector2f>& pos) {
-    float len = length(pos[v] - pos[u]);
-    return len * len / idealLength * (pos[v] - pos[u]);
-}
 
 void GeneralGraph::arrangeGraph() {
+    // std::cout << "--------------------\n";
     std::vector <int> idList;
     for (auto x : nodes) {
         idList.push_back(x.first);
     }
     std::map <int, sf::Vector2f> pos, nextPos;
-    for (int t = 0; t < maxStep; t++) {
-        bool flag = false;
-        nextPos = pos;
-        for (int i = 0; i < idList.size(); i++) {
-            sf::Vector2f fTotal = {0.f, 0.f};
-            int u = idList[i];
-            for (int j = 0; j < idList.size(); j++) {
-                if (j == i) continue;
-                int v = idList[j];
-                fTotal += fRepel(u, v, pos);
-            }
-            std::set <int> adj;
-            for (auto x : edges) {
-                if (x.from == u) {
-                    adj.insert(x.to);
-                }
-                if (x.to == u) {
-                    adj.insert(x.from);
-                }
-            }
-            for (auto v : adj) {
-                fTotal += fAttract(u, v, pos);
-            }
-            if (fTotal.x > epsilonFloat || fTotal.y > epsilonFloat) {
-                flag = true;
-                nextPos[u] = pos[u] + fTotal;
-            }
-        }
-        if (!flag) {
-            break;
-        }
-        else {
-            pos = nextPos;
+    for (int i = 0; i < idList.size(); i++) {
+        pos[idList[i]] = nodes[idList[i]].getPosition();
+    }
+    float maximumDisp = 0;
+    for (auto u : idList) {
+        for (auto v : idList) {
+            if (u == v) continue;
+            sf::Vector2f delta = pos[u] - pos[v];
+            maximumDisp = std::max(maximumDisp, length(delta));
         }
     }
-    for (auto x : nodes) {
+    maximumDisp /= 2;
+    for (int t = 0; t < maxStep; t++) {
+        // std::cout << "iteration " << t << "\n";
+        std::map <int, sf::Vector2f> disp;
+        // for (int v : idList) {
+        //     std::cout << v << " " << pos[v].x << " " << pos[v].y << "\n";
+        // }
+        nextPos.clear();
+        for (int v : idList) {
+            nextPos[v] = pos[v];
+        }
+        for (int v : idList) {
+            for (int u : idList) {
+                if (u == v) continue;
+                sf::Vector2f delta = pos[v] - pos[u];
+                disp[v] += normalize(delta) * fRepel(length(delta));
+            }
+        }
+        for (auto x : edges) {
+            int v = x.from;
+            int u = x.to;
+            sf::Vector2f delta = pos[v] - pos[u];
+            disp[v] -= normalize(delta) * fAttract(length(delta));
+            disp[u] += normalize(delta) * fAttract(length(delta));
+        }
+        for (int v : idList) {
+            nextPos[v] += normalize(disp[v]) * std::min(length(disp[v]), maximumDisp);
+            // nextPos[v].x = std::max(viewRect.left, std::min(viewRect.left + viewRect.width, nextPos[v].x));
+            // nextPos[v].y = std::max(viewRect.top, std::min(viewRect.top + viewRect.height, nextPos[v].y));
+            maximumDisp *= damperingConst;
+        }
+        pos = nextPos;
+    }
+    for (auto &x : nodes) {
+        // std::cout << x.first << " " << pos[x.first].x << " " << pos[x.first].y << "\n";
         x.second.setPosition(pos[x.first]);
     }
 }
@@ -97,6 +115,30 @@ int GeneralGraph::getMexID() {
         i++;
     }
     assert(false);
+}
+
+std::vector <sf::RectangleShape> GeneralGraph::getEdgeLines(sf::Vector2f startPosition, sf::Vector2f endPosition, bool directed) {
+    std::vector <sf::RectangleShape> res;
+    sf::Vector2f delta = endPosition - startPosition;
+    sf::RectangleShape line(sf::Vector2f(length(delta) - 2 * (radiusGraph + thicknessGraph), thicknessGraph));
+    line.setOrigin(0, thicknessGraph / 2);
+    line.setPosition(startPosition + normalize(delta) * (radiusGraph + thicknessGraph));
+    line.setRotation(180 / PI * atan2(delta.y, delta.x));
+    res.push_back(line);
+    if (directed) {
+        sf::RectangleShape smallLine1(sf::Vector2f(0.5f * radiusGraph, thicknessGraph));
+        smallLine1.setOrigin(0, thicknessGraph / 2);
+        smallLine1.setPosition(endPosition - normalize(delta) * (radiusGraph + thicknessGraph));
+        smallLine1.setRotation(180 / PI * atan2(delta.y, delta.x) + 135);
+
+        res.push_back(smallLine1);
+        sf::RectangleShape smallLine2(sf::Vector2f(0.5f * radiusGraph, thicknessGraph));
+        smallLine2.setOrigin(0, thicknessGraph / 2);
+        smallLine2.setPosition(endPosition - normalize(delta) * (radiusGraph + thicknessGraph));
+        smallLine2.setRotation(180 / PI * atan2(delta.y, delta.x) - 135);
+        res.push_back(smallLine2);
+    }
+    return res;
 }
 
 GeneralGraph GeneralGraph::execAnimation(std::vector <Animation> animations) {
@@ -140,8 +182,23 @@ GeneralGraph GeneralGraph::execAnimation(std::vector <Animation> animations) {
 void GeneralGraph::draw(sf::RenderWindow& window, ColorTheme theme, sf::Time totalTime, sf::Time timePassed, std::vector<Animation> animations) {
     if (timePassed < epsilonTime) {
         for (auto x = nodes.begin(); x != nodes.end(); x++) {
+            // std::cout << x->first << " ";
             x->second.draw(window, theme);
+            for (auto y = edges.begin(); y != edges.end(); y++) {
+                if (y->from == x->first) {
+                    if (!isDirected && y->from > y->to) {
+                        continue;
+                    }
+                    //std::cout << y->from << " " << y->to << "\n";
+                    std::vector <sf::RectangleShape> lines = getEdgeLines(x->second.getPosition(), nodes[y->to].getPosition(), isDirected);
+                    for (auto line : lines) {
+                        line.setFillColor(General::color[y->type]->outlineColor);
+                        window.draw(line);
+                    }
+                }
+            }
         }
+        // std::cout << "\n";
     }
     float percent = (totalTime < epsilonTime ? 1.f : timePassed / totalTime);
     GeneralGraph tmp = execAnimation(animations);

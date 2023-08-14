@@ -52,7 +52,16 @@ GraphStage::GraphStage(sf::RenderWindow& _window, ColorTheme _theme) :
 
     setDSName("Graph");
 
-        
+	viewRect = sf::FloatRect(widthBox * 2, HEIGHT_RES / 4, WIDTH_RES - 4 * widthBox, HEIGHT_RES / 2);
+    graphList.push_back(GeneralGraph({}, viewRect, font(fontType::Arial)));
+}
+
+void GraphStage::setGraph() {
+	GeneralGraph graph = graphList.back();
+	matrixInput.setDirected(directedChoices.getChoice());
+	graph.setEdges(matrixInput.getEdges(), directedChoices.getChoice());
+	graphList.clear();
+	graphList.push_back(graph);
 }
 
 void GraphStage::setDSName(std::string name) {
@@ -75,7 +84,9 @@ bool GraphStage::handleMousePressed(float x, float y) {
 	codeVisualizer.handleMousePressed(x, y);
     algorithmChoices.handleMousePressed(x, y);
     representationChoices.handleMousePressed(x, y);
-    directedChoices.handleMousePressed(x, y);
+    if (directedChoices.handleMousePressed(x, y)) {
+		setGraph();
+	}
     sizeTypingBox.clickOn(x, y);
     startVertexTypingBox.clickOn(x, y);
 	matrixInput.handleMousePressed(x, y);
@@ -110,7 +121,9 @@ void GraphStage::handleKeyPressed(int key) {
     if (startVertexTypingBox.isReading()) {
         startVertexTypingBox.readKey(key);
     }
-	matrixInput.handleKeyPressed(key);
+	if (matrixInput.handleKeyPressed(key)) {
+		setGraph();
+	}
 }
 
 void GraphStage::handleMouseMove(float x, float y) {
@@ -183,21 +196,7 @@ void GraphStage::draw() {
 	nextModeButton.draw(window, theme);
     sizeTypingBox.drawAll(window, theme);
     startVertexTypingBox.drawAll(window, theme);
-	matrixInput.setDirected(directedChoices.getChoice());
 	matrixInput.draw(window, theme);
-    
-
-	// if (numValue[curOperation][curMode]) {
-	// 	for (int i = 0; i < numValue[curOperation][curMode]; i++) {
-	// 		valueTypingBox[i].drawAll(window, theme);
-	// 	}
-	// }
-	// else {
-	// 	if (modeName[curOperation][curMode] == "Upload File") {
-	// 		Box emptyBox(0, HEIGHT_RES - heightBox * 12, widthBox * 2, heightBox, { CommandBoxNormal });
-	// 		emptyBox.draw(window, theme);
-	// 	}
-	// }
 	readFromFile.draw(window, theme);
 	backButton.draw(window, theme);
 }
@@ -322,35 +321,35 @@ void GraphStage::graphStageUpdate(sf::Time deltaT) {
 void GraphStage::render() {
     window.clear(theme == LightTheme ? LavenderBushColor : EerieBlackColor);
 	draw();
-	// if (TrieList.size() == 1) {
-	// 	TrieList[0].draw(window, theme, sf::Time::Zero, sf::Time::Zero, {});
-	// }
-	// else {
-	// 	int curStep = getCurStep();
-	// 	bool exactStep = false;
-	// 	if (curStep < 0) {
-	// 		curStep = -curStep - 1;
-	// 		codeVisualizer.setHighlightLine(animationList[curStep].line);
-	// 		codeVisualizer.setDescription(animationList[curStep].description);
-	// 	}
-	// 	else {
-	// 		exactStep = true;
-	// 		if (curStep > 0) {
-	// 			codeVisualizer.setHighlightLine(animationList[curStep - 1].line);
-	// 			codeVisualizer.setDescription(animationList[curStep - 1].description);
-	// 		}
-	// 		else {
-	// 			codeVisualizer.setHighlightLine(-1);
-	// 			codeVisualizer.setDescription("");
-	// 		}
-	// 	}
-	// 	if (!exactStep) {
-	// 		TrieList[curStep].draw(window, theme, animationList[curStep].time, curTime - getPrefixTime(curStep), animationList[curStep].animations);
-	// 	}
-	// 	else {
-	// 		TrieList[curStep].draw(window, theme) ;
-	// 	}
-	// }
+	if (graphList.size() == 1) {
+		graphList[0].draw(window, theme, sf::Time::Zero, sf::Time::Zero, {});
+	}
+	else {
+		int curStep = getCurStep();
+		bool exactStep = false;
+		if (curStep < 0) {
+			curStep = -curStep - 1;
+			codeVisualizer.setHighlightLine(animationList[curStep].line);
+			codeVisualizer.setDescription(animationList[curStep].description);
+		}
+		else {
+			exactStep = true;
+			if (curStep > 0) {
+				codeVisualizer.setHighlightLine(animationList[curStep - 1].line);
+				codeVisualizer.setDescription(animationList[curStep - 1].description);
+			}
+			else {
+				codeVisualizer.setHighlightLine(-1);
+				codeVisualizer.setDescription("");
+			}
+		}
+		if (!exactStep) {
+			graphList[curStep].draw(window, theme, animationList[curStep].time, curTime - getPrefixTime(curStep), animationList[curStep].animations);
+		}
+		else {
+			graphList[curStep].draw(window, theme);
+		}
+	}
 	window.display();
 }
 
@@ -383,6 +382,7 @@ std::pair<bool, ColorTheme> GraphStage::processEvents() {
 		int x = sizeTypingBox.getProperInt();
 		if (x != -1) {
 			matrixInput.setSize(x);
+			setGraph();
 		}
 		isCreating = false;
 	}

@@ -2,7 +2,7 @@
 
 GeneralNode::GeneralNode(sf::Vector2f pos, int value, sf::Font* font) :
 circle(radiusGraph), value(value), type(General::ColorType::normal){
-    circle.setOrigin(radiusGraph / 2, radiusGraph / 2);
+    circle.setOrigin(circle.getLocalBounds().left + circle.getLocalBounds().width / 2, circle.getLocalBounds().top + circle.getLocalBounds().height / 2);
     circle.setPosition(pos);
     circle.setOutlineThickness(thicknessGraph);
     valueText.setFont(*font);

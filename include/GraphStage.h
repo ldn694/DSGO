@@ -12,6 +12,7 @@
 #include "IngameSettings.h"
 #include "CodeVisualizer.h"
 #include "GraphMatrixInput.h"
+#include "GeneralGraph.h"
 
 struct GraphStage {
 private:
@@ -41,6 +42,9 @@ private:
 	bool isCreating;
 	GraphMatrixInput matrixInput;
 
+	sf::FloatRect viewRect;
+	std::vector <GeneralGraph> graphList;
+
 	AnimatingDirection animatingDirection;
 	sf::Time curTime;
 	int previousStep;
@@ -48,6 +52,7 @@ private:
 
 public:
     GraphStage(sf::RenderWindow &window, ColorTheme theme = LightTheme);
+	void setGraph();
 	void setDSName(std::string name);
 	void setMode(int newMode);
 	bool handleMousePressed(float x, float y);

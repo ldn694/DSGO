@@ -74,13 +74,13 @@ const float verticalDistTrie = 25;
 int maxSizeDataTrie = 20;
 int maxLengthDataTrie = 7;
 
-const float sizeValueLetterGraph = 15;
-const float edgeGraph = 20;
-const float radiusGraph = 15;
+const float sizeValueLetterGraph = 20;
+const float edgeGraph = 30;
+const float radiusGraph = 20;
 const float thicknessGraph = 3;
 int maxSizeDataGraph = 10;
 int maxValueDataGraph = 99;
-const float idealLength = 50;
+const float idealLength = 100;
 const float damperingConst = 0.975;
 const int maxStep = 10000;
 

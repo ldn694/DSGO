@@ -2,6 +2,7 @@
 #include "Color.h"
 #include "Box.h"
 #include "TypingBox.h"
+#include "GeneralEdge.h"
 
 struct GraphMatrixInput {
     bool directed;
@@ -15,7 +16,8 @@ struct GraphMatrixInput {
     void setDirected(bool isDirected);
     void handleMouseMoved(float mouseX, float mouseY, sf::RenderWindow& window);
     void handleMousePressed(float mouseX, float mouseY);
-    void handleKeyPressed(int key);
+    bool handleKeyPressed(int key);
     void update(sf::Time deltaT);
+    std::vector <GeneralEdge> getEdges();
     void draw(sf::RenderWindow& window, ColorTheme theme);
 };

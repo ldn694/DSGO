@@ -9,8 +9,15 @@ GraphMatrixInput::GraphMatrixInput(sf::Rect <float> rect, int size, sf::Font *fo
 
 void GraphMatrixInput::setDirected(bool isDirected) {
     directed = isDirected;
+    float boxSize = rect.width / std::max(size + 1, 8);
     for (int i = 1; i <= size; i++) {
         for (int j = 1; j <= i - 1; j++) {
+            if (directed != boxes[i][j].isDrawable()) {
+                float x = rect.left + j * boxSize;
+                float y = rect.top + i * boxSize;
+                float outline = (1 > boxSize ? 0 : outlineBox);
+                boxes[i][j] = TypingBox(x + outline / 2, y + outline / 2, boxSize - outline, boxSize - outline, 0, HEIGHT_RES - heightBox, widthBox * 2, heightBox, singleNumber, font, 2, 0, maxValueDataGraph, true);
+            }
             boxes[i][j].setDrawable(directed);
         }
     }
@@ -47,6 +54,36 @@ void GraphMatrixInput::setSize(int newSize) {
     }
 }
 
+std::vector <GeneralEdge> GraphMatrixInput::getEdges() {
+    if (directed) {
+        std::vector <GeneralEdge> edges;
+        for (int i = 1; i <= size; i++) {
+            for (int j = 1; j <= size; j++) {
+                int weight = boxes[i][j].getProperInt();
+                if (weight == -1) return {};
+                if (weight > 0) {
+                    edges.push_back(GeneralEdge(i, j, weight));
+                }
+            }
+        }
+        return edges;
+    }
+    else {
+        std::vector <GeneralEdge> edges;
+        for (int i = 1; i <= size; i++) {
+            for (int j = i + 1; j <= size; j++) {
+                int weight = boxes[i][j].getProperInt();
+                if (weight == -1) return {};
+                if (weight > 0) {
+                    edges.push_back(GeneralEdge(i, j, weight));
+                    edges.push_back(GeneralEdge(j, i, weight));
+                }
+            }
+        }
+        return edges;
+    }
+}
+
 void GraphMatrixInput::handleMouseMoved(float mouseX, float mouseY, sf::RenderWindow& window) {
     for (int i = 1; i <= size; i++) {
         for (int j = 1; j <= size; j++) {
@@ -63,14 +100,17 @@ void GraphMatrixInput::handleMousePressed(float mouseX, float mouseY) {
     }
 }
 
-void GraphMatrixInput::handleKeyPressed(int key) {
+bool GraphMatrixInput::handleKeyPressed(int key) {
+    bool flag = false;
     for (int i = 1; i <= size; i++) {
         for (int j = 1; j <= size; j++) {
             if (boxes[i][j].isReading()) {
                 boxes[i][j].readKey(key);
+                flag = true;
             }
         }
     }
+    return flag;
 }
 
 void GraphMatrixInput::update(sf::Time deltaT) {
