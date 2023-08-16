@@ -290,10 +290,11 @@ BigTypingBox::BigTypingBox(float _x, float _y, float _width, float _height, floa
 
 void BigTypingBox::setDrawable(bool val) {
 	drawable = val;
+	TypingBox::setDrawable(val);
 }
 
 void BigTypingBox::setTypingBoxDrawable(bool val) {
-	typingBoxDrawable = val;
+	TypingBox::setDrawable(val);
 }
 
 void BigTypingBox::setName(std::string newName) {
@@ -313,8 +314,6 @@ void BigTypingBox::drawAll(sf::RenderWindow& window, ColorTheme theme) {
 		Text.setOrigin(textRect.left + textRect.width / 2.0f, textRect.top + textRect.height / 2.0f);
 		Text.setPosition(outerX + (valueWidth + outlineSize) / 2, outerY + outerHeight / 2);
 		window.draw(Text);
-		if (typingBoxDrawable) {
-			draw(window, theme);
-		}
+		draw(window, theme);
 	}
 }

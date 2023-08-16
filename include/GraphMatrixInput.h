@@ -13,6 +13,7 @@ struct GraphMatrixInput {
     std::vector <Box> firstRow, firstColumn;
     std::vector <std::vector <TypingBox>> boxes;
     GraphMatrixInput(sf::Rect <float> rect, int size, sf::Font *font, bool isDirected = true);
+    void setEdges(std::vector <GeneralEdge> edges, bool isDirected, int size);
     void createRandom();
     void setSize(int size);
     void setDirected(bool isDirected);

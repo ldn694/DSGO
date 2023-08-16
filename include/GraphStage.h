@@ -31,6 +31,7 @@ private:
     BackButton backButton;
 
     ReadFromFile readFromFile;
+	Box readFromFileBox;
 	
 	IngameSettings ingameSettings;
 	CodeVisualizer codeVisualizer;

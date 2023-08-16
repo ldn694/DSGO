@@ -134,7 +134,121 @@ std::vector <int> ReadFromFile::getListInt() {
     return tmp;
 }
 
+std::pair <std::vector <GeneralEdge>, int> ReadFromFile::getListEdge() {
+    if (fileName == "Choose file") {
+        return {};
+    }
+    std::ifstream fi(address);
+    //first number = size;
+    std::string firstLine;
+    std::getline(fi, firstLine);
+    int size = 0;
+    for (char x : firstLine) {
+        if (x < '0' || x > '9') {
+            fi.close();
+            return { {}, -1 };
+        }
+        size = size * 10 + x - '0';
+    }
+    if (size > maxSize) {
+        fi.close();
+        return { {}, -4 };
+    }
+    std::vector <GeneralEdge> tmp;
+    for (int numRow = 1; numRow <= size; numRow++) {
+        std::string line;
+        std::getline(fi, line);
+        int i = 0, numCol = 1;
+        std::string valText;
+        std::string curText = line + " ";
+        while (i < curText.size()) {
+            if (curText[i] == ' ') {
+                if (!valText.empty()) {
+                    int val = stringToInt(valText);
+                    tmp.push_back({ numRow, numCol, stringToInt(valText) });
+                    valText.clear();
+                    if (numCol > size) {
+                        fi.close();
+                        // std::cout << "size = " << size << "\n";
+                        // for (auto x : tmp) {
+                        //     std::cout << x.from << " " << x.to << " " << x.weight << "\n";
+                        // }
+                        return { {}, -4 };
+                    }
+                    numCol++;
+                }
+                i++;
+                continue;
+            }
+            if (curText[i] < '0' || curText[i] > '9') {
+                fi.close();
+                return { {}, -1 };
+            }
+            valText.push_back(curText[i]);
+            if (valText.size() > 9) {
+                fi.close();
+                return { {}, -3 };
+            }
+            if (stringToInt(valText) < minValue || stringToInt(valText) > maxValue) {
+                fi.close();
+                return { {}, -2 };
+            }
+            i++;
+        }
+        if (numCol - 1 != size) {
+            fi.close();
+            return { {}, -5 };
+        }
+    }
+    fi.close();
+    while (true) {
+        bool found = false;
+        for (int i = 0; i < tmp.size(); i++) {
+            if (tmp[i].from == tmp[i].to) {
+                tmp.erase(tmp.begin() + i);
+                found = true;
+                break;
+            }
+        }
+        if (!found) {
+            break;
+        }
+    }
+    // for (auto x : tmp) {
+    //     std::cout << x.from << " " << x.to << " " << x.weight << "\n";
+    // }
+    return {tmp, size};
+}
+
 void ReadFromFile::setWarning() {
+    if (type == MatrixGraphInput) {
+        std::pair <std::vector <GeneralEdge>, int> tmp = getListEdge();
+        if (tmp.second == -1) {
+            displayingWarning = true;
+            warning = "Illegar character found, character must be space, comma, or number (0..9)!";
+            return;
+        }
+        if (tmp.second == -2 || tmp.second == -3) {
+            displayingWarning = true;
+            warning = "Value must be in [";
+            warning = warning + intToString(minValue) + "," + intToString(maxValue) + "]!";
+            return;
+        }
+        if (tmp.second == -4) {
+            displayingWarning = true;
+            warning = "Too many values on one line!";
+            return;
+        }
+        if (tmp.second == -5) {
+            displayingWarning = true;
+            warning = "Matrix is missing numbers!";
+            return;
+        }
+        if (!tmp.first.empty()) {
+            displayingWarning = false;
+        }
+        return;
+    }
     std::vector <int> tmp = getListInt();
     if (!tmp.empty() && tmp[0] == -1) {
         displayingWarning = true;

@@ -7,6 +7,22 @@ GraphMatrixInput::GraphMatrixInput(sf::Rect <float> rect, int size, sf::Font *fo
     setDirected(isDirected);
 }
 
+void GraphMatrixInput::setEdges(std::vector <GeneralEdge> edges, bool directed, int size) {
+    setSize(size);
+    setDirected(directed);
+    for (int i = 1; i <= size; i++) {
+        for (int j = 1; j < i; j++) {
+            boxes[i][j].setText("0");
+        }
+    }
+    for (auto edge : edges) {
+        int u = edge.from;
+        int v = edge.to;
+        int weight = edge.weight;
+        boxes[u][v].setText(intToString(weight));
+    }
+}
+
 void GraphMatrixInput::setDirected(bool isDirected) {
     directed = isDirected;
     float boxSize = rect.width / std::max(size + 1, 8);

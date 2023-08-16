@@ -1,3 +1,5 @@
-//answer me for the next lines
-//ê
-//ê
+3
+0 1 2
+0 0 0
+6 5 0
+4

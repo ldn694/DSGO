@@ -2,9 +2,10 @@
 #include <iostream>
 #include "Template.h"
 #include "Color.h"
+#include "GeneralEdge.h"
 
 enum InputType {
-	HashTableInput, GraphInput, ListInput
+	HashTableInput, MatrixGraphInput, ListInput
 };
 
 struct ReadFromFile {
@@ -23,6 +24,7 @@ public:
 	void handleMousePressed(float x, float y);
 	void handleMouseMove(float x, float y, sf::RenderWindow& window);
 	std::vector <int> getListInt();
+	std::pair <std::vector <GeneralEdge>, int> getListEdge();
 	void draw(sf::RenderWindow& window, ColorTheme theme);
 	void setDisplaying(bool val);
 	bool getDisplaying();

@@ -5,8 +5,8 @@
 GraphStage::GraphStage(sf::RenderWindow& _window, ColorTheme _theme) :
 	window(_window), theme(_theme),
 	backButton(WIDTH_RES - widthBox / 2, 0, widthBox / 4, widthBox / 4),
-	readFromFile(1.125 * widthBox, 4.25 * heightBox, widthBox * 0.75, heightBox / 2,
-				0, HEIGHT_RES - heightBox * 15, widthBox * 2, heightBox, font(fontType::Prototype), maxSizeDataGraph, 0, maxValueDataGraph, InputType::ListInput),
+	readFromFile(widthBox * 0.125f, 5.125 * heightBox, 0.75f * widthBox, 0.75f * heightBox,
+				0, 6.0f * heightBox, widthBox * 2, heightBox, font(fontType::Prototype), maxSizeDataGraph, 0, maxValueDataGraph, InputType::MatrixGraphInput),
 	lightBulb("Images/full_bulb.png", WIDTH_RES - widthBox / 8, widthBox / 8, widthBox / 8 / 46 * 30, widthBox / 8, bulbColor),
 	darkBulb("Images/empty_bulb.png", WIDTH_RES - widthBox / 8, widthBox / 8, widthBox / 8 / 46 * 30, widthBox / 8, bulbColor),
 	themeBox("Images/curved_square.png", WIDTH_RES - widthBox / 8, widthBox / 8, widthBox / 4, widthBox / 4, backButtonNormalFillColor),
@@ -31,11 +31,14 @@ GraphStage::GraphStage(sf::RenderWindow& _window, ColorTheme _theme) :
     modeBox.resize(3);
     modeBox[0] = Box(0, 4 * heightBox, 2 * widthBox, heightBox, { CommandBoxNormal }, "Random", font(fontType::Prototype), 20);
     modeBox[1] = Box(0, 4 * heightBox, 2 * widthBox, heightBox, { CommandBoxNormal }, "Empty", font(fontType::Prototype), 20);
-    modeBox[2] = Box(0, 4 * heightBox, 2 * widthBox, heightBox, { CommandBoxNormal }, "Manual", font(fontType::Prototype), 20);
-	for (int i = 0; i < 3; i++) {
+	modeBox[2] = Box(0, 4 * heightBox, 2 * widthBox, heightBox, { CommandBoxNormal }, "Read From File", font(fontType::Prototype), 20);
+	for (int i = 0; i < modeBox.size(); i++) {
 		modeBox[i].setDrawable(false);
 	}
+	readFromFileBox = Box(0, 5.0 * heightBox, widthBox, heightBox, { CommandBoxNormal }, "", font(fontType::Prototype), 20);
+	
 	setMode(0);
+
 
 	prevModeButton = TriangleButton(widthBox / 5.0f, heightBox * 4.5f, 12, 3, -90.f);
 	nextModeButton = TriangleButton(2 * widthBox - widthBox / 5.0f, heightBox * 4.5f, 12, 3, 90.f);
@@ -74,8 +77,18 @@ void GraphStage::setDSName(std::string name) {
 
 void GraphStage::setMode(int newMode) {
 	modeBox[curMode].setDrawable(false);
+	if (modeBox[curMode].getText() == "Read From File") {
+		readFromFile.setDisplaying(false);
+		readFromFileBox.setDrawable(false);
+		sizeTypingBox.setDrawable(true);
+	}
 	curMode = newMode;
 	modeBox[curMode].setDrawable(true);
+	if (modeBox[curMode].getText() == "Read From File") {
+		readFromFile.setDisplaying(true);
+		readFromFileBox.setDrawable(true);
+		sizeTypingBox.setDrawable(false);
+	}
 }
 
 bool GraphStage::handleMousePressed(float x, float y) {
@@ -194,10 +207,11 @@ void GraphStage::draw() {
 	}
 	prevModeButton.draw(window, theme);
 	nextModeButton.draw(window, theme);
-    sizeTypingBox.drawAll(window, theme);
     startVertexTypingBox.drawAll(window, theme);
 	matrixInput.draw(window, theme);
+	readFromFileBox.draw(window, theme);
 	readFromFile.draw(window, theme);
+    sizeTypingBox.drawAll(window, theme);
 	backButton.draw(window, theme);
 }
 
@@ -379,14 +393,23 @@ std::pair<bool, ColorTheme> GraphStage::processEvents() {
 		}
 	}
 	if (isCreating) {
-		int x = sizeTypingBox.getProperInt();
-		if (x != -1) {
-			matrixInput.setSize(x);
-			setGraph();
+		if (modeBox[curMode].getText() == "Read From File") {
+			auto edgeList = readFromFile.getListEdge();
+			if (!edgeList.first.empty()) {
+				matrixInput.setEdges(edgeList.first, directedChoices.getChoice(), edgeList.second);
+				setGraph();
+			}
 		}
-		if (modeBox[curMode].getText() == "Random") {
-			matrixInput.createRandom();
-			setGraph();
+		else {
+			int x = sizeTypingBox.getProperInt();
+			if (x != -1) {
+				matrixInput.setSize(x);
+				setGraph();
+			}
+			if (modeBox[curMode].getText() == "Random") {
+				matrixInput.createRandom();
+				setGraph();
+			}
 		}
 		isCreating = false;
 	}
