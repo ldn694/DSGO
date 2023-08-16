@@ -89,6 +89,8 @@ add_executable(DSGO
 	include/GeneralEdge.h
 	src/GeneralGraph.cpp
 	include/GeneralGraph.h
+	src/DSU.cpp
+	include/DSU.h
 	)
 
 target_link_libraries(DSGO PRIVATE sfml-graphics)

@@ -39,6 +39,10 @@ void Box::setText(std::string newText) {
 	Text.setString(newText);
 }
 
+std::string Box::getText() {
+	return text;
+}
+
 sf::Font* Box::getFont() {
 	return font;
 }

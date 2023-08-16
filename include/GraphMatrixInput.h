@@ -3,6 +3,7 @@
 #include "Box.h"
 #include "TypingBox.h"
 #include "GeneralEdge.h"
+#include "DSU.h"
 
 struct GraphMatrixInput {
     bool directed;
@@ -12,6 +13,7 @@ struct GraphMatrixInput {
     std::vector <Box> firstRow, firstColumn;
     std::vector <std::vector <TypingBox>> boxes;
     GraphMatrixInput(sf::Rect <float> rect, int size, sf::Font *font, bool isDirected = true);
+    void createRandom();
     void setSize(int size);
     void setDirected(bool isDirected);
     void handleMouseMoved(float mouseX, float mouseY, sf::RenderWindow& window);

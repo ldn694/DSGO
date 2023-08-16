@@ -90,5 +90,4 @@ void MultipleChoice::draw(sf::RenderWindow& window, ColorTheme theme) {
 	curCircle.setFillColor(choicesInnerCircleColor[theme]);
 	curCircle.setPosition(circles[curChoice].getPosition());
 	window.draw(curCircle);
-
 }

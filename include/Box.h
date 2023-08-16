@@ -26,6 +26,7 @@ public:
 	void setSize(float width, float height);
 	void setText(std::string newText);
 	void setTextSize(float newSize);
+	std::string getText();
 	int getWidth();
 	int getHeight();
 	sf::Font* getFont();

@@ -4,7 +4,7 @@ GeneralGraph::GeneralGraph(std::vector <GeneralEdge> edges, sf::FloatRect viewRe
     setEdges(edges);
 }
 
-void GeneralGraph::setEdges(std::vector <GeneralEdge> edges, bool directed) {
+void GeneralGraph::setEdges(std::vector <GeneralEdge> edges, bool directed, int maxSize) {
     this->isDirected = directed;
     // std::cout << "------------\n";
     // for (auto x : edges) {
@@ -13,28 +13,26 @@ void GeneralGraph::setEdges(std::vector <GeneralEdge> edges, bool directed) {
     this->edges.clear();
     for (auto x : edges) {
         this->edges.insert(x);
+        maxSize = std::max(maxSize, std::max(x.from, x.to));
     }
     nodes.clear();
-    for (auto x : edges) {
-        nodes[x.from] = GeneralNode({0, 0}, x.from, font);
-        nodes[x.to] = GeneralNode({0, 0}, x.to, font);
+    for (int i = 1; i <= maxSize; i++) {
+        nodes[i] = GeneralNode({0, 0}, i, font);
     }
     int numNode = nodes.size();
-    int numRow = std::max(int(sqrt(numNode)), 1);
-    int numCol = (numNode + numRow - 1) / numRow;
-    // std::cout << "numRow = " << numRow << " numCol = " << numCol << "\n";
-    float distX = viewRect.getSize().x / (numCol + 1);
-    float distY = viewRect.getSize().y / (numRow + 1);
-    // std::cout << "distX = " << distX << " distY = " << distY << "\n";
-    int cnt = 0;
-    for (auto &x : nodes) {
-        int row = cnt / numCol;
-        int col = cnt % numCol;
-        x.second.setPosition(viewRect.getPosition() + sf::Vector2f(distX * (col + 1), distY * (row + 1)));
-        // std::cout << "cnt = " << cnt << " row = " << row << " col = " << col << " " << x.second.getPosition().x << " " << x.second.getPosition().y << "\n";
-        cnt++;
+    float angle = 2 * PI / numNode;
+    std::vector <int> idList;
+    for (auto x = nodes.begin(); x != nodes.end(); x++) {
+        idList.push_back(x->first);
     }
-    arrangeGraph();
+    std::random_shuffle(idList.begin(), idList.end());
+    for (int i = 0; i < idList.size(); i++) {
+        int x = idList[i];
+        nodes[x].setPosition(sf::Vector2f(viewRect.left + viewRect.width / 2 + idealLength * cos(angle * i), viewRect.top + viewRect.height / 2 + idealLength * sin(angle * i)));
+    }
+    if (edges.size() <= maxSize * 2) {
+        arrangeGraph();
+    }
 }
 
 float GeneralGraph::fAttract(float x) {
@@ -46,10 +44,17 @@ float GeneralGraph::fRepel(float x) {
 
 
 void GeneralGraph::arrangeGraph() {
-    // std::cout << "--------------------\n";
     std::vector <int> idList;
     for (auto x : nodes) {
         idList.push_back(x.first);
+    }
+    if (idList.empty()) {
+        return;
+    }
+    DSU F(idList.back());
+    for (auto x : edges) {
+        // std::cout << x.from << " -> " << x.to << " " << x.weight << "\n";
+        F.join(x.from, x.to);
     }
     std::map <int, sf::Vector2f> pos, nextPos;
     for (int i = 0; i < idList.size(); i++) {
@@ -65,11 +70,8 @@ void GeneralGraph::arrangeGraph() {
     }
     maximumDisp /= 2;
     for (int t = 0; t < maxStep; t++) {
-        // std::cout << "iteration " << t << "\n";
         std::map <int, sf::Vector2f> disp;
-        // for (int v : idList) {
-        //     std::cout << v << " " << pos[v].x << " " << pos[v].y << "\n";
-        // }
+        std::map <int, std::map <int, sf::Vector2f> > differentCCDisp;
         nextPos.clear();
         for (int v : idList) {
             nextPos[v] = pos[v];
@@ -77,10 +79,28 @@ void GeneralGraph::arrangeGraph() {
         for (int v : idList) {
             for (int u : idList) {
                 if (u == v) continue;
-                sf::Vector2f delta = pos[v] - pos[u];
-                disp[v] += normalize(delta) * fRepel(length(delta));
+                if (F.find(u) == F.find(v)) {
+                    sf::Vector2f delta = pos[v] - pos[u];
+                    disp[v] += normalize(delta) * fRepel(length(delta));
+                }
+                else {
+                    sf::Vector2f delta = pos[v] - pos[u];
+                    //differentCCDisp[F.find(v)][F.find(u)] += normalize(delta) * fRepel(length(delta));
+                    disp[v] += normalize(delta) * fRepel(length(delta));
+                }
             }
         }
+        // for (int v : idList) {
+        //     for (int u : idList) {
+        //         if (u != F.find(u)) continue;
+        //         if (F.find(u) != F.find(v)) {
+        //             if (F.getSize(u) == 0) {
+        //                 assert(false);
+        //             }
+        //             disp[v] += differentCCDisp[F.find(v)][F.find(u)];
+        //         }
+        //     }   
+        // }
         for (auto x : edges) {
             int v = x.from;
             int u = x.to;
@@ -88,18 +108,26 @@ void GeneralGraph::arrangeGraph() {
             disp[v] -= normalize(delta) * fAttract(length(delta));
             disp[u] += normalize(delta) * fAttract(length(delta));
         }
+        bool flag = false;
         for (int v : idList) {
             nextPos[v] += normalize(disp[v]) * std::min(length(disp[v]), maximumDisp);
-            // nextPos[v].x = std::max(viewRect.left, std::min(viewRect.left + viewRect.width, nextPos[v].x));
-            // nextPos[v].y = std::max(viewRect.top, std::min(viewRect.top + viewRect.height, nextPos[v].y));
+            if (length(disp[v]) > epsilonFloat) {
+                flag = true;
+            }
+            nextPos[v].x = std::max(viewRect.left, std::min(viewRect.left + viewRect.width, nextPos[v].x));
+            nextPos[v].y = std::max(viewRect.top, std::min(viewRect.top + viewRect.height, nextPos[v].y));
             maximumDisp *= damperingConst;
         }
         pos = nextPos;
+        if (!flag) {
+            break;
+        }
     }
     for (auto &x : nodes) {
         // std::cout << x.first << " " << pos[x.first].x << " " << pos[x.first].y << "\n";
         x.second.setPosition(pos[x.first]);
     }
+    // std::cout << "DONE!\n";
 }
 
 int GeneralGraph::getMexID() {
@@ -192,7 +220,7 @@ void GeneralGraph::draw(sf::RenderWindow& window, ColorTheme theme, sf::Time tot
                     //std::cout << y->from << " " << y->to << "\n";
                     std::vector <sf::RectangleShape> lines = getEdgeLines(x->second.getPosition(), nodes[y->to].getPosition(), isDirected);
                     for (auto line : lines) {
-                        line.setFillColor(General::color[y->type]->outlineColor);
+                        line.setFillColor(General::color[theme][y->type].outlineColor);
                         window.draw(line);
                     }
                 }

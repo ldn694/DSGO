@@ -52,14 +52,14 @@ GraphStage::GraphStage(sf::RenderWindow& _window, ColorTheme _theme) :
 
     setDSName("Graph");
 
-	viewRect = sf::FloatRect(widthBox * 2, HEIGHT_RES / 4, WIDTH_RES - 4 * widthBox, HEIGHT_RES / 2);
+	viewRect = sf::FloatRect(widthBox * 3, HEIGHT_RES / 4, WIDTH_RES - 6 * widthBox, HEIGHT_RES / 2);
     graphList.push_back(GeneralGraph({}, viewRect, font(fontType::Arial)));
 }
 
 void GraphStage::setGraph() {
 	GeneralGraph graph = graphList.back();
 	matrixInput.setDirected(directedChoices.getChoice());
-	graph.setEdges(matrixInput.getEdges(), directedChoices.getChoice());
+	graph.setEdges(matrixInput.getEdges(), directedChoices.getChoice(), matrixInput.size);
 	graphList.clear();
 	graphList.push_back(graph);
 }
@@ -382,6 +382,10 @@ std::pair<bool, ColorTheme> GraphStage::processEvents() {
 		int x = sizeTypingBox.getProperInt();
 		if (x != -1) {
 			matrixInput.setSize(x);
+			setGraph();
+		}
+		if (modeBox[curMode].getText() == "Random") {
+			matrixInput.createRandom();
 			setGraph();
 		}
 		isCreating = false;

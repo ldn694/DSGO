@@ -11,14 +11,55 @@ void GraphMatrixInput::setDirected(bool isDirected) {
     directed = isDirected;
     float boxSize = rect.width / std::max(size + 1, 8);
     for (int i = 1; i <= size; i++) {
-        for (int j = 1; j <= i - 1; j++) {
+        for (int j = 1; j < i; j++) {
             if (directed != boxes[i][j].isDrawable()) {
                 float x = rect.left + j * boxSize;
                 float y = rect.top + i * boxSize;
                 float outline = (1 > boxSize ? 0 : outlineBox);
-                boxes[i][j] = TypingBox(x + outline / 2, y + outline / 2, boxSize - outline, boxSize - outline, 0, HEIGHT_RES - heightBox, widthBox * 2, heightBox, singleNumber, font, 2, 0, maxValueDataGraph, true);
+                boxes[i][j].setText("0");
+                boxes[i][j].setDrawable(directed);
             }
-            boxes[i][j].setDrawable(directed);
+        }
+    }
+}
+
+void GraphMatrixInput::createRandom() {
+    if (size == 0) return;
+    int graphType = rand() % 2;
+    if (graphType == 0) {//densly connected
+        for (int i = 1; i <= size; i++) {
+            for (int j = 1; j <= size; j++) {
+                if (i == j) continue;
+                if (!directed && i > j) continue;
+                int isEdge = rand() % ((size + 2) / 2);
+                if (isEdge) {
+                    int weight = rand() % maxValueDataGraph + 1;
+                    boxes[i][j].setText(intToString(weight));
+                }
+                else {
+                    boxes[i][j].setText("0");
+                }
+            }
+        }
+    }
+    if (graphType == 1) {//many components
+        int numComp = rand() % size + 1;
+        DSU F(size);
+        for (int i = 1; i <= size; i++) {
+            for (int j = 1; j <= size; j++) {
+                boxes[i][j].setText("0");
+            }
+        }
+        int cnt = size;
+        while (cnt > numComp) {
+            int u = rand() % size + 1;
+            int v = rand() % size + 1;
+            if (u == v) continue;
+            if (F.join(u, v)) {
+                cnt--;
+                int weight = rand() % maxValueDataGraph + 1;
+                boxes[u][v].setText(intToString(weight));
+            }
         }
     }
 }
@@ -59,6 +100,7 @@ std::vector <GeneralEdge> GraphMatrixInput::getEdges() {
         std::vector <GeneralEdge> edges;
         for (int i = 1; i <= size; i++) {
             for (int j = 1; j <= size; j++) {
+                if (i == j) continue;
                 int weight = boxes[i][j].getProperInt();
                 if (weight == -1) return {};
                 if (weight > 0) {
@@ -76,7 +118,7 @@ std::vector <GeneralEdge> GraphMatrixInput::getEdges() {
                 if (weight == -1) return {};
                 if (weight > 0) {
                     edges.push_back(GeneralEdge(i, j, weight));
-                    edges.push_back(GeneralEdge(j, i, weight));
+                    //edges.push_back(GeneralEdge(j, i, weight));
                 }
             }
         }
