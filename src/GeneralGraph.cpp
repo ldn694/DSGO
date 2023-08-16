@@ -169,6 +169,17 @@ std::vector <sf::RectangleShape> GeneralGraph::getEdgeLines(sf::Vector2f startPo
     return res;
 }
 
+std::vector <sf::Text> GeneralGraph::getEdgeWeightText(sf::Vector2f startPosition, sf::Vector2f endPosition, int weight) {
+    std::vector <sf::Text> res;
+    sf::Vector2f delta = endPosition - startPosition;
+    sf::Text text(std::to_string(weight), *font, 20);
+    text.setOrigin(text.getLocalBounds().width / 2, text.getLocalBounds().height / 2);
+    text.setPosition(startPosition + normalize(delta) * (length(delta) * 0.5f) + normalize(sf::Vector2f(-delta.y, delta.x)) * (3.0f * thicknessGraph + text.getGlobalBounds().height / 2));
+    // text.setRotation(180 / PI * atan2(delta.y, delta.x));
+    res.push_back(text);
+    return res;
+}
+
 GeneralGraph GeneralGraph::execAnimation(std::vector <Animation> animations) {
     GeneralGraph tmp = *this;
     std::sort(animations.begin(), animations.end());
@@ -222,6 +233,11 @@ void GeneralGraph::draw(sf::RenderWindow& window, ColorTheme theme, sf::Time tot
                     for (auto line : lines) {
                         line.setFillColor(General::color[theme][y->type].outlineColor);
                         window.draw(line);
+                    }
+                    std::vector <sf::Text> texts = getEdgeWeightText(x->second.getPosition(), nodes[y->to].getPosition(), y->weight);
+                    for (auto text : texts) {
+                        text.setFillColor(General::color[theme][y->type].outlineColor);
+                        window.draw(text);
                     }
                 }
             }
