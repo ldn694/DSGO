@@ -145,33 +145,53 @@ int GeneralGraph::getMexID() {
     assert(false);
 }
 
-std::vector <sf::RectangleShape> GeneralGraph::getEdgeLines(sf::Vector2f startPosition, sf::Vector2f endPosition, bool directed) {
-    std::vector <sf::RectangleShape> res;
+std::vector <sf::RectangleShape> GeneralGraph::getEdgeLines(sf::Vector2f startPosition, sf::Vector2f endPosition, bool directed, bool upward) {
     sf::Vector2f delta = endPosition - startPosition;
+    if (upward) {
+        float diff = 3.f * thicknessGraph;
+        float x1 = sqrt(radiusGraph * radiusGraph - diff * diff);
+        float x2 = radiusGraph - x1;
+        startPosition += normalize(sf::Vector2f(-delta.y, delta.x)) * 2.0f * thicknessGraph;
+        startPosition -= normalize(delta) * x2;
+        endPosition += normalize(sf::Vector2f(-delta.y, delta.x)) * 2.0f * thicknessGraph;
+        endPosition += normalize(delta) * x2;
+        delta = endPosition - startPosition;
+    }
+    std::vector <sf::RectangleShape> res;
     sf::RectangleShape line(sf::Vector2f(length(delta) - 2 * (radiusGraph + thicknessGraph), thicknessGraph));
     line.setOrigin(0, thicknessGraph / 2);
     line.setPosition(startPosition + normalize(delta) * (radiusGraph + thicknessGraph));
     line.setRotation(180 / PI * atan2(delta.y, delta.x));
     res.push_back(line);
     if (directed) {
-        sf::RectangleShape smallLine1(sf::Vector2f(0.5f * radiusGraph, thicknessGraph));
+        sf::RectangleShape smallLine1(sf::Vector2f(0.4f * radiusGraph, thicknessGraph));
         smallLine1.setOrigin(0, thicknessGraph / 2);
         smallLine1.setPosition(endPosition - normalize(delta) * (radiusGraph + thicknessGraph));
-        smallLine1.setRotation(180 / PI * atan2(delta.y, delta.x) + 135);
+        smallLine1.setRotation(180 / PI * atan2(delta.y, delta.x) + 145);
 
         res.push_back(smallLine1);
-        sf::RectangleShape smallLine2(sf::Vector2f(0.5f * radiusGraph, thicknessGraph));
+        sf::RectangleShape smallLine2(sf::Vector2f(0.4f * radiusGraph, thicknessGraph));
         smallLine2.setOrigin(0, thicknessGraph / 2);
         smallLine2.setPosition(endPosition - normalize(delta) * (radiusGraph + thicknessGraph));
-        smallLine2.setRotation(180 / PI * atan2(delta.y, delta.x) - 135);
+        smallLine2.setRotation(180 / PI * atan2(delta.y, delta.x) - 145);
         res.push_back(smallLine2);
     }
     return res;
 }
 
-std::vector <sf::Text> GeneralGraph::getEdgeWeightText(sf::Vector2f startPosition, sf::Vector2f endPosition, int weight) {
-    std::vector <sf::Text> res;
+std::vector <sf::Text> GeneralGraph::getEdgeWeightText(sf::Vector2f startPosition, sf::Vector2f endPosition, int weight, bool upward) {
     sf::Vector2f delta = endPosition - startPosition;
+    if (upward) {
+        float diff = 3.f * thicknessGraph;
+        float x1 = sqrt(radiusGraph * radiusGraph - diff * diff);
+        float x2 = radiusGraph - x1;
+        startPosition += normalize(sf::Vector2f(-delta.y, delta.x)) * 3.f * thicknessGraph;
+        startPosition -= normalize(delta) * x2;
+        endPosition += normalize(sf::Vector2f(-delta.y, delta.x)) * 3.f * thicknessGraph;
+        endPosition += normalize(delta) * x2;
+        delta = endPosition - startPosition;
+    }
+    std::vector <sf::Text> res;
     sf::Text text(std::to_string(weight), *font, 20);
     text.setOrigin(text.getLocalBounds().width / 2, text.getLocalBounds().height / 2);
     text.setPosition(startPosition + normalize(delta) * (length(delta) * 0.5f) + normalize(sf::Vector2f(-delta.y, delta.x)) * (3.0f * thicknessGraph + text.getGlobalBounds().height / 2));
@@ -228,13 +248,22 @@ void GeneralGraph::draw(sf::RenderWindow& window, ColorTheme theme, sf::Time tot
                     if (!isDirected && y->from > y->to) {
                         continue;
                     }
+                    bool upward = false;
+                    if (isDirected) {
+                        for (auto z = edges.begin(); z != edges.end(); z++) {
+                            if (z->from == y->to && z->to == y->from) {
+                                upward = true;
+                                break;
+                            }
+                        }
+                    }
                     //std::cout << y->from << " " << y->to << "\n";
-                    std::vector <sf::RectangleShape> lines = getEdgeLines(x->second.getPosition(), nodes[y->to].getPosition(), isDirected);
+                    std::vector <sf::RectangleShape> lines = getEdgeLines(x->second.getPosition(), nodes[y->to].getPosition(), isDirected, upward);
                     for (auto line : lines) {
                         line.setFillColor(General::color[theme][y->type].outlineColor);
                         window.draw(line);
                     }
-                    std::vector <sf::Text> texts = getEdgeWeightText(x->second.getPosition(), nodes[y->to].getPosition(), y->weight);
+                    std::vector <sf::Text> texts = getEdgeWeightText(x->second.getPosition(), nodes[y->to].getPosition(), y->weight, upward);
                     for (auto text : texts) {
                         text.setFillColor(General::color[theme][y->type].outlineColor);
                         window.draw(text);

@@ -16,8 +16,8 @@ struct GeneralGraph{
 
     GeneralGraph(std::vector <GeneralEdge> edges, sf::FloatRect viewRect, sf::Font* font);
 
-    std::vector <sf::RectangleShape> getEdgeLines(sf::Vector2f startPosition, sf::Vector2f endPosition, bool directed);
-    std::vector <sf::Text> getEdgeWeightText(sf::Vector2f startPosition, sf::Vector2f endPosition, int weight);
+    std::vector <sf::RectangleShape> getEdgeLines(sf::Vector2f startPosition, sf::Vector2f endPosition, bool directed, bool upward = false);
+    std::vector <sf::Text> getEdgeWeightText(sf::Vector2f startPosition, sf::Vector2f endPosition, int weight, bool upward = false);
 
     void setEdges(std::vector <GeneralEdge> edges, bool directed = false, int maxSize = 0);
 
