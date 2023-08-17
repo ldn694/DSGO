@@ -3,10 +3,13 @@
 CodeBox::CodeBox(float _x, float _y, float _width, float _height) :
     x(_x), y(_y), width(_width), height(_height), slideBar(x, y + height * 0.95, width, height * 0.05),
     leftRect(sf::Vector2f(_width, _height)), rightRect(sf::Vector2f(_width, _height)),
-    outerBox(_x, _y, _width, _height * 0.95, {CodeOuterBox}), highlightLine(-1), finalMaxWidth(0) {
+    smallLeftRect(sf::Vector2f(3, _height * 0.95)), smallRightRect(sf::Vector2f(3, _height * 0.95)),
+    outerBox(_x, _y, _width, _height * 0.95, {CodeOuterBox}, "", nullptr, 0, false), highlightLine(-1), finalMaxWidth(0) {
     highlightLine = -1;
     leftRect.setPosition(x - width - 3, y);
     rightRect.setPosition(x + width + 3, y);
+    smallLeftRect.setPosition(x - 3, y + height * 0.025);
+    smallRightRect.setPosition(x + width, y + height * 0.025);
 }
 
 void CodeBox::setLines(std::vector <std::string> lines) {
@@ -85,6 +88,10 @@ void CodeBox::draw(sf::RenderWindow& window, ColorTheme theme) {
     slideBar.draw(window, theme);
     leftRect.setFillColor(theme == LightTheme ? LavenderBushColor : EerieBlackColor);
     rightRect.setFillColor(theme == LightTheme ? LavenderBushColor : EerieBlackColor);
+    smallLeftRect.setFillColor(toolBoxColor[theme]);
+    smallRightRect.setFillColor(toolBoxColor[theme]);
     window.draw(leftRect);
     window.draw(rightRect);
+    window.draw(smallLeftRect);
+    window.draw(smallRightRect);
 }

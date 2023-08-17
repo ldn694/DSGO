@@ -196,7 +196,7 @@ const General::Color General::color[numColorTheme][numColorType] =
 
 //-----------------------------------------------------------------------------------
 
-const sf::Color toolBoxColor[numColorTheme] = { AntiFlashWhiteColor, DimGrayColor };
+const sf::Color toolBoxColor[numColorTheme] = { AntiFlashWhiteColor, BlackColor};
 
 const ColorBox colorBox[numColorBoxType][numColorTheme] =
 {

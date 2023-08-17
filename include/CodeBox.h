@@ -7,7 +7,7 @@ struct CodeBox {
     std::vector <std::string> lines;
     std::vector <sf::Text> texts;
     Box outerBox;
-    sf::RectangleShape leftRect, rightRect;
+    sf::RectangleShape leftRect, rightRect, smallLeftRect, smallRightRect;
     SlideBar slideBar;
     int highlightLine;
     CodeBox(float x, float y, float width, float height);

@@ -19,6 +19,7 @@ private:
     sf::RenderWindow window;
 	Box hashTableBox, AVLBox, minHeapBox, maxHeapBox, BTreeBox, TrieBox, GraphBox;
 	MyShape lightBulb, darkBulb, themeBox;
+	sf::Text projName, shortName, description, author;
 public:
 	Game(sf::ContextSettings settings);
 	bool handleMousePressed(float x, float y);
