@@ -348,9 +348,16 @@ void HeapStage::deleteValue(int hID) {
 	animations.clear();
 	int realID = HeapList.back().getRealID(hID);
 	int realTopID = HeapList.back().getRealID(1);
-	setValue(animations, realID, HeapList.back().nodes[realTopID].value + 1);
-	setColorType(animations, realID, Heap::ColorType::highlight);
-	addAnimationStep(animations, stepTime, 0, "Set A[" + intToString(hID) + "] = A[1] + 1");
+	if (!isMinHeap) {
+		setValue(animations, realID, HeapList.back().nodes[realTopID].value + 1);
+		setColorType(animations, realID, Heap::ColorType::highlight);
+		addAnimationStep(animations, stepTime, 0, "Set A[" + intToString(hID) + "] = A[1] + 1");
+	}
+	else {
+		setValue(animations, realID, HeapList.back().nodes[realTopID].value - 1);
+		setColorType(animations, realID, Heap::ColorType::highlight);
+		addAnimationStep(animations, stepTime, 0, "Set A[" + intToString(hID) + "] = A[1] - 1");
+	}
 
 	animations.clear();
 	insertVariable(animations, realID, { intToString(hID) });
