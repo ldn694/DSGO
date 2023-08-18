@@ -107,7 +107,7 @@ TrieStage::TrieStage(sf::RenderWindow& window, ColorTheme theme) :
 		theme)
 {
     rootPosition = sf::Vector2f((WIDTH_RES - 2 * widthBox) / 2 + 2 * widthBox, HEIGHT_RES / 6);
-	setDSName("Trie Tree");
+	setDSName("Trie");
 	TrieList.push_back(TrieGraph(rootPosition, font(fontType::Arial)));
 }
 

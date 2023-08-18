@@ -35,6 +35,7 @@ private:
 	
 	IngameSettings ingameSettings;
 	CodeVisualizer codeVisualizer;
+	std::vector <std::vector <std::string> > codes;
 
 	MyShape lightBulb, darkBulb, themeBox;
 	ColorTheme theme;

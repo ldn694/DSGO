@@ -57,6 +57,39 @@ GraphStage::GraphStage(sf::RenderWindow& _window, ColorTheme _theme) :
 
 	viewRect = sf::FloatRect(widthBox * 3, HEIGHT_RES / 4, WIDTH_RES - 6 * widthBox, HEIGHT_RES / 2);
     graphList.push_back(GeneralGraph({}, viewRect, font(fontType::Arial)));
+
+	codes = {
+		{
+			"for v : nodes: dist[v] = INF",
+			"dist[start] = 0, pq.push({0, start})",
+			"while pq is not empty:",
+			"	(u, d) = pq.top(), pq.pop()",
+			"	if d > dist[u]: continue",
+			"	for (v, w) : u.edges:",
+			"		if dist[v] > dist[u] + w:",
+			"			dist[v] = dist[u] + w",
+			"			pq.push({dist[v], v})"
+		},
+		{
+			"sort edges by weight, T = empty graph, sum = 0",
+			"for edge : edges",
+			"	if (T + edge) is acyclic:",
+			"		T += edge, sum += edge.weight",
+			"return sum"
+		},
+		{
+			"for v : nodes: cc[v] = -1",
+			"for v : nodes:",
+			"	if cc[v] == -1:",
+			"	q = queue(), q.push(v), cc[v] = v",
+			"	while q is not empty:",
+			"		u = q.front(), q.pop()",
+			"		for v : u.edges:",
+			"			if cc[v] == -1: cc[v] = u, q.push(v)",
+			"show cc"
+		}
+	};
+	codeVisualizer.setLines(codes[0]);
 }
 
 void GraphStage::setGraph() {
@@ -95,10 +128,12 @@ bool GraphStage::handleMousePressed(float x, float y) {
 	handleMouseMove(x, y);
 	ingameSettings.handleMousePressed(x, y);
 	codeVisualizer.handleMousePressed(x, y);
-    algorithmChoices.handleMousePressed(x, y);
     representationChoices.handleMousePressed(x, y);
     if (directedChoices.handleMousePressed(x, y)) {
 		setGraph();
+	}
+	if (algorithmChoices.handleMousePressed(x, y)) {
+		codeVisualizer.setLines(codes[algorithmChoices.getChoice()]);
 	}
     sizeTypingBox.clickOn(x, y);
     startVertexTypingBox.clickOn(x, y);
