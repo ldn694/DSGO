@@ -27,6 +27,8 @@ public:
 	bool isReading();
 	std::string getText();
 	void setWarning();
+	void setMinValue(int newMinValue);
+	void setMaxValue(int newMaxValue);
 	void setText(std::string newText);
 	void insert(int key);
 	void deleteBack();

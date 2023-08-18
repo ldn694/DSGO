@@ -12,7 +12,7 @@ circle(radiusGraph), value(value), type(General::ColorType::normal){
     valueText.setOrigin(valueText.getLocalBounds().left + valueText.getLocalBounds().width / 2, valueText.getLocalBounds().top + valueText.getLocalBounds().height / 2);
     valueText.setPosition(pos);
     variableText.setFont(*font);
-    variableText.setStyle(sf::Text::Bold);
+    //variableText.setStyle(sf::Text::Bold);
     variableText.setString("");
     variableText.setCharacterSize(sizeValueLetterGraph);
     variableText.setOrigin(variableText.getLocalBounds().left + variableText.getLocalBounds().width / 2, variableText.getLocalBounds().top + variableText.getLocalBounds().height / 2);
@@ -93,6 +93,10 @@ void GeneralNode::insertVariable(std::vector <std::string> variables) {
 
 void GeneralNode::deleteVariable(std::vector <std::string> variables) {
     for (auto variable : variables) {
+        if (variableList.find(variable) == variableList.end()) {
+            std::cout << "Variable " << variable << " is not in the list\n";
+            assert(false);
+        }
         variableList.erase(variableList.find(variable));
     }
     variableText.setString(getVariableString());
@@ -126,6 +130,7 @@ void GeneralNode::draw(sf::RenderWindow& window, ColorTheme theme, sf::Time tota
         for (int i = 0; i < animations.size(); i++) {
             for (int j = i + 1; j < animations.size(); j++) {
                 if (animations[i].animationType == animations[j].animationType) {
+                    std::cout << animations[i].animationType << "\n";
                     assert(false);
                 }
             }
@@ -153,6 +158,12 @@ void GeneralNode::draw(sf::RenderWindow& window, ColorTheme theme, sf::Time tota
                     break;
                 }
                 case DeleteVariable: {
+                    for (auto it = animations[i].variableList.begin(); it != animations[i].variableList.end(); it++) {
+                        if (tmp.variableList.find(*it) == tmp.variableList.end()) {
+                            std::cout << "Variable " << *it << " is not in the list\n";
+                            assert(false);
+                        }
+                    }
                     tmp.deleteVariable(animations[i].variableList);
                     break;
                 }

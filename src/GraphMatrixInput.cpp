@@ -41,7 +41,7 @@ void GraphMatrixInput::setDirected(bool isDirected) {
 
 void GraphMatrixInput::createRandom() {
     if (size == 0) return;
-    int graphType = rand() % 2;
+    int graphType = rand() % 3;
     if (graphType == 0) {//densly connected
         for (int i = 1; i <= size; i++) {
             for (int j = 1; j <= size; j++) {
@@ -75,6 +75,36 @@ void GraphMatrixInput::createRandom() {
                 cnt--;
                 int weight = rand() % maxValueDataGraph + 1;
                 boxes[u][v].setText(intToString(weight));
+            }
+        }
+    }
+    if (graphType == 2) {//a tree with some extra edges
+        DSU F(size);
+        for (int i = 1; i <= size; i++) {
+            for (int j = 1; j <= size; j++) {
+                boxes[i][j].setText("0");
+            }
+        }
+        int cnt = size - 1;
+        while (cnt) {
+            int u = rand() % size + 1;
+            int v = rand() % size + 1;
+            if (u == v) continue;
+            if (F.join(u, v)) {
+                cnt--;
+                int weight = rand() % maxValueDataGraph + 1;
+                boxes[u][v].setText(intToString(weight));
+            }
+        }
+        int numExtraEdge = rand() % (size + 1);
+        while (numExtraEdge) {
+            int u = rand() % size + 1;
+            int v = rand() % size + 1;
+            if (u == v) continue;
+            if (boxes[u][v].getText() == "0") {
+                int weight = rand() % maxValueDataGraph + 1;
+                boxes[u][v].setText(intToString(weight));
+                numExtraEdge--;
             }
         }
     }
@@ -180,7 +210,6 @@ void GraphMatrixInput::update(sf::Time deltaT) {
 }
 
 void GraphMatrixInput::draw(sf::RenderWindow& window, ColorTheme theme) {
-    //std::cout << "HAHA\n";
     if (size > 0) {
         firstRow[0].draw(window, theme);
     }

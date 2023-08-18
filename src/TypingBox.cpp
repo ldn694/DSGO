@@ -30,6 +30,16 @@ void TypingBox::setDrawable(bool newDrawable) {
 	drawable = newDrawable;
 }
 
+void TypingBox::setMinValue(int newMinValue) {
+	minValue = newMinValue;
+	setWarning();
+}
+
+void TypingBox::setMaxValue(int newMaxValue) {
+	maxValue = newMaxValue;
+	setWarning();
+}
+
 void TypingBox::setWarning() {
 	if (typingMode == singleNumber) {
 		int curVal = getInt();

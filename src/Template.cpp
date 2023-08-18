@@ -78,9 +78,9 @@ const float sizeValueLetterGraph = 20;
 const float edgeGraph = 30;
 const float radiusGraph = 20;
 const float thicknessGraph = 3;
-int maxSizeDataGraph = 10;
+int maxSizeDataGraph = 8;
 int maxValueDataGraph = 99;
-const float idealLength = 200;
+const float idealLength = 150;
 const float damperingConst = 0.9;
 const int maxStep = 1000;
 

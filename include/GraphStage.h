@@ -44,6 +44,8 @@ private:
 	bool isCreating;
 	GraphMatrixInput matrixInput;
 
+	bool isOperating;
+
 	sf::FloatRect viewRect;
 	std::vector <GeneralGraph> graphList;
 
@@ -76,6 +78,12 @@ public:
     void render();
     ColorTheme run();
 
+	void setDefaultView();
+	void Dijkstra(int startVertex);
+
+	void addAnimationStep(std::vector <Animation> animations, sf::Time time, int line, std::string description);
+	void resetAnimation();
+
 	void insertVariable(std::vector <Animation> &animations, int index, std::vector <std::string> variableList);
 	void deleteVariable(std::vector <Animation> &animations, int index, std::vector <std::string> variableList);
 	void setValue(std::vector <Animation> &animations, int index, int value);
@@ -85,11 +93,7 @@ public:
 	void addNode(std::vector <Animation> &animations, int index, int value);
 	void addNode(std::vector <Animation> &animations, int index, std::string value);
 	void deleteNode(std::vector <Animation> &animations, int index);
-	void swapNode(std::vector <Animation> &animations, int index1, int index2);
-	void setLeftNode(std::vector <Animation> &animations, int index, int value);
-	void setRightNode(std::vector <Animation> &animations, int index, int value);
-	void setLeftEdgeColorType(std::vector <Animation> &animations, int index, int nextColorType);
-	void setRightEdgeColorType(std::vector <Animation> &animations, int index, int nextColorType);
+	void setEdgeType(std::vector <Animation> &animations, int from, int to, int nextColorType);
 	void insertNodeToGroup(std::vector <Animation> &animations, int idGroup, int idNode);
 	void deleteNodeFromGroup(std::vector <Animation> &animations, int idGroup, int idNode);
 	void addGroup(std::vector <Animation> &animations, int idGroup);

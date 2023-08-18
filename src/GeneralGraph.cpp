@@ -28,7 +28,7 @@ void GeneralGraph::setEdges(std::vector <GeneralEdge> edges, bool directed, int 
     std::random_shuffle(idList.begin(), idList.end());
     for (int i = 0; i < idList.size(); i++) {
         int x = idList[i];
-        nodes[x].setPosition(sf::Vector2f(viewRect.left + viewRect.width / 2 + idealLength * cos(angle * i), viewRect.top + viewRect.height / 2 + idealLength * sin(angle * i)));
+        nodes[x].setPosition(sf::Vector2f(viewRect.left + viewRect.width / 2 + idealLength * 2 * cos(angle * i), viewRect.top + viewRect.height / 2 + idealLength * 2 * sin(angle * i)));
     }
     if (edges.size() <= maxSize * 2) {
         arrangeGraph();
@@ -145,6 +145,15 @@ int GeneralGraph::getMexID() {
     assert(false);
 }
 
+std::set <GeneralEdge>::iterator GeneralGraph::findEdge(int from, int to) {
+    for (auto x = edges.begin(); x != edges.end(); x++) {
+        if (x->from == from && x->to == to) {
+            return x;
+        }
+    }
+    return edges.end();
+}
+
 std::vector <sf::RectangleShape> GeneralGraph::getEdgeLines(sf::Vector2f startPosition, sf::Vector2f endPosition, bool directed, bool upward) {
     sf::Vector2f delta = endPosition - startPosition;
     if (upward) {
@@ -233,6 +242,16 @@ GeneralGraph GeneralGraph::execAnimation(std::vector <Animation> animations) {
                 tmp.nodes[animations[i].id1].setColorType(General::ColorType(animations[i].nextValue));
                 break;
             }
+            case SetEdgeType: {
+                auto it = tmp.findEdge(animations[i].id1, animations[i].id2);
+                if (it == tmp.edges.end()) {
+                    assert(false);
+                }
+                int weight = it->weight;
+                tmp.edges.erase(it);
+                tmp.edges.insert(GeneralEdge(animations[i].id1, animations[i].id2, weight, General::ColorType(animations[i].nextValue)));
+                break;
+            }
         }
     }
     return tmp;
@@ -296,11 +315,51 @@ void GeneralGraph::draw(sf::RenderWindow& window, ColorTheme theme, sf::Time tot
         }
     }
     for (int i = 0; i < animations.size(); i++) {
+        if (animations[i].animationType == SetEdgeType) continue;
         if (animations[i].id1 != -1) {
             animationMap[animations[i].id1].push_back(animations[i]);
         }
     }
     //Edges
+    for (auto x = nodes.begin(); x != nodes.end(); x++) {
+            for (auto y = edges.begin(); y != edges.end(); y++) {
+                if (y->from == x->first) {
+                    if (!isDirected && y->from > y->to) {
+                        continue;
+                    }
+                    auto p = tmp.edges.end();
+                    for (auto z = tmp.edges.begin(); z != tmp.edges.end(); z++) {
+                        if (z->from == y->from && z->to == y->to) {
+                            p = z;
+                            break;
+                        }
+                    }
+                    if (p == tmp.edges.end()) {
+                        assert(false);
+                    }
+                    bool upward = false;
+                    if (isDirected) {
+                        for (auto z = edges.begin(); z != edges.end(); z++) {
+                            if (z->from == y->to && z->to == y->from) {
+                                upward = true;
+                                break;
+                            }
+                        }
+                    }
+                    std::vector <sf::RectangleShape> lines = getEdgeLines(x->second.getPosition(), nodes[y->to].getPosition(), isDirected, upward);
+                    sf::Color color = General::fadingColorType(y->type, p->type, theme, percent).outlineColor;
+                    for (auto line : lines) {
+                        line.setFillColor(color);
+                        window.draw(line);
+                    }
+                    std::vector <sf::Text> texts = getEdgeWeightText(x->second.getPosition(), nodes[y->to].getPosition(), y->weight, upward);
+                    for (auto text : texts) {
+                        text.setFillColor(color);
+                        window.draw(text);
+                    }
+                }
+            }
+        }
     //Draw nodes
     for (auto x = animationMap.begin(); x != animationMap.end(); x++) {
         int id = x->first;
