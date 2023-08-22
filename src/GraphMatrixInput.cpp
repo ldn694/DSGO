@@ -96,7 +96,8 @@ void GraphMatrixInput::createRandom() {
                 boxes[u][v].setText(intToString(weight));
             }
         }
-        int numExtraEdge = rand() % (size + 1);
+        int maximumExtraEdge = std::min((size + 1), size * (size - 1) / 2 - size + 1);
+        int numExtraEdge = rand() % (maximumExtraEdge + 1);
         while (numExtraEdge) {
             int u = rand() % size + 1;
             int v = rand() % size + 1;

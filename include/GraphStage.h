@@ -80,6 +80,8 @@ public:
 
 	void setDefaultView();
 	void Dijkstra(int startVertex);
+	void MST();
+	void FindCC();
 
 	void addAnimationStep(std::vector <Animation> animations, sf::Time time, int line, std::string description);
 	void resetAnimation();
@@ -94,6 +96,7 @@ public:
 	void addNode(std::vector <Animation> &animations, int index, std::string value);
 	void deleteNode(std::vector <Animation> &animations, int index);
 	void setEdgeType(std::vector <Animation> &animations, int from, int to, int nextColorType);
+	void setEdgeOpacity(std::vector <Animation> &animations, int from, int to, float opacity);
 	void insertNodeToGroup(std::vector <Animation> &animations, int idGroup, int idNode);
 	void deleteNodeFromGroup(std::vector <Animation> &animations, int idGroup, int idNode);
 	void addGroup(std::vector <Animation> &animations, int idGroup);

@@ -147,10 +147,12 @@ namespace Trie {
 namespace General {
 
     enum ColorType {
-        normal, highlight, lowlight, highlight2
+        normal, lowlight, highlight,  
+        highlight2, highlight3, highlight4, highlight5, 
+        highlight6, highlight7, highlight8, highlight9, highlight10,
     };
 
-    const int numColorType = 4;
+    const int numColorType = 12;
     
     struct Color {
         sf::Color fillColor, outlineColor, valueColor, variableColor;
@@ -158,6 +160,7 @@ namespace General {
     };
 	
 	Color fadingColorType(ColorType before, ColorType after, ColorTheme theme, float percent);
+    Color fadingColorType(ColorType before, float beforeOpacity, ColorType after, float afterOpacity, ColorTheme theme, float percent);
 
     extern const Color color[numColorTheme][numColorType];
 }

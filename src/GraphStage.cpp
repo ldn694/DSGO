@@ -55,7 +55,7 @@ GraphStage::GraphStage(sf::RenderWindow& _window, ColorTheme _theme) :
 
     setDSName("Graph");
 
-	viewRect = sf::FloatRect(widthBox * 2.5, HEIGHT_RES * 0.15f, WIDTH_RES - 5 * widthBox, HEIGHT_RES * 0.7f);
+	viewRect = sf::FloatRect(widthBox * 2.5, HEIGHT_RES * 0.15f, WIDTH_RES - 5 * widthBox, WIDTH_RES - 5 * widthBox);
     graphList.push_back(GeneralGraph({}, viewRect, font(fontType::Arial)));
 
 	codes = {
@@ -78,14 +78,14 @@ GraphStage::GraphStage(sf::RenderWindow& _window, ColorTheme _theme) :
 			"return sum"
 		},
 		{
-			"for v : nodes: cc[v] = -1",
-			"for v : nodes:",
-			"	if cc[v] == -1:",
-			"	q = queue(), q.push(v), cc[v] = v",
-			"	while q is not empty:",
-			"		u = q.front(), q.pop()",
-			"		for v : u.edges:",
-			"			if cc[v] == -1: cc[v] = u, q.push(v)",
+			"for u : nodes: cc[u] = -1",
+			"for start : nodes:",
+			"	if cc[start] == -1:",
+			"		q = queue(), q.push(start), cc[start] = start",
+			"		while q is not empty:",
+			"			u = q.front(), q.pop()",
+			"			for v : u.edges:",
+			"				if cc[v] == -1: cc[v] = u, q.push(v)",
 			"show cc"
 		}
 	};
@@ -95,6 +95,7 @@ GraphStage::GraphStage(sf::RenderWindow& _window, ColorTheme _theme) :
 void GraphStage::setGraph() {
 	GeneralGraph graph = graphList.back();
 	matrixInput.setDirected(directedChoices.getChoice());
+	auto o = matrixInput.getEdges();
 	graph.setEdges(matrixInput.getEdges(), directedChoices.getChoice(), matrixInput.size);
 	startVertexTypingBox.setMaxValue(matrixInput.size);
 	graphList.clear();
@@ -136,6 +137,7 @@ bool GraphStage::handleMousePressed(float x, float y) {
 	}
 	if (algorithmChoices.handleMousePressed(x, y)) {
 		codeVisualizer.setLines(codes[algorithmChoices.getChoice()]);
+		resetAnimation();
 	}
     sizeTypingBox.clickOn(x, y);
     startVertexTypingBox.clickOn(x, y);
@@ -460,6 +462,14 @@ std::pair<bool, ColorTheme> GraphStage::processEvents() {
 				Dijkstra(startVertex);
 			}
 		}
+		if (algorithmChoices.getChoice() == 1) {
+			if (directedChoices.getChoice() == 0) {
+				MST();
+			}
+		}
+		if (algorithmChoices.getChoice() == 2) {
+			FindCC();
+		}
 		isOperating = false;
 	}
 	return { false, theme };
@@ -491,10 +501,15 @@ void GraphStage::setDefaultView() {
 		deleteVariable(animations, id, variables);
 		setColorType(animations, id, Heap::ColorType::normal);
 	}
+	for (auto edge : graphList.back().edges) {
+		setEdgeType(animations, edge.from, edge.to, General::ColorType::normal);
+		setEdgeOpacity(animations, edge.from, edge.to, 1.f);
+	}
 	addAnimationStep(animations, stepTime, -1, "Reformat for visualization");
 }
 
 void GraphStage::Dijkstra(int startVertex) {
+	setDefaultView();
 	resetAnimation();
 	setAnimatingDirection(Continuous);
 	std::vector <Animation> animations;
@@ -614,8 +629,185 @@ void GraphStage::Dijkstra(int startVertex) {
 		preU = u;
 		lastV = preV;
 	}
+}
 
+void GraphStage::MST() {
 	setDefaultView();
+	resetAnimation();
+	setAnimatingDirection(Continuous);
+	std::vector <Animation> animations;
+
+	std::vector <GeneralEdge> edgeList;
+	for (auto edge : graphList.back().edges) {
+		edgeList.push_back(edge);
+	}
+
+	animations.clear();
+	for (auto edge : edgeList) {
+		setEdgeOpacity(animations, edge.from, edge.to, 0.f);
+	}
+	addAnimationStep(animations, stepTime, 0, "Sort edges by weight, set graph T = empty graph and set sum = 0");
+
+	int maxNode = graphList.back().nodes.rbegin()->first;
+	DSU F(maxNode);
+
+	int sum = 0;
+	for (auto edge : edgeList) {
+		int u = edge.from;
+		int v = edge.to;
+		int weight = edge.weight;
+
+		animations.clear();
+		setEdgeOpacity(animations, u, v, 1.f);
+		setEdgeType(animations, u, v, General::ColorType::highlight);
+		addAnimationStep(animations, stepTime, 1, "Consider edge (" + intToString(u) + ", " + intToString(v) + ")");
+
+		if (F.join(u, v)) {
+			animations.clear();
+			addAnimationStep(animations, stepTime, 2, "Adding this edge to T does not create a cycle");
+
+			sum += weight;
+			animations.clear();
+			setEdgeType(animations, u, v, General::ColorType::highlight2);
+			addAnimationStep(animations, stepTime, 3, "Add this edge to T and add its weight to sum, sum is now " + intToString(sum));
+		}
+		else {
+			animations.clear();
+			addAnimationStep(animations, stepTime, 2, "Adding this edge to T will create a cycle");
+
+			animations.clear();
+			setEdgeOpacity(animations, u, v, 0.f);
+			setEdgeType(animations, u, v, General::ColorType::normal);
+			addAnimationStep(animations, stepTime, 3, "We skip this edge");
+		}
+	}
+	animations.clear();
+	for (auto edge : edgeList) {
+		setEdgeOpacity(animations, edge.from, edge.to, 1.f);
+	}
+	addAnimationStep(animations, stepTime, 4, "We have considered all edges, the total weight of the minimum spanning tree is now " + intToString(sum));
+}
+
+void GraphStage::FindCC() {
+	setDefaultView();
+	resetAnimation();
+	setAnimatingDirection(Continuous);
+	std::vector <Animation> animations;
+	
+	std::vector <int> idList, cc;
+	std::vector <std::vector <int>> adj;
+	for (auto u : graphList.back().nodes) {
+		idList.push_back(u.first);
+	}
+	int maxNode = graphList.back().nodes.rbegin()->first;
+	cc.resize(maxNode + 1);
+	adj.resize(maxNode + 1);
+	for (auto edge : graphList.back().edges) {
+		adj[edge.from].push_back(edge.to);
+		adj[edge.to].push_back(edge.from);
+	}
+
+	int curType = General::ColorType::highlight;
+
+	animations.clear();
+	for (int u : idList) {
+		cc[u] = -1;
+		insertVariable(animations, u, { "-1" });
+	}
+	addAnimationStep(animations, stepTime, 0, "Initialize cc[]");
+
+	int preStart = -1;
+	for (int start : idList) {
+		General::ColorType preType = graphList.back().nodes[start].type;
+		animations.clear();
+		insertVariable(animations, start, { "start = " + intToString(start)});
+		if (preStart != -1) {
+			deleteVariable(animations, preStart, { "start = " + intToString(preStart) });
+		}
+		setColorType(animations, start, General::ColorType::lowlight);
+		addAnimationStep(animations, stepTime, 1, "Consider vertex " + intToString(start));
+
+		if (cc[start] != -1) {
+			animations.clear();
+			setColorType(animations, start, preType);
+			addAnimationStep(animations, stepTime, 2, "This vertex has been visited, we skip it");
+			preStart = start;
+			continue;
+		}
+
+		std::queue <int> q;
+		animations.clear();
+		setColorType(animations, start, curType);
+		deleteVariable(animations, start, { "-1" });
+		insertVariable(animations, start, { intToString(start) });
+		q.push(start);
+		cc[start] = start;
+		addAnimationStep(animations, stepTime, 3, "We push this vertex to queue and set cc[start] = start");
+
+		int preU = -1, lastV = -1;
+		while (!q.empty()) {
+			animations.clear();
+			addAnimationStep(animations, stepTime, 4, "q is not empty, we continue");
+
+			int u = q.front();
+			q.pop();
+
+			animations.clear();
+			insertVariable(animations, u, { "u = " + intToString(u) });
+			if (preU != -1) {
+				deleteVariable(animations, preU, { "u = " + intToString(preU) });
+			}
+			if (lastV != -1) {
+				deleteVariable(animations, lastV, { "v = " + intToString(lastV) });
+			}
+			addAnimationStep(animations, stepTime, 5, "set u = " + intToString(u) + " and pop it from q");
+
+			int preV = -1;
+			for (int v : adj[u]) {
+				animations.clear();
+				insertVariable(animations, v, { "v = " + intToString(v) });
+				if (preV != -1) {
+					deleteVariable(animations, preV, { "v = " + intToString(preV) });
+				}
+				setEdgeType(animations, std::min(u, v), std::max(u, v), curType);
+				addAnimationStep(animations, stepTime, 6, "Consider vertex " + intToString(v) + " adjacent to u = " + intToString(u));
+
+				if (cc[v] == -1) {
+					q.push(v);
+					cc[v] = start;
+
+					animations.clear();
+					setColorType(animations, v, curType);
+					deleteVariable(animations, v, { "-1" });
+					insertVariable(animations, v, { intToString(start) });
+					addAnimationStep(animations, stepTime, 7, "cc[v] = -1, we push v to q and set cc[v] = start");
+				}
+				else {
+					animations.clear();
+					addAnimationStep(animations, stepTime, 7, "cc[v] != -1, we skip this vertex");
+				}
+				preV = v;
+				lastV = v;
+			}
+			preU = u;
+		}
+		animations.clear();
+		if (preU != -1) {
+			deleteVariable(animations, preU, { "u = " + intToString(preU) });
+		}
+		if (lastV != -1) {
+			deleteVariable(animations, lastV, { "v = " + intToString(lastV) });
+		}
+		addAnimationStep(animations, stepTime, 4, "q is empty, we continue considering next start node here");
+		curType++;
+		preStart = start;
+	}
+
+	animations.clear();
+	if (preStart != -1) {
+		deleteVariable(animations, preStart, { "start = " + intToString(preStart) });
+	}
+	addAnimationStep(animations, stepTime, 8, "We have considered all vertices, the connected components are now colored");
 }
 
 void GraphStage::setAnimatingDirection(AnimatingDirection dir) {
@@ -780,5 +972,14 @@ void GraphStage::setEdgeType(std::vector <Animation> &animations, int idU, int i
 	tmp.id1 = idU;
 	tmp.id2 = idV;
 	tmp.nextValue = nextColorType;
+	animations.push_back(tmp);
+}
+
+void GraphStage::setEdgeOpacity(std::vector <Animation> &animations, int from, int to, float nextOpacity) {
+	Animation tmp;
+	tmp.animationType = SetOpacity;
+	tmp.id1 = from;
+	tmp.id2 = to;
+	tmp.nextPercent = nextOpacity;
 	animations.push_back(tmp);
 }

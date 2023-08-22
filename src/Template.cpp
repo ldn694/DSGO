@@ -78,10 +78,11 @@ const float sizeValueLetterGraph = 20;
 const float edgeGraph = 30;
 const float radiusGraph = 20;
 const float thicknessGraph = 3;
-int maxSizeDataGraph = 8;
+int maxSizeDataGraph = 15;
 int maxValueDataGraph = 99;
-const float idealLength = 150;
-const float damperingConst = 0.9;
+const float idealLength = 120;
+const float damperingConst = 0.99;
+const float springConstant = 0.9;
 const int maxStep = 1000;
 
 const int UNKOWN = -(1e9 + 7);

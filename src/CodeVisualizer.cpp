@@ -18,6 +18,8 @@ void CodeVisualizer::handleMouseReleased(float x, float y) {
 
 void CodeVisualizer::setLines(std::vector <std::string> lines) {
     codeBox.setLines(lines);
+    codeBox.setHighlightLine(-1);
+    setDescription("");
 }
 
 void CodeVisualizer::setHighlightLine(int newHighlightLine) {

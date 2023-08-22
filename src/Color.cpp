@@ -4,7 +4,8 @@ sf::Color fadingColor(sf::Color before, sf::Color after, float percent) {
 	return sf::Color(
 		before.r + (after.r - before.r) * percent,
 		before.g + (after.g - before.g) * percent,
-		before.b + (after.b - before.b) * percent
+		before.b + (after.b - before.b) * percent,
+		before.a + (after.a - before.a) * percent
 	);
 }
 
@@ -178,19 +179,61 @@ General::Color General::fadingColorType(General::ColorType before, General::Colo
 	);
 }
 
+General::Color General::fadingColorType(General::ColorType before, float beforeOpacity, General::ColorType after, float afterOpacity, ColorTheme theme, float percent) {
+	sf::Color beforeFillColor = General::color[theme][before].fillColor;
+	beforeFillColor.a = beforeOpacity * 255;
+	sf::Color beforeOutlineColor = General::color[theme][before].outlineColor;
+	beforeOutlineColor.a = beforeOpacity * 255;
+	sf::Color beforeValueColor = General::color[theme][before].valueColor;
+	beforeValueColor.a = beforeOpacity * 255;
+	sf::Color beforeVariableColor = General::color[theme][before].variableColor;
+	beforeVariableColor.a = beforeOpacity * 255;
+	sf::Color afterFillColor = General::color[theme][after].fillColor;
+	afterFillColor.a = afterOpacity * 255;
+	sf::Color afterOutlineColor = General::color[theme][after].outlineColor;
+	afterOutlineColor.a = afterOpacity * 255;
+	sf::Color afterValueColor = General::color[theme][after].valueColor;
+	afterValueColor.a = afterOpacity * 255;
+	sf::Color afterVariableColor = General::color[theme][after].variableColor;
+	afterVariableColor.a = afterOpacity * 255;
+	return General::Color(
+		fadingColor(beforeFillColor, afterFillColor, percent),
+		fadingColor(beforeOutlineColor, afterOutlineColor, percent),
+		fadingColor(beforeValueColor, afterValueColor, percent),
+		fadingColor(beforeVariableColor, afterVariableColor, percent)
+	);
+
+}
 const General::Color General::color[numColorTheme][numColorType] =
 {
 	{
 		Color(LavenderBushColor, BlackColor, BlackColor, RedColor),
-		Color(OrangeColor, OrangeColor, LavenderBushColor, RedColor),
 		Color(LavenderBushColor, OrangeColor, OrangeColor, RedColor),
-		Color(LightGreenColor, LightGreenColor, LavenderBushColor, RedColor)
+		Color(OrangeColor, OrangeColor, LavenderBushColor, RedColor),
+		Color(LightGreenColor, LightGreenColor, LavenderBushColor, RedColor),
+		Color(BrightPinkColor, BrightPinkColor, LavenderBushColor, RedColor),
+		Color(LightRedColor, LightRedColor, LavenderBushColor, RedColor),
+		Color(RedColor, RedColor, LavenderBushColor, RedColor),
+		Color(BlueColor, BlueColor, LavenderBushColor, RedColor),
+		Color(YellowColor, YellowColor, LavenderBushColor, RedColor),
+		Color(sf::Color::Magenta, sf::Color::Magenta, LavenderBushColor, RedColor),
+		Color(sf::Color::Cyan, sf::Color::Cyan, LavenderBushColor, RedColor),
+		Color(MediumSlateBlueColor, MediumSlateBlueColor, LavenderBushColor, RedColor),
+
 	} ,
 	{
 		Color(EerieBlackColor, WhiteColor, WhiteColor, WhiteColor),
-		Color(MediumSlateBlueColor, MediumSlateBlueColor, EerieBlackColor, WhiteColor),
 		Color(EerieBlackColor, MediumSlateBlueColor, MediumSlateBlueColor, WhiteColor),
-		Color(VistaBlueColor, VistaBlueColor, EerieBlackColor, WhiteColor)
+		Color(MediumSlateBlueColor, MediumSlateBlueColor, EerieBlackColor, WhiteColor),
+		Color(VistaBlueColor, VistaBlueColor, EerieBlackColor, WhiteColor),
+		Color(RoyalPurpleColor, RoyalPurpleColor, EerieBlackColor, WhiteColor),
+		Color(UranianBlueColor, UranianBlueColor, EerieBlackColor, WhiteColor),
+		Color(RedColor, RedColor, EerieBlackColor, WhiteColor),
+		Color(BlueColor, BlueColor, EerieBlackColor, WhiteColor),
+		Color(YellowColor, YellowColor, EerieBlackColor, WhiteColor),
+		Color(sf::Color::Magenta, sf::Color::Magenta, EerieBlackColor, WhiteColor),
+		Color(sf::Color::Cyan, sf::Color::Cyan, EerieBlackColor, WhiteColor),
+		Color(OrangeColor, OrangeColor, EerieBlackColor, WhiteColor)
 	}
 };
 

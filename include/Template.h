@@ -107,6 +107,7 @@ extern int maxSizeDataGraph;
 extern int maxValueDataGraph;
 extern const float idealLength;
 extern const float damperingConst;
+extern const float springConstant;
 extern const int maxStep;
 
 extern const int UNKOWN;
@@ -166,7 +167,7 @@ enum AnimationType {
 	AddNode, SwapNode, SetLeftNode, SetRightNode,
 	AddGroup, InsertNodeToGroup, SetEdgeType,
 	SetRoot, SetValue, SetState, SetSize,
-	SetColorType, Move, DeleteVariable, InsertVariable,
+	SetColorType, SetOpacity, Move, DeleteVariable, InsertVariable,
 	SetLeftEdgeColorType, SetRightEdgeColorType, 
 	DeleteEdge,
 	DeleteNode, DeleteNodeFromGroup, DeleteGroup,

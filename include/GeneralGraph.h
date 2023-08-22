@@ -13,6 +13,8 @@ struct GeneralGraph{
 
     float fAttract(float x);
     float fRepel(float x);
+    sf::Vector2f springForce(sf::Vector2f stablePosition, sf::Vector2f mobilePosition, float idealLength);
+    sf::Vector2f repelForce(sf::Vector2f stablePosition, sf::Vector2f mobilePosition, float idealLength);
 
     GeneralGraph(std::vector <GeneralEdge> edges, sf::FloatRect viewRect, sf::Font* font);
 

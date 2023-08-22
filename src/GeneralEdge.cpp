@@ -1,6 +1,6 @@
 #include "GeneralEdge.h"
 
-GeneralEdge::GeneralEdge(int from, int to, int weight, General::ColorType type): from(from), to(to), weight(weight), type(type) {
+GeneralEdge::GeneralEdge(int from, int to, int weight, General::ColorType type, float opacity): from(from), to(to), weight(weight), type(type), opacity(opacity) {
     
 }
 

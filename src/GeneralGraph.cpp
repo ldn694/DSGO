@@ -6,10 +6,6 @@ GeneralGraph::GeneralGraph(std::vector <GeneralEdge> edges, sf::FloatRect viewRe
 
 void GeneralGraph::setEdges(std::vector <GeneralEdge> edges, bool directed, int maxSize) {
     this->isDirected = directed;
-    // std::cout << "------------\n";
-    // for (auto x : edges) {
-    //     std::cout << x.from << " " << x.to << " " << x.weight << "\n";
-    // }
     this->edges.clear();
     for (auto x : edges) {
         this->edges.insert(x);
@@ -25,21 +21,39 @@ void GeneralGraph::setEdges(std::vector <GeneralEdge> edges, bool directed, int 
     for (auto x = nodes.begin(); x != nodes.end(); x++) {
         idList.push_back(x->first);
     }
-    std::random_shuffle(idList.begin(), idList.end());
+    //std::random_shuffle(idList.begin(), idList.end());
+    if (idList.size() == 1) {
+        nodes[idList[0]].setPosition(sf::Vector2f(viewRect.left + viewRect.width / 2, viewRect.top + viewRect.height / 2));
+        return;
+    }
+    if (idList.size() == 2) {
+        nodes[idList[0]].setPosition(sf::Vector2f(viewRect.left + viewRect.width / 2 - viewRect.width / 4, viewRect.top + viewRect.height / 2));
+        nodes[idList[1]].setPosition(sf::Vector2f(viewRect.left + viewRect.width / 2 + viewRect.width / 4, viewRect.top + viewRect.height / 2));
+        return;
+    }
     for (int i = 0; i < idList.size(); i++) {
         int x = idList[i];
-        nodes[x].setPosition(sf::Vector2f(viewRect.left + viewRect.width / 2 + idealLength * 2 * cos(angle * i), viewRect.top + viewRect.height / 2 + idealLength * 2 * sin(angle * i)));
+        nodes[x].setPosition(sf::Vector2f(viewRect.left + viewRect.width / 2 + viewRect.width * 0.5f * cos(angle * i), viewRect.top + viewRect.height / 2 + viewRect.height * 0.5f * sin(angle * i)));
     }
-    if (edges.size() <= maxSize * 2) {
-        arrangeGraph();
-    }
+    // if (edges.size() <= maxSize * 2) {
+    //     arrangeGraph();
+    // }
+    arrangeGraph();
 }
 
-float GeneralGraph::fAttract(float x) {
-    return x * x / idealLength;
+sf::Vector2f GeneralGraph::springForce(sf::Vector2f stablePosition, sf::Vector2f mobilePosition, float idealLength) {
+    sf::Vector2f delta = mobilePosition - stablePosition;
+    float diff = length(delta) - idealLength;
+    return -springConstant * diff * normalize(delta);
 }
-float GeneralGraph::fRepel(float x) {
-    return idealLength * idealLength / x;
+
+sf::Vector2f GeneralGraph::repelForce(sf::Vector2f stablePosition, sf::Vector2f mobilePosition, float idealLength) {
+    sf::Vector2f delta = mobilePosition - stablePosition;
+    float diff = length(delta) - idealLength;
+    if (diff > 0) {
+        return sf::Vector2f(0, 0);
+    }
+    return -springConstant * diff * normalize(delta);
 }
 
 
@@ -51,15 +65,14 @@ void GeneralGraph::arrangeGraph() {
     if (idList.empty()) {
         return;
     }
-    DSU F(idList.back());
-    for (auto x : edges) {
-        // std::cout << x.from << " -> " << x.to << " " << x.weight << "\n";
-        F.join(x.from, x.to);
-    }
-    std::map <int, sf::Vector2f> pos, nextPos;
+    int maxNode = nodes.rbegin()->first;
+    std::vector <sf::Vector2f> pos, nextPos, prePos;
+    pos.resize(maxNode + 1);
+    nextPos.resize(maxNode + 1);
     for (int i = 0; i < idList.size(); i++) {
         pos[idList[i]] = nodes[idList[i]].getPosition();
     }
+    prePos = pos;
     float maximumDisp = 0;
     for (auto u : idList) {
         for (auto v : idList) {
@@ -70,44 +83,71 @@ void GeneralGraph::arrangeGraph() {
     }
     maximumDisp /= 2;
     for (int t = 0; t < maxStep; t++) {
-        std::map <int, sf::Vector2f> disp;
-        std::map <int, std::map <int, sf::Vector2f> > differentCCDisp;
-        nextPos.clear();
-        for (int v : idList) {
-            nextPos[v] = pos[v];
+        std::vector <sf::Vector2f> disp;
+        disp.resize(maxNode + 1);
+        for (int u : idList) {
+            nextPos[u] = pos[u];
         }
-        for (int v : idList) {
-            for (int u : idList) {
-                if (u == v) continue;
-                if (F.find(u) == F.find(v)) {
-                    sf::Vector2f delta = pos[v] - pos[u];
-                    disp[v] += normalize(delta) * fRepel(length(delta));
-                }
-                else {
-                    sf::Vector2f delta = pos[v] - pos[u];
-                    //differentCCDisp[F.find(v)][F.find(u)] += normalize(delta) * fRepel(length(delta));
-                    disp[v] += normalize(delta) * fRepel(length(delta));
+
+        for (auto edge : edges) {
+            int u = edge.from;
+            int v = edge.to;
+            sf::Vector2f middle = (pos[u] + pos[v]) / 2.0f;
+            disp[u] += springForce(middle, pos[u], idealLength);
+            disp[v] += springForce(middle, pos[v], idealLength);
+        }
+        std::vector <std::vector <bool>> adjacencyMatrix(maxNode + 1, std::vector <bool>(maxNode + 1, false));
+        for (auto edge : edges) {
+            int u = edge.from;
+            int v = edge.to;
+            adjacencyMatrix[u][v] = true;
+        }
+        for (int u : idList) {
+            for (int v : idList) {
+                if (!adjacencyMatrix[u][v]) {
+                    sf::Vector2f middle = (pos[u] + pos[v]) / 2.0f;
+                    disp[u] += repelForce(middle, pos[u], idealLength);
+                    disp[v] += repelForce(middle, pos[v], idealLength);
                 }
             }
         }
-        // for (int v : idList) {
-        //     for (int u : idList) {
-        //         if (u != F.find(u)) continue;
-        //         if (F.find(u) != F.find(v)) {
-        //             if (F.getSize(u) == 0) {
-        //                 assert(false);
-        //             }
-        //             disp[v] += differentCCDisp[F.find(v)][F.find(u)];
-        //         }
-        //     }   
-        // }
-        for (auto x : edges) {
-            int v = x.from;
-            int u = x.to;
-            sf::Vector2f delta = pos[v] - pos[u];
-            disp[v] -= normalize(delta) * fAttract(length(delta));
-            disp[u] += normalize(delta) * fAttract(length(delta));
+        for (auto edge : edges) {
+            int u = edge.from;
+            int v = edge.to;
+            sf::Vector2f middle = (pos[u] + pos[v]) / 2.0f;
+            for (int x : idList) {
+                if (x == u || x == v) continue;
+                disp[x] += repelForce(middle, pos[x], idealLength);
+            }
+            for (auto otherEdge : edges) {
+                int x = otherEdge.from;
+                int y = otherEdge.to;
+                if (x == u && y == v) continue;
+                sf::Vector2f otherMiddle = (pos[x] + pos[y]) / 2.0f;
+                disp[x] += repelForce(middle, otherMiddle, idealLength);
+                disp[y] += repelForce(middle, otherMiddle, idealLength);
+            }
         }
+        for (int x : idList) {
+            for (auto edge : edges) {
+                int u = edge.from;
+                int v = edge.to;
+                if (u == x || v == x) continue;
+                sf::Vector2f middle = (pos[u] + pos[v]) / 2.0f;
+                disp[u] += repelForce(pos[x], middle, idealLength);
+                disp[v] += repelForce(pos[x], middle, idealLength);
+            }
+        }
+        sf::Vector2f screenCenter = sf::Vector2f(viewRect.left + viewRect.width / 2, viewRect.top + viewRect.height / 2);
+        sf::Vector2f totalPos = sf::Vector2f(0, 0);
+        for (int u : idList) {
+            totalPos += pos[u];
+        }
+        totalPos *= 1.f / maxNode;
+        for (int u : idList) {
+            disp[u] += springForce(screenCenter, totalPos, 0);
+        }
+        
         bool flag = false;
         for (int v : idList) {
             nextPos[v] += normalize(disp[v]) * std::min(length(disp[v]), maximumDisp);
@@ -116,18 +156,32 @@ void GeneralGraph::arrangeGraph() {
             }
             nextPos[v].x = std::max(viewRect.left, std::min(viewRect.left + viewRect.width, nextPos[v].x));
             nextPos[v].y = std::max(viewRect.top, std::min(viewRect.top + viewRect.height, nextPos[v].y));
-            maximumDisp *= damperingConst;
         }
+        maximumDisp *= damperingConst;
         pos = nextPos;
         if (!flag) {
             break;
         }
     }
+    bool goodGraph = true;
+    for (int u : idList) {
+        for (int v : idList) {
+            if (u == v) continue;
+            if (pos[u] == pos[v]) {
+                goodGraph = false;
+                break;
+            }
+        }
+        if (!goodGraph) {
+            break;
+        }
+    }
+    if (!goodGraph) {
+        pos = prePos;
+    }
     for (auto &x : nodes) {
-        // std::cout << x.first << " " << pos[x.first].x << " " << pos[x.first].y << "\n";
         x.second.setPosition(pos[x.first]);
     }
-    // std::cout << "DONE!\n";
 }
 
 int GeneralGraph::getMexID() {
@@ -252,6 +306,17 @@ GeneralGraph GeneralGraph::execAnimation(std::vector <Animation> animations) {
                 tmp.edges.insert(GeneralEdge(animations[i].id1, animations[i].id2, weight, General::ColorType(animations[i].nextValue)));
                 break;
             }
+            case SetOpacity: {
+                auto it = tmp.findEdge(animations[i].id1, animations[i].id2);
+                if (it == tmp.edges.end()) {
+                    assert(false);
+                }
+                int weight = it->weight;
+                General::ColorType type = it->type;
+                tmp.edges.erase(it);
+                tmp.edges.insert(GeneralEdge(animations[i].id1, animations[i].id2, weight, type, animations[i].nextPercent));
+                break;
+            }
         }
     }
     return tmp;
@@ -278,13 +343,15 @@ void GeneralGraph::draw(sf::RenderWindow& window, ColorTheme theme, sf::Time tot
                     }
                     //std::cout << y->from << " " << y->to << "\n";
                     std::vector <sf::RectangleShape> lines = getEdgeLines(x->second.getPosition(), nodes[y->to].getPosition(), isDirected, upward);
+                    sf::Color color = General::color[theme][y->type].outlineColor;
+                    color.a = 255 * y->opacity;
                     for (auto line : lines) {
-                        line.setFillColor(General::color[theme][y->type].outlineColor);
+                        line.setFillColor(color);
                         window.draw(line);
                     }
                     std::vector <sf::Text> texts = getEdgeWeightText(x->second.getPosition(), nodes[y->to].getPosition(), y->weight, upward);
                     for (auto text : texts) {
-                        text.setFillColor(General::color[theme][y->type].outlineColor);
+                        text.setFillColor(color);
                         window.draw(text);
                     }
                 }
@@ -316,6 +383,7 @@ void GeneralGraph::draw(sf::RenderWindow& window, ColorTheme theme, sf::Time tot
     }
     for (int i = 0; i < animations.size(); i++) {
         if (animations[i].animationType == SetEdgeType) continue;
+        if (animations[i].animationType == SetOpacity) continue;
         if (animations[i].id1 != -1) {
             animationMap[animations[i].id1].push_back(animations[i]);
         }
@@ -347,7 +415,7 @@ void GeneralGraph::draw(sf::RenderWindow& window, ColorTheme theme, sf::Time tot
                         }
                     }
                     std::vector <sf::RectangleShape> lines = getEdgeLines(x->second.getPosition(), nodes[y->to].getPosition(), isDirected, upward);
-                    sf::Color color = General::fadingColorType(y->type, p->type, theme, percent).outlineColor;
+                    sf::Color color = General::fadingColorType(y->type, y->opacity, p->type, p->opacity, theme, percent).outlineColor;
                     for (auto line : lines) {
                         line.setFillColor(color);
                         window.draw(line);
