@@ -570,7 +570,7 @@ void GraphStage::Dijkstra(int startVertex) {
 			setColorType(animations, u, General::ColorType::lowlight);
 			addAnimationStep(animations, stepTime, 4, "d > dist[u], we skip this vertex");
 			lastV = -1;
-			preU = -1;
+			preU = u;
 			continue;
 		}
 
