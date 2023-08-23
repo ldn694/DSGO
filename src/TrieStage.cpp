@@ -103,7 +103,7 @@ TrieStage::TrieStage(sf::RenderWindow& window, ColorTheme theme) :
 				}
 			}
 		},
-		&maxSizeDataTrie, &maxLengthDataTrie, ListInput,
+		&maxSizeDataTrie, &maxLengthDataTrie, StringListInput,
 		theme)
 {
     rootPosition = sf::Vector2f((WIDTH_RES - 2 * widthBox) / 2 + 2 * widthBox, HEIGHT_RES / 6);
@@ -393,7 +393,15 @@ std::pair<bool, ColorTheme> TrieStage::processEvents() {
 				
 			}
 			if (modeString == "Upload File") {
-				
+				std::vector <std::string> tmp = readFromFile.getListString().first;
+				if (!tmp.empty()) {
+					TrieList.clear();
+					TrieList.push_back(TrieGraph(rootPosition, font(fontType::Arial)));
+					for (auto x : tmp) {
+						insertString(x);
+					}
+					resetAnimation();
+				}
 			}
 		}
 		if (operationName[curOperation] == "Insert") {

@@ -5,7 +5,7 @@
 #include "GeneralEdge.h"
 
 enum InputType {
-	HashTableInput, MatrixGraphInput, ListInput
+	HashTableInput, MatrixGraphInput, ListInput, StringListInput
 };
 
 struct ReadFromFile {
@@ -25,6 +25,7 @@ public:
 	void handleMouseMove(float x, float y, sf::RenderWindow& window);
 	std::vector <int> getListInt();
 	std::pair <std::vector <GeneralEdge>, int> getListEdge();
+	std::pair <std::vector <std::string>, int> getListString();
 	void draw(sf::RenderWindow& window, ColorTheme theme);
 	void setDisplaying(bool val);
 	bool getDisplaying();

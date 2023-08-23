@@ -169,10 +169,6 @@ std::pair <std::vector <GeneralEdge>, int> ReadFromFile::getListEdge() {
                     valText.clear();
                     if (numCol > size) {
                         fi.close();
-                        // std::cout << "size = " << size << "\n";
-                        // for (auto x : tmp) {
-                        //     std::cout << x.from << " " << x.to << " " << x.weight << "\n";
-                        // }
                         return { {}, -4 };
                     }
                     numCol++;
@@ -214,10 +210,49 @@ std::pair <std::vector <GeneralEdge>, int> ReadFromFile::getListEdge() {
             break;
         }
     }
-    // for (auto x : tmp) {
-    //     std::cout << x.from << " " << x.to << " " << x.weight << "\n";
-    // }
     return {tmp, size};
+}
+
+std::pair <std::vector <std::string>, int> ReadFromFile::getListString() {
+    if (fileName == "Choose file") {
+        return {{}, 0};
+    }
+    std::ifstream fi(address);
+    //first number = size;
+    std::vector <std::string> tmp;
+    while (!fi.eof()) {
+        std::string line;
+        std::getline(fi, line);
+        int i = 0;
+        std::string valText;
+        std::string curText = line + ",";
+        while (i < curText.size()) {
+            if (curText[i] == ',' || curText[i] == ' ') {
+                if (!valText.empty()) {
+                    tmp.push_back(valText);
+                    if (tmp.size() > maxSizeDataTrie) {
+                        fi.close();
+                        return {{}, -2 };
+                    }
+                    valText.clear();
+                }
+                i++;
+                continue;
+            }
+            if (curText[i] < 'a' || curText[i] > 'z') {
+                fi.close();
+                return {{}, -1 };
+            }
+            valText.push_back(curText[i]);
+            if (valText.size() > maxLengthDataTrie) {
+                fi.close();
+                return {{}, -3 };
+            }
+            i++;
+        }
+    }
+    fi.close();
+    return {tmp, 0};
 }
 
 void ReadFromFile::setWarning() {
@@ -225,7 +260,7 @@ void ReadFromFile::setWarning() {
         std::pair <std::vector <GeneralEdge>, int> tmp = getListEdge();
         if (tmp.second == -1) {
             displayingWarning = true;
-            warning = "Illegar character found, character must be space, comma, or number (0..9)!";
+            warning = "Illegar character found, character must be space or number (0..9)!";
             return;
         }
         if (tmp.second == -2 || tmp.second == -3) {
@@ -242,6 +277,28 @@ void ReadFromFile::setWarning() {
         if (tmp.second == -5) {
             displayingWarning = true;
             warning = "Matrix is missing numbers!";
+            return;
+        }
+        if (!tmp.first.empty()) {
+            displayingWarning = false;
+        }
+        return;
+    }
+    if (type == StringListInput) {
+        std::pair <std::vector <std::string>, int> tmp = getListString();
+        if (tmp.second == -1) {
+            displayingWarning = true;
+            warning = "Illegar character found, character must be space, comma, or letter (a..z)!";
+            return;
+        }
+        if (tmp.second == -2) {
+            displayingWarning = true;
+            warning = "Maximum number of string is " + intToString(maxSizeDataTrie) + "!";
+            return;
+        }
+        if (tmp.second == -3) {
+            displayingWarning = true;
+            warning = "A single string's length must NOT be greater than " + intToString(maxLengthDataTrie) + "!";
             return;
         }
         if (!tmp.first.empty()) {

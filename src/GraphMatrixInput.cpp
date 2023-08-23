@@ -39,6 +39,16 @@ void GraphMatrixInput::setDirected(bool isDirected) {
     }
 }
 
+int getRandomWeight(int bigValue, int smallValue, int chance) {
+    int o = rand() % chance;
+    if (!o) {
+        return rand() % smallValue + 1;
+    }
+    else {
+        return rand() % bigValue + 1;
+    }
+}
+
 void GraphMatrixInput::createRandom() {
     if (size == 0) return;
     int graphType = rand() % 3;
@@ -49,7 +59,7 @@ void GraphMatrixInput::createRandom() {
                 if (!directed && i > j) continue;
                 int isEdge = rand() % ((size + 2) / 2);
                 if (isEdge) {
-                    int weight = rand() % maxValueDataGraph + 1;
+                    int weight = getRandomWeight(maxValueDataGraph, maxSizeDataGraph, std::max(size * size / 4, 2));
                     boxes[i][j].setText(intToString(weight));
                 }
                 else {
@@ -66,14 +76,29 @@ void GraphMatrixInput::createRandom() {
                 boxes[i][j].setText("0");
             }
         }
+        std::vector <int> cha;
+        for (int i = 1; i <= size; i++) {
+            cha.push_back(i);
+        }
         int cnt = size;
         while (cnt > numComp) {
-            int u = rand() % size + 1;
-            int v = rand() % size + 1;
-            if (u == v) continue;
+            int pu = cha[rand() % cha.size()];
+            int pv = cha[rand() % cha.size()];
+            if (pu == pv) continue;
+            std::vector <int> listU = F.getComponents(pu);
+            std::vector <int> listV = F.getComponents(pv);
+            int u = listU[rand() % listU.size()];
+            int v = listV[rand() % listV.size()];
             if (F.join(u, v)) {
+                int o = F.find(u) ^ pu ^ pv;
+                for (int p = 0; p < cha.size(); p++) {
+                    if (cha[p] == o) {
+                        cha.erase(cha.begin() + p);
+                        break;
+                    }
+                }
                 cnt--;
-                int weight = rand() % maxValueDataGraph + 1;
+                int weight = getRandomWeight(maxValueDataGraph, maxSizeDataGraph, std::max(size * size / 4, 2));
                 boxes[u][v].setText(intToString(weight));
             }
         }
@@ -92,7 +117,8 @@ void GraphMatrixInput::createRandom() {
             if (u == v) continue;
             if (F.join(u, v)) {
                 cnt--;
-                int weight = rand() % maxValueDataGraph + 1;
+                int weight = getRandomWeight(maxValueDataGraph, maxSizeDataGraph, std::max(size * size / 4, 2));
+                if (u > v && !directed) std::swap(u, v);
                 boxes[u][v].setText(intToString(weight));
             }
         }
@@ -102,8 +128,9 @@ void GraphMatrixInput::createRandom() {
             int u = rand() % size + 1;
             int v = rand() % size + 1;
             if (u == v) continue;
+            if (u > v && !directed) std::swap(u, v);
             if (boxes[u][v].getText() == "0") {
-                int weight = rand() % maxValueDataGraph + 1;
+                int weight = getRandomWeight(maxValueDataGraph, maxSizeDataGraph, std::max(size * size / 4, 2));
                 boxes[u][v].setText(intToString(weight));
                 numExtraEdge--;
             }

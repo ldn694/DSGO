@@ -11,6 +11,16 @@ int DSU::find(int v) {
     return lab[v] < 0 ? v : lab[v] = find(lab[v]);
 }
 
+std::vector <int> DSU::getComponents(int u) {
+    std::vector <int> tmp;
+    for (int i = 1; i <= n; i++) {
+        if (find(i) == find(u)) {
+            tmp.push_back(i);
+        }
+    }
+    return tmp;
+}
+
 bool DSU::join(int a, int b) {
     a = find(a);
     b = find(b);

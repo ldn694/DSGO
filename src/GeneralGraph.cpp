@@ -35,10 +35,10 @@ void GeneralGraph::setEdges(std::vector <GeneralEdge> edges, bool directed, int 
         int x = idList[i];
         nodes[x].setPosition(sf::Vector2f(viewRect.left + viewRect.width / 2 + viewRect.width * 0.5f * cos(angle * i), viewRect.top + viewRect.height / 2 + viewRect.height * 0.5f * sin(angle * i)));
     }
-    // if (edges.size() <= maxSize * 2) {
-    //     arrangeGraph();
-    // }
-    arrangeGraph();
+    if (maxSize <= 6 || edges.size() <= maxSize * 2) {
+        arrangeGraph();
+    }
+    //arrangeGraph();
 }
 
 sf::Vector2f GeneralGraph::springForce(sf::Vector2f stablePosition, sf::Vector2f mobilePosition, float idealLength) {
