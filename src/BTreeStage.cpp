@@ -74,32 +74,36 @@ BTreeStage::BTreeStage(sf::RenderWindow& window, ColorTheme theme) :
 			},
 			{
 				{
-					"insert value",
-					"check balance factor of this node",
-    				"	case LL: rotateRight(this)",
-    				"	case RR: rotateLeft(this)",
-    				"	case LR: rotateLeft(this.left); rotateRight(this)",
-    				"	case RL: rotateRight(this.right); rotateLeft(this)",
-					"	case OK: continue"
+					"if (node == NULL):",
+					"	insert node",
+					"if (node.isFull()):",
+					"	split node",
+					"search for the node"
 				}
 			},
 			{
 				{
-					"delete value",
-					"check balance factor of this node",
-    				"	case LL: rotateRight(this)",
-    				"	case RR: rotateLeft(this)",
-    				"	case LR: rotateLeft(this.left); rotateRight(this)",
-    				"	case RL: rotateRight(this.right); rotateLeft(this)",
-					"	case OK: continue"
+					"if (node.isLeaf()):",
+					"	if (node.find(k) != NULL): node.delete(k)",
+					"	return",
+					"if (node.find(k) != NULL):",
+					"	find sibling with at least 2 key",
+					"	if (sibling != NULL): node.key = sibling.findNearest(k), delete(sibling, node.key)",
+					"	else: merge(node), delete(node.left, k)",
+					"else:",
+					"	nextNode = node.findNextNode(k)",
+					"	if (nextNode.numKey == 1):",
+					"		find sibling with at least 2 key",
+					"		if (sibling != NULL): rotate(node)",
+					"		else: merge(node)",
+					"	delete(nextNode, k)"
 				}
 			},
 			{
 				{
-					"if this == null: return null",
-					"else if this.key == search value:return this",
-					"else if this.key < search value: search this.right",
-					"else search this.left"
+					"if (node == NULL):",
+					"	return NULL",
+					"search for the node"
 				}
 			}
 		},
@@ -138,7 +142,7 @@ void BTreeStage::insertValue(int value) {
 		insertNodeToGroup(animations, idGroup, idNode);
 		setColorType(animations, idGroup, BTree::ColorType::highlight);
 		setRoot(animations, idGroup);
-		addAnimationStep(animations, stepTime, -1, "Tree is empty, init new node");
+		addAnimationStep(animations, stepTime, 1, "Tree is empty, init new node");
 
 		setDefaultView();
 		return;
@@ -153,17 +157,17 @@ void BTreeStage::insertValue(int value) {
 				addNode(animations, idNode, value);
 				insertNodeToGroup(animations, idGroup, idNode);
 				setColorType(animations, idGroup, BTree::ColorType::highlight);
-				addAnimationStep(animations, stepTime, -1, "Insert " + intToString(value) + " to this node");
+				addAnimationStep(animations, stepTime, 1, "Insert " + intToString(value) + " to this node");
 				break;
 			}
 			else {
 				animations.clear();
 				setColorType(animations, idGroup, BTree::ColorType::highlight);
-				addAnimationStep(animations, stepTime, -1, "Inserting " + intToString(value));
+				addAnimationStep(animations, stepTime, 4, "Inserting " + intToString(value));
 				animations.clear();
 				setColorType(animations, idGroup, BTree::ColorType::lowlight);
 				setColorType(animations, nextIDGroup, BTree::ColorType::highlight);
-				addAnimationStep(animations, stepTime, -1, "Go to next node");
+				addAnimationStep(animations, stepTime, 4, "Go to next node");
 				par = idGroup;
 				idGroup = nextIDGroup;
 			}
@@ -188,13 +192,13 @@ void BTreeStage::insertValue(int value) {
 			setColorType(animations, idGroup, BTree::ColorType::highlight);
 			setColorType(animations, idLeftGroup, BTree::ColorType::highlight);
 			setColorType(animations, idRightGroup, BTree::ColorType::highlight);
-			addAnimationStep(animations, stepTime, -1, "Spliting this node");
+			addAnimationStep(animations, stepTime, 3, "Spliting this node");
 
 			animations.clear();
 			setColorType(animations, idGroup, BTree::ColorType::lowlight);
 			setColorType(animations, idLeftGroup, BTree::ColorType::normal);
 			setColorType(animations, idRightGroup, BTree::ColorType::normal);
-			addAnimationStep(animations, stepTime, -1, "Continuing");
+			addAnimationStep(animations, stepTime, 4, "Continuing");
 		}
 		else if (idGroup != par) {
 			animations.clear();
@@ -221,23 +225,23 @@ void BTreeStage::insertValue(int value) {
 			setColorType(animations, par, BTree::ColorType::lowlight);
 			setColorType(animations, idLeftGroup, BTree::ColorType::highlight);
 			setColorType(animations, idRightGroup, BTree::ColorType::highlight);
-			addAnimationStep(animations, stepTime, -1, "Spliting this node");
+			addAnimationStep(animations, stepTime, 3, "Spliting this node");
 
 			animations.clear();
 			setColorType(animations, par, BTree::ColorType::lowlight);
 			setColorType(animations, idLeftGroup, BTree::ColorType::normal);
 			setColorType(animations, idRightGroup, BTree::ColorType::normal);
-			addAnimationStep(animations, stepTime, -1, "Continuing");
+			addAnimationStep(animations, stepTime, 4, "Continuing");
 			idGroup = par;
 		} else {
 			int nextIDGroup = BTreeList.back().findEdge(idGroup, value);
 			animations.clear();
 			setColorType(animations, idGroup, BTree::ColorType::highlight);
-			addAnimationStep(animations, stepTime, -1, "Inserting " + intToString(value));
+			addAnimationStep(animations, stepTime, 4, "Inserting " + intToString(value));
 			animations.clear();
 			setColorType(animations, idGroup, BTree::ColorType::lowlight);
 			setColorType(animations, nextIDGroup, BTree::ColorType::highlight);
-			addAnimationStep(animations, stepTime, -1, "Go to next node");
+			addAnimationStep(animations, stepTime, 4, "Go to next node");
 			par = idGroup;
 			idGroup = nextIDGroup;
 		}
@@ -246,7 +250,302 @@ void BTreeStage::insertValue(int value) {
 }
 
 void BTreeStage::deleteValue(int value) {
-	
+	#define tree BTreeList.back()
+	resetAnimation();
+	setAnimatingDirection(Continuous);
+
+	std::vector <Animation> animations;
+
+	int preID = -1;
+	int idGroup = tree.root;
+	if (idGroup == -1) {
+		animations.clear();
+		addAnimationStep(animations, stepTime, -1, "Tree is empty");
+		return;
+	}
+	int k = value;
+	while (true) {
+		if (tree.groups[idGroup].isLeaf()) {
+			animations.clear();
+			setColorType(animations, idGroup, BTree::ColorType::highlight);
+			if (preID != -1) {
+				setColorType(animations, preID, BTree::ColorType::lowlight);
+			}
+			addAnimationStep(animations, stepTime, 0, "Reached a leaf node");
+
+			int curNode = tree.findNode(idGroup, k);
+			if (curNode != -1) {
+				animations.clear();
+				deleteNode(animations, curNode);
+				deleteNodeFromGroup(animations, idGroup, curNode);
+				if (BTreeList.back().groups[idGroup].nodes.size() == 1) {
+					deleteGroup(animations, idGroup);
+					if (idGroup == BTreeList.back().root) {
+						setRoot(animations, -1);
+					}
+				}
+				addAnimationStep(animations, stepTime, 1, "Found " + intToString(k) + " in this node, so we delete " + intToString(k) + " from this node");
+			}
+			else {
+				animations.clear();
+				addAnimationStep(animations, stepTime, 1, "Not found " + intToString(k) + " in this node, no deleting");
+			}
+			setDefaultView();
+			return;
+		}
+		int curNode = tree.findNode(idGroup, k);
+		int pos = tree.findNodePos(idGroup, k);
+		if (curNode != -1) {
+			animations.clear();
+			setColorType(animations, idGroup, BTree::ColorType::highlight);
+			if (preID != -1) {
+				setColorType(animations, preID, BTree::ColorType::lowlight);
+			}
+			addAnimationStep(animations, stepTime, 3, "Found " + intToString(k) + " in this node");
+
+			int leftIDGroup = tree.groups[idGroup].listEdge[pos];
+			int rightIDGroup = tree.groups[idGroup].listEdge[pos + 1];
+
+			if (leftIDGroup == -1 || rightIDGroup == -1) {
+				std::cout << "Not a leaf but missing edge";
+				assert(false);
+			}
+
+			if (tree.groups[leftIDGroup].nodes.size() >= 2) {
+				animations.clear();
+				setColorType(animations, leftIDGroup, BTree::ColorType::highlight);
+				addAnimationStep(animations, stepTime, 4, "Left node has at least 2 keys");
+
+				int idGroupPredecessor = leftIDGroup, preID = -1;
+				while (true) {
+					if (tree.groups[idGroupPredecessor].isLeaf()) {
+						animations.clear();
+						setColorType(animations, idGroupPredecessor, BTree::ColorType::highlight2);
+						if (preID != -1) {
+							setColorType(animations, preID, BTree::ColorType::normal);
+						}
+						addAnimationStep(animations, stepTime, 5, "Found predecessor");
+
+						int predecessor = tree.nodes[tree.groups[idGroupPredecessor].nodes.back()].getValue();
+
+						animations.clear();
+						setColorType(animations, idGroup, BTree::ColorType::highlight2);
+						setColorType(animations, idGroupPredecessor, BTree::ColorType::normal);
+						setValue(animations, curNode, predecessor);
+						addAnimationStep(animations, stepTime, 5, "Replace " + intToString(k) + " with predecessor");
+
+						idGroup = leftIDGroup;
+						k = predecessor;
+						break;
+					}
+					else {
+						animations.clear();
+						setColorType(animations, idGroupPredecessor, BTree::ColorType::highlight);
+						if (preID != -1) {
+							setColorType(animations, preID, BTree::ColorType::normal);
+						}
+						addAnimationStep(animations, stepTime, 5, "Searching predecessor");
+
+						preID = idGroupPredecessor;
+						idGroupPredecessor = tree.groups[idGroupPredecessor].listEdge.back();
+					}
+				}
+			}
+			else if (tree.groups[rightIDGroup].nodes.size() > 1) {
+				animations.clear();
+				setColorType(animations, rightIDGroup, BTree::ColorType::highlight);
+				addAnimationStep(animations, stepTime, 5, "Right node has at least 2 keys");
+
+				int idGroupSuccessor = rightIDGroup, preID = -1;
+				while (true) {
+					if (tree.groups[idGroupSuccessor].isLeaf()) {
+						animations.clear();
+						setColorType(animations, idGroupSuccessor, BTree::ColorType::highlight2);
+						if (preID != -1) {
+							setColorType(animations, preID, BTree::ColorType::normal);
+						}
+						addAnimationStep(animations, stepTime, 5, "Found successor");
+
+						int successor = tree.nodes[tree.groups[idGroupSuccessor].nodes[0]].getValue();
+
+						animations.clear();
+						setColorType(animations, idGroup, BTree::ColorType::highlight2);
+						setColorType(animations, idGroupSuccessor, BTree::ColorType::normal);
+						setValue(animations, curNode, successor);
+						addAnimationStep(animations, stepTime, 5, "Replace " + intToString(k) + " with successor");
+
+						idGroup = rightIDGroup;
+						k = successor;
+						break;
+					}
+					else {
+						animations.clear();
+						setColorType(animations, idGroupSuccessor, BTree::ColorType::highlight);
+						if (preID != -1) {
+							setColorType(animations, preID, BTree::ColorType::normal);
+						}
+						addAnimationStep(animations, stepTime, 5, "Searching successor");
+
+						preID = idGroupSuccessor;
+						idGroupSuccessor = tree.groups[idGroupSuccessor].listEdge[0];
+					}
+				}
+			}
+			else {
+				animations.clear();
+				setColorType(animations, leftIDGroup, BTree::ColorType::highlight);
+				addAnimationStep(animations, stepTime, 5, "Both left and right node have 1 key");
+
+				int a = tree.groups[leftIDGroup].nodes[0];
+				int b = tree.groups[rightIDGroup].nodes[0];
+
+				std::vector <int> preListEdge;
+				for (int i = 0; i <= pos; i++) {
+					preListEdge.push_back(tree.groups[idGroup].listEdge[i]);
+				}
+				for (int i = pos + 2; i < tree.groups[idGroup].listEdge.size(); i++) {
+					preListEdge.push_back(tree.groups[idGroup].listEdge[i]);
+				}
+				animations.clear();
+				deleteNodeFromGroup(animations, idGroup, curNode);
+				deleteNodeFromGroup(animations, rightIDGroup, b);
+				deleteGroup(animations, rightIDGroup);
+				insertNodeToGroup(animations, leftIDGroup, curNode);
+				insertNodeToGroup(animations, leftIDGroup, b);
+				int x = tree.groups[leftIDGroup].listEdge[0];
+				int y = tree.groups[leftIDGroup].listEdge[1];
+				int z = tree.groups[rightIDGroup].listEdge[0];
+				int w = tree.groups[rightIDGroup].listEdge[1];
+				setEdge(animations, leftIDGroup, 0, x);
+				setEdge(animations, leftIDGroup, 1, y);
+				setEdge(animations, leftIDGroup, 2, z);
+				setEdge(animations, leftIDGroup, 3, w);
+				for (int i = 0; i < preListEdge.size(); i++) {
+					setEdge(animations, idGroup, i, preListEdge[i]);
+				}
+				addAnimationStep(animations, stepTime, 6, "Merging");
+				idGroup = leftIDGroup;
+			}
+		}
+		else {
+			animations.clear();
+			setColorType(animations, idGroup, BTree::ColorType::highlight);
+			if (preID != -1) {
+				setColorType(animations, preID, BTree::ColorType::lowlight);
+			}
+			addAnimationStep(animations, stepTime, 7, "Not found " + intToString(k) + " in this node");
+
+			int nextIDGroup = tree.findEdge(idGroup, k);
+			int nextPos = tree.findEdgePos(idGroup, k);
+			if (tree.groups[nextIDGroup].nodes.size() != 1) {
+				animations.clear();
+				setColorType(animations, nextIDGroup, BTree::ColorType::highlight);
+				addAnimationStep(animations, stepTime, 9, "Next node has at least 2 keys, so we can continue");
+
+				preID = idGroup;
+				idGroup = nextIDGroup;
+			}
+			else {
+				animations.clear();
+				setColorType(animations, nextIDGroup, BTree::ColorType::highlight);
+				addAnimationStep(animations, stepTime, 9, "Next node has only 1 key");
+
+				bool found = false;
+				for (int delta = -1; delta <= 1; delta += 2) {
+					int siblingPos = nextPos + delta;
+					if (siblingPos < 0 || siblingPos > tree.groups[idGroup].nodes.size()) {
+						continue;
+					}
+					int siblingIDGroup = tree.groups[idGroup].listEdge[siblingPos];
+					if (tree.groups[siblingIDGroup].nodes.size() >= 2) {
+						animations.clear();
+						setColorType(animations, siblingIDGroup, BTree::ColorType::highlight);
+						addAnimationStep(animations, stepTime, 10, "Sibling has at least 2 keys");
+
+						int idNodeStolen = tree.groups[siblingIDGroup].nodes[delta == 1 ? 0 : tree.groups[siblingIDGroup].nodes.size() - 1];
+						int curNode = tree.groups[idGroup].nodes[delta == -1 ? nextPos - 1 : nextPos];
+						std::vector <int> preCurListEdge, preSiblingListEdge, preNextListEdge;
+						preCurListEdge = tree.groups[idGroup].listEdge;
+						preSiblingListEdge = tree.groups[siblingIDGroup].listEdge;
+						preSiblingListEdge.erase(preSiblingListEdge.begin() + (delta == 1 ? 0 : tree.groups[siblingIDGroup].listEdge.size() - 1));
+						preNextListEdge = tree.groups[nextIDGroup].listEdge;
+						preNextListEdge.insert(preNextListEdge.begin() + (delta == -1 ? 0 : tree.groups[nextIDGroup].listEdge.size()), tree.groups[siblingIDGroup].listEdge[delta == 1 ? 0 : tree.groups[siblingIDGroup].nodes.size()]);
+
+						animations.clear();
+						deleteNodeFromGroup(animations, siblingIDGroup, idNodeStolen);
+						deleteNodeFromGroup(animations, idGroup, curNode);
+						insertNodeToGroup(animations, idGroup, idNodeStolen);
+						insertNodeToGroup(animations, nextIDGroup, curNode);
+						for (int i = 0; i < preCurListEdge.size(); i++) {
+							setEdge(animations, idGroup, i, preCurListEdge[i]);
+						}
+						for (int i = 0; i < preSiblingListEdge.size(); i++) {
+							setEdge(animations, siblingIDGroup, i, preSiblingListEdge[i]);
+						}
+						for (int i = 0; i < preNextListEdge.size(); i++) {
+							setEdge(animations, nextIDGroup, i, preNextListEdge[i]);
+						}
+						setColorType(animations, siblingIDGroup, BTree::ColorType::normal);
+						addAnimationStep(animations, stepTime, 11, "Stealing from sibling");
+						found = true;
+					}
+				}
+				if (!found) {
+					animations.clear();
+					addAnimationStep(animations, stepTime, 10, "No sibling has at least 2 keys");
+
+					int siblingIDGroup = nextPos == 0 ? tree.groups[idGroup].listEdge[1] : tree.groups[idGroup].listEdge[nextPos - 1];
+					int deleteCurEdgePos = nextPos == 0 ? 1 : nextPos - 1;
+					int idCurNode = tree.groups[idGroup].nodes[nextPos == 0 ? 0 : nextPos - 1];
+					int idSiblingNode = tree.groups[siblingIDGroup].nodes[0];
+					std::vector <int> preCurListEdge, preNextListEdge;
+					preCurListEdge = tree.groups[idGroup].listEdge;
+					preCurListEdge.erase(preCurListEdge.begin() + deleteCurEdgePos);
+					int a, b, c, d;
+					if (deleteCurEdgePos < nextPos) {
+						a = tree.groups[siblingIDGroup].listEdge[0];
+						b = tree.groups[siblingIDGroup].listEdge[1];
+						c = tree.groups[nextIDGroup].listEdge[0];
+						d = tree.groups[nextIDGroup].listEdge[1];
+					}
+					else {
+						a = tree.groups[nextIDGroup].listEdge[0];
+						b = tree.groups[nextIDGroup].listEdge[1];
+						c = tree.groups[siblingIDGroup].listEdge[0];
+						d = tree.groups[siblingIDGroup].listEdge[1];
+					}
+					preNextListEdge = { a, b, c, d };
+
+					animations.clear();
+					deleteNodeFromGroup(animations, idGroup, idCurNode);
+					deleteNodeFromGroup(animations, siblingIDGroup, idSiblingNode);
+					deleteGroup(animations, siblingIDGroup);
+					insertNodeToGroup(animations, nextIDGroup, idSiblingNode);
+					insertNodeToGroup(animations, nextIDGroup, idCurNode);
+					setColorType(animations, nextIDGroup, BTree::ColorType::highlight);
+					if (tree.groups[idGroup].nodes.size() == 1) {
+						deleteGroup(animations, idGroup);
+						setRoot(animations, nextIDGroup);
+						idGroup = -1;
+					}
+					else {
+						for (int i = 0; i < preCurListEdge.size(); i++) {
+							setEdge(animations, idGroup, i, preCurListEdge[i]);
+						}
+					}
+					for (int i = 0; i < preNextListEdge.size(); i++) {
+						setEdge(animations, nextIDGroup, i, preNextListEdge[i]);
+					}
+					addAnimationStep(animations, stepTime, 12, "Merging");
+				}
+				animations.clear();
+				setColorType(animations, nextIDGroup, BTree::ColorType::highlight);
+				addAnimationStep(animations, stepTime, 13, "Now we can continue");
+				preID = idGroup;
+				idGroup = nextIDGroup;
+			}
+		}
+	}
 }
 
 void BTreeStage::searchValue(int value) {

@@ -195,6 +195,32 @@ sf::Vector2f BTreeGraph::getPosition(int idGroup) {
     }
 }
 
+int BTreeGraph::findNodePos(int idGroup, int value) {
+    if (groups.find(idGroup) == groups.end()) {
+        assert(false);
+    }
+    auto& group = groups[idGroup];
+    for (int i = 0; i < group.nodes.size(); i++) {
+        if (nodes[group.nodes[i]].getValue() == value) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+int BTreeGraph::findNode(int idGroup, int value) {
+    if (groups.find(idGroup) == groups.end()) {
+        assert(false);
+    }
+    auto& group = groups[idGroup];
+    for (int i = 0; i < group.nodes.size(); i++) {
+        if (nodes[group.nodes[i]].getValue() == value) {
+            return group.nodes[i];
+        }
+    }
+    return -1;
+}
+
 int BTreeGraph::findEdge(int idGroup, int value) {
     if (groups.find(idGroup) == groups.end()) {
         assert(false);
@@ -334,11 +360,11 @@ void BTreeGraph::arrangeBTree() {
 }
 
 BTreeGraph BTreeGraph::execAnimation(std::vector <Animation> animations) {
-    // std::cout << "****************\n";
+    //std::cout << "****************\n";
     BTreeGraph tmp = *this;
     std::sort(animations.begin(), animations.end());
     for (int i = 0; i < animations.size(); i++) {
-        // std::cout << "animation " << i << " " << animations[i].animationType << " " << animations[i].id1 << " " << animations[i].id2 << " " << animations[i].nextValue << "\n";
+        //std::cout << "animation " << i << " " << animations[i].animationType << " " << animations[i].id1 << " " << animations[i].id2 << " " << animations[i].nextValue << "\n";
         switch (animations[i].animationType) {
             case SetValue: {
                 if (tmp.nodes.find(animations[i].id1) == tmp.nodes.end()) {
@@ -359,7 +385,6 @@ BTreeGraph BTreeGraph::execAnimation(std::vector <Animation> animations) {
             case AddNode: {
                 tmp.nodes[animations[i].id1] = BTreeNode({0, 0}, animations[i].nextValue, font);
                 tmp.nodes[animations[i].id1].setSize(1.f);
-                tmp.arrangeBTree();
                 break;
             }
             case DeleteNode: {
@@ -367,12 +392,10 @@ BTreeGraph BTreeGraph::execAnimation(std::vector <Animation> animations) {
                     assert(false);
                 }
                 tmp.nodes.erase(animations[i].id1);
-                tmp.arrangeBTree();
                 break;
             }
             case AddGroup: {
                 tmp.groups[animations[i].id1] = BTreeGroup(std::vector <int>());
-                tmp.arrangeBTree();
                 break;
             }
             case DeleteGroup: {
@@ -380,18 +403,17 @@ BTreeGraph BTreeGraph::execAnimation(std::vector <Animation> animations) {
                     assert(false);
                 }
                 tmp.groups.erase(animations[i].id1);
-                tmp.arrangeBTree();
                 break;
             }
             case InsertNodeToGroup: {
                 if (tmp.groups.find(animations[i].id1) == tmp.groups.end()) {
+                    //std::cout << "InsertNodeToGroup " << animations[i].id1 << " " << animations[i].id2 << "\n";
                     assert(false);
                 }
                 if (tmp.nodes.find(animations[i].id2) == tmp.nodes.end()) {
                     assert(false);
                 }
                 tmp.insertNode(animations[i].id1, animations[i].id2);
-                tmp.arrangeBTree();
                 break;
             }
             case DeleteNodeFromGroup: {
@@ -402,25 +424,23 @@ BTreeGraph BTreeGraph::execAnimation(std::vector <Animation> animations) {
                     assert(false);
                 }
                 tmp.deleteNode(animations[i].id1, animations[i].id2);
-                tmp.arrangeBTree();
                 break;
             }
             case SetEdge: {
                 // std::cout << "SetEdge " << animations[i].id1 << " " << animations[i].id2 << " " << animations[i].nextValue << "\n";
-                // if (tmp.groups.find(animations[i].id1) == tmp.groups.end()) assert(false);
-                // if (tmp.groups[animations[i].id1].listEdge.size() <= animations[i].id2) assert(false);
-                // if (animations[i].nextValue != -1 && tmp.groups.find(animations[i].nextValue) == tmp.groups.end()) assert(false);
+                if (tmp.groups.find(animations[i].id1) == tmp.groups.end()) assert(false);
+                if (tmp.groups[animations[i].id1].listEdge.size() <= animations[i].id2) assert(false);
+                if (animations[i].nextValue != -1 && tmp.groups.find(animations[i].nextValue) == tmp.groups.end()) assert(false);
                 tmp.groups[animations[i].id1].setEdge(animations[i].id2, animations[i].nextValue);
-                tmp.arrangeBTree();
                 break;
             }
             case SetRoot: {
                 tmp.root = animations[i].nextValue;
-                tmp.arrangeBTree();
                 break;
             }
         }
     }
+    tmp.arrangeBTree();
     return tmp;
 }
 
@@ -467,8 +487,16 @@ void BTreeGraph::draw(sf::RenderWindow& window, ColorTheme theme, sf::Time total
     for (int i = 0; i < animations.size(); i++) {
         if (animations[i].id1 != -1) {
             if (animations[i].animationType == SetColorType) {
-                for (int j = 0; j < nodes.size(); j++) {
-                    if (getGroupID(j) == animations[i].id1) {
+                for (auto &x : nodes) {
+                    int j = x.first;
+                    if (tmp.nodes.find(j) != tmp.nodes.end() && tmp.getGroupID(j) == animations[i].id1) {
+                        Animation animation;
+                        animation.animationType = SetColorType;
+                        animation.id1 = j;
+                        animation.nextValue = animations[i].nextValue;
+                        animationMap[j].push_back(animation);
+                    }
+                    else if (getGroupID(j) == animations[i].id1) {
                         Animation animation;
                         animation.animationType = SetColorType;
                         animation.id1 = j;
@@ -537,7 +565,7 @@ void BTreeGraph::draw(sf::RenderWindow& window, ColorTheme theme, sf::Time total
     //Draw nodes
     for (auto x = animationMap.begin(); x != animationMap.end(); x++) {
         int id = x->first;
-        if (nodes.find(id) == nodes.end()) { //New node
+        if (nodes.find(id) == nodes.end()) { //new node
             tmp.nodes[id].draw(window, theme, totalTime, timePassed, x->second);
         }
         else { //Old node

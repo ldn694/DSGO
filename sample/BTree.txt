@@ -1,0 +1,24 @@
+//insert
+
+if (node == NULL):
+    insert node
+if (node.isFull()): 
+    split node
+search for the node
+
+//delete
+"if (node.isLeaf()):",
+"	if (node.find(k) != NULL): node.delete(k)",
+"	return",
+"if (node.find(k) != NULL):",
+"	find sibling with at least 2 key",
+"	if (sibling != NULL): node.key = sibling.findNearest(k), delete(sibling, node.key)",
+"	else: merge(node), delete(node.left, k)",
+"else:",
+"	nextNode = node.findNextNode(k)",
+"	if (nextNode.numKey == 1):",
+"		find sibling with at least 2 key",
+"		if (sibling != NULL): rotate(node)",
+"		else: merge(node)",
+"	delete(nextNode, k)"
+

@@ -117,6 +117,9 @@ std::vector <int> TypingBox::getListInt() {
 			return { -1 };
 		}
 		valText.push_back(curText[i]);
+		while (valText[0] == '0') {
+			valText.erase(valText.begin());
+		}
 		if (valText.size() > 9) {
 			return { -3 };
 		}

@@ -378,7 +378,7 @@ std::pair<bool, ColorTheme> HashTableStage::processEvents() {
 			if (modeString == "Manual") {
 				int num = valueTypingBox[0].getProperInt();
 				std::vector <int> values = valueTypingBox[1].getListInt();
-				if (num != -1 && (values.empty() || values[0] != -1)) {
+				if (num != -1 && (values.empty() || values[0] >= 0)) {
 					size = num;
 					hashList.clear();
 					hashList.push_back(HashTable(num, font(fontType::Arial)));

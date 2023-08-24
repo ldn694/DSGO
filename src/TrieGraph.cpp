@@ -4,6 +4,7 @@ TrieGraph::TrieGraph(sf::Vector2f startPosition, sf::Font* font) : startPosition
     nodes = std::map <int, TrieNode>();
     root = 0;
     nodes[0] = TrieNode(startPosition, "", font);
+    nodes[0].setState(ISWORD);
 }
 
 int TrieGraph::getMexID() {
@@ -165,6 +166,7 @@ TrieGraph TrieGraph::execAnimation(std::vector <Animation> animations) {
             }
             case SetColorType: {
                 if (tmp.nodes.find(animations[i].id1) == tmp.nodes.end()) {
+                    std::cout << animations[i].id1 << "doesnt exist\n";
                     assert(false);
                 }
                 tmp.nodes[animations[i].id1].setColorType(Trie::ColorType(animations[i].nextValue));

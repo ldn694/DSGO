@@ -167,11 +167,11 @@ enum AnimationType {
 	AddNode, SwapNode, SetLeftNode, SetRightNode,
 	AddGroup, InsertNodeToGroup, SetEdgeType,
 	SetRoot, SetValue, SetState, SetSize,
-	SetColorType, SetOpacity, Move, DeleteVariable, InsertVariable,
+	SetOpacity, Move, DeleteVariable, InsertVariable,
 	SetLeftEdgeColorType, SetRightEdgeColorType, 
 	DeleteEdge,
-	DeleteNode, DeleteNodeFromGroup, DeleteGroup,
-	SetEdge, InsertEdge
+	DeleteNodeFromGroup, DeleteNode, DeleteGroup,
+	SetEdge, InsertEdge, SetColorType
 };
 struct Animation {
 	AnimationType animationType;

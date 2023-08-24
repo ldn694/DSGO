@@ -1,4 +1,1 @@
-em yeu truong em voi
-bao ban than
-va co giao hien
-nhu yeu que huong
+1 2 3 4

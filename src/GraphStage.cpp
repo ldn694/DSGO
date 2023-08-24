@@ -469,7 +469,7 @@ std::pair<bool, ColorTheme> GraphStage::processEvents() {
 		}
 		if (algorithmChoices.getChoice() == 2) {
 			if (directedChoices.getChoice() == 0) {
-				MST();
+				FindCC();
 			}
 		}
 		isOperating = false;

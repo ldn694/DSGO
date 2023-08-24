@@ -244,6 +244,11 @@ void TrieStage::deleteString(std::string str) {
 		}
 	}
 	while (true) {
+		if (path.empty()) {
+			std::cout << "path is never empty";
+			assert(false);
+			return;
+		}
 		cur = path.back();
 		path.pop_back();
 		if (TrieList.back().nodes[cur].getState() == NOTWORD && TrieList.back().nodes[cur].edges.empty()) {
@@ -251,9 +256,16 @@ void TrieStage::deleteString(std::string str) {
 			addAnimationStep(animations, stepTime, 9, "cur has no edge and not a word, deleting cur");
 
 			animations.clear();
-			deleteEdge(animations, path.back(), cur);
+			if (cur == TrieList.back().root) {
+				setRoot(animations, -1);
+			}
+			if (!path.empty()) {
+				deleteEdge(animations, path.back(), cur);
+			}
 			deleteNode(animations, cur);
-			setColorType(animations, path.back(), Trie::ColorType::highlight);
+			if (!path.empty()) {
+				setColorType(animations, path.back(), Trie::ColorType::highlight);
+			}
 			addAnimationStep(animations, stepTime, 10, "Delete cur, backtracking to parent");
 		}
 		else {

@@ -16,6 +16,7 @@ struct BTreeGroup {
     void setEdge(int pos, int id);
     void insertNode(int idNode);
     void deleteNode(BTreeNode* idNode);
+    bool isLeaf();
 
     sf::Vector2f getSize();
 };

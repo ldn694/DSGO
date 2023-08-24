@@ -19,3 +19,12 @@ sf::Vector2f BTreeGroup::getSize() {
     }
     return sf::Vector2f(nodes.size() * edgeBTree + thicknessBTree, edgeBTree + thicknessBTree);
 }
+
+bool BTreeGroup::isLeaf() {
+    for (int i = 0; i < listEdge.size(); ++i) {
+        if (listEdge[i] != -1) {
+            return false;
+        }
+    }
+    return true;
+}

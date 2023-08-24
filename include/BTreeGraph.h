@@ -29,6 +29,8 @@ struct BTreeGraph {
     std::vector <int> getEdges(int idGroup);
     sf::Vector2f getStartEdgePosition(int idGroup, int pos, sf::Vector2f curPosition);
     sf::Vector2f getEndEdgePosition(int idGroup, sf::Vector2f curPosition);
+    int findNodePos(int idGroup, int value);
+    int findNode(int idGroup, int value);
     int findEdge(int idGroup, int value);
     int findEdgePos(int idGroup, int value);
 
