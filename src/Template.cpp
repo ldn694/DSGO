@@ -56,10 +56,10 @@ int maxSizeDataHeap = 31;
 int maxValueDataHeap = 99;
 
 const float sizeValueLetterBTree = 20;
-const float edgeBTree = 30;
+const float edgeBTree = 40;
 const float thicknessBTree = 3;
-const float minHorizontalDistBTree = 37;
-const float verticalDistBTree = 100;
+const float minHorizontalDistBTree = 20;
+const float verticalDistBTree = 140;
 const int maxDegreeBTree = 4;
 int maxSizeDataBTree = 31;
 int maxValueDataBTree = 99;
