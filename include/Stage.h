@@ -20,6 +20,8 @@ protected:
 	bool operationSelecting;
 	bool operating;
 
+	sf::Text operationText;
+
 	sf::Text dsName;
 
 	Box goBox, outerGoBox;
@@ -72,6 +74,7 @@ public:
 		int* maxSizeData, int* maxValueData, InputType type,
 		ColorTheme theme = LightTheme);
 	void setDSName(std::string name);
+	void setOperationName(std::string name);
 	void updateModeBox(int newMode);
 	bool handleMousePressed(float x, float y);
 	void handleMouseMove(float x, float y);

@@ -157,6 +157,7 @@ void HeapStage::setDefaultView() {
 
 void HeapStage::insertValue(int value) {
 	resetAnimation();
+	setOperationName("Insert " + intToString(value));
 	setAnimatingDirection(Continuous);
 	int size = HeapList.back().nodes.size();
 	std::vector <Animation> animations;
@@ -235,6 +236,7 @@ void HeapStage::insertValue(int value) {
 void HeapStage::getTop(bool isDelete) {
 	if (!isDelete) {
 		resetAnimation();
+		setOperationName("Extract " + std::string(isMinHeap ? "minimum " : "maximum ") + "value");
 		setAnimatingDirection(Continuous);
 	}
 
@@ -343,6 +345,7 @@ void HeapStage::getTop(bool isDelete) {
 
 void HeapStage::deleteValue(int hID) {
 	resetAnimation();
+	setOperationName("Delete A[" + intToString(hID) + "]");
 	setAnimatingDirection(Continuous);
 
 	std::vector <Animation> animations;
@@ -403,6 +406,7 @@ void HeapStage::deleteValue(int hID) {
 
 void HeapStage::getSize() {
 	resetAnimation();
+	setOperationName("Get Size");
 	setAnimatingDirection(Continuous);
 
 	std::vector <Animation> animations;
@@ -520,6 +524,7 @@ std::pair<bool, ColorTheme> HeapStage::processEvents() {
 }
 
 void HeapStage::resetAnimation() {
+	setOperationName("");
 	animationList.clear();
 	curTime = sf::Time::Zero;
 	previousStep = UNKOWN;

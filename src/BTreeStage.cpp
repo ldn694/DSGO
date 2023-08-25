@@ -141,6 +141,7 @@ void BTreeStage::setDefaultView() {
 void BTreeStage::insertValue(int value) {
 	resetAnimation();
 	setAnimatingDirection(Continuous);
+	setOperationName("Insert " + intToString(value));
 
 	std::vector <Animation> animations;
 
@@ -264,6 +265,7 @@ void BTreeStage::deleteValue(int value) {
 	#define tree BTreeList.back()
 	resetAnimation();
 	setAnimatingDirection(Continuous);
+	setOperationName("Delete " + intToString(value));
 
 	std::vector <Animation> animations;
 
@@ -563,6 +565,7 @@ void BTreeStage::deleteValue(int value) {
 void BTreeStage::searchValue(int value) {
 	resetAnimation();
 	setAnimatingDirection(Continuous);
+	setOperationName("Search " + intToString(value));
 
 	std::vector <Animation> animations;
 
@@ -714,6 +717,7 @@ std::pair<bool, ColorTheme> BTreeStage::processEvents() {
 }
 
 void BTreeStage::resetAnimation() {
+	setOperationName("");
 	animationList.clear();
 	curTime = sf::Time::Zero;
 	previousStep = UNKOWN;

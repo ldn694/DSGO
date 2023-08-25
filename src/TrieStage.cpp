@@ -141,6 +141,7 @@ void TrieStage::setDefaultView() {
 
 void TrieStage::insertString(std::string str) {
 	resetAnimation();
+	setOperationName("Insert " + str);
 	setAnimatingDirection(Continuous);
 	std::vector <Animation> animations;
 
@@ -196,6 +197,7 @@ void TrieStage::insertString(std::string str) {
 
 void TrieStage::deleteString(std::string str) {
 	resetAnimation();
+	setOperationName("Delete " + str);
 	setAnimatingDirection(Continuous);
 	std::vector <Animation> animations;
 	
@@ -300,6 +302,7 @@ void TrieStage::deleteString(std::string str) {
 
 void TrieStage::searchString(std::string str) {
 	resetAnimation();
+	setOperationName("Search " + str);
 	setAnimatingDirection(Continuous);
 	std::vector <Animation> animations;
 
@@ -469,6 +472,7 @@ std::pair<bool, ColorTheme> TrieStage::processEvents() {
 }
 
 void TrieStage::resetAnimation() {
+	setOperationName("");
 	animationList.clear();
 	curTime = sf::Time::Zero;
 	previousStep = UNKOWN;

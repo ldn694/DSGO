@@ -138,6 +138,7 @@ void HashTableStage::setDefaultView() {
 
 void HashTableStage::insertValue(int value) {
 	resetAnimation();
+	setOperationName("Insert " + intToString(value));
 
 	setAnimatingDirection(Continuous);
 	int id = value % size, cnt = 0;
@@ -200,6 +201,7 @@ void HashTableStage::insertValue(int value) {
 
 void HashTableStage::deleteValue(int value) {
 	resetAnimation();
+	setOperationName("Delete " + intToString(value));
 
 	setAnimatingDirection(Continuous);
 	int id = value % size, cnt = 0;
@@ -265,6 +267,7 @@ void HashTableStage::deleteValue(int value) {
 
 void HashTableStage::searchValue(int value) {
 	resetAnimation();
+	setOperationName("Search " + intToString(value));
 
 	setAnimatingDirection(Continuous);
 	int id = value % size, cnt = 0;
@@ -445,6 +448,7 @@ std::pair<bool, ColorTheme> HashTableStage::processEvents() {
 }
 
 void HashTableStage::resetAnimation() {
+	setOperationName("");
 	animationList.clear();
 	curTime = sf::Time::Zero;
 	previousStep = UNKOWN;

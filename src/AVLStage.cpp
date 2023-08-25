@@ -175,6 +175,7 @@ void AVLStage::rightRotate(std::vector <Animation>& animations, int id) {
 
 void AVLStage::insertValue(int value) {
 	resetAnimation();
+	setOperationName("Insert " + intToString(value));
 	setAnimatingDirection(Continuous);
 	std::vector <Animation> animations;
 	if (AVLList.back().nodes.size() == maxSizeDataAVL) {
@@ -319,6 +320,7 @@ void AVLStage::insertValue(int value) {
 void AVLStage::deleteValue(int value) {
 	resetAnimation();
 	setAnimatingDirection(Continuous);
+	setOperationName("Delete " + intToString(value));
 	std::vector <Animation> animations;
 	if (AVLList.back().nodes.size() == 0) {
 		animations.clear();
@@ -572,6 +574,7 @@ void AVLStage::deleteValue(int value) {
 void AVLStage::searchValue(int value) {
 	resetAnimation();
 	setAnimatingDirection(Continuous);
+	setOperationName("Search " + intToString(value));
 	std::vector <Animation> animations;
 	int root = AVLList.back().root;
 	while (true) {
@@ -733,6 +736,7 @@ std::pair<bool, ColorTheme> AVLStage::processEvents() {
 }
 
 void AVLStage::resetAnimation() {
+	setOperationName("");
 	animationList.clear();
 	curTime = sf::Time::Zero;
 	previousStep = UNKOWN;

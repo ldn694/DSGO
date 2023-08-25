@@ -88,6 +88,14 @@ Stage::Stage(sf::RenderWindow& _window, std::vector <std::string> _operationName
 	}
 }
 
+void Stage::setOperationName(std::string name) {
+	operationText.setString(name);
+	operationText.setFont(*font(fontType::Prototype));
+	operationText.setCharacterSize(30);
+	operationText.setOrigin(operationText.getLocalBounds().left + operationText.getLocalBounds().width / 2, operationText.getLocalBounds().top + operationText.getLocalBounds().height / 2);
+	operationText.setPosition(widthBox, 30);
+}
+
 void Stage::setDSName(std::string name) {
 	dsName.setString(name);
 	dsName.setFont(*font(fontType::Prototype));
@@ -253,12 +261,15 @@ void Stage::draw() {
 	if (theme == LightTheme) {
 		lightBulb.draw(window, theme);
 		dsName.setFillColor(BlackColor);
+		operationText.setFillColor(BlackColor);
 	}
 	else {
 		darkBulb.draw(window, theme);
 		dsName.setFillColor(WhiteColor);
+		operationText.setFillColor(WhiteColor);
 	}
 	window.draw(dsName);
+	window.draw(operationText);
 	outerGoBox.draw(window, theme);
 	goBox.draw(window, theme);
 	for (int i = 0; i < numOperation; i++) {
