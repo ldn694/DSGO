@@ -145,6 +145,12 @@ void BTreeStage::insertValue(int value) {
 
 	std::vector <Animation> animations;
 
+	if (BTreeList.back().nodes.size() + 1 > maxSizeDataBTree) {
+		animations.clear();
+		addAnimationStep(animations, stepTime, -1, "Tree is full");
+		return;
+	}
+
 	if (BTreeList.back().nodes.empty()) {
 		animations.clear();
 		int idNode = BTreeList.back().getMexNodeID();

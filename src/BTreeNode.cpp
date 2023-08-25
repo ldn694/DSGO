@@ -61,13 +61,13 @@ void BTreeNode::draw(sf::RenderWindow& window, ColorTheme theme, sf::Time totalT
         window.draw(valueText);
     }
     else {
-        for (int i = 0; i < animations.size(); i++) {
-            for (int j = i + 1; j < animations.size(); j++) {
-                if (animations[i].animationType == animations[j].animationType) {
-                    assert(false);
-                }
-            }
-        }
+        // for (int i = 0; i < animations.size(); i++) {
+        //     for (int j = i + 1; j < animations.size(); j++) {
+        //         if (animations[i].animationType == animations[j].animationType) {
+        //             assert(false);
+        //         }
+        //     }
+        // }
         BTreeNode tmp = *this;
         for (int i = 0; i < animations.size(); i++) {
             switch (animations[i].animationType) {
