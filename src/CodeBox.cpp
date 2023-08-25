@@ -66,7 +66,7 @@ void CodeBox::handleMouseReleased(float x, float y) {
 
 void CodeBox::draw(sf::RenderWindow& window, ColorTheme theme) {
     outerBox.draw(window, theme);
-    if (highlightLine != -1) {
+    if (highlightLine != -1 && 0 <= highlightLine && highlightLine < texts.size()) {
         sf::RectangleShape highlightRect;
         highlightRect.setPosition(x, texts[highlightLine].getGlobalBounds().top - texts[highlightLine].getLocalBounds().height * 0.25f);
         highlightRect.setSize(sf::Vector2f(width, texts[highlightLine].getLocalBounds().height * 1.5f));
