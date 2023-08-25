@@ -103,6 +103,8 @@ BTreeStage::BTreeStage(sf::RenderWindow& window, ColorTheme theme) :
 				{
 					"if (node == NULL):",
 					"	return NULL",
+					"else:",
+					"	return this",
 					"search for the node"
 				}
 			}
@@ -488,6 +490,7 @@ void BTreeStage::deleteValue(int value) {
 						setColorType(animations, siblingIDGroup, BTree::ColorType::normal);
 						addAnimationStep(animations, stepTime, 11, "Stealing from sibling");
 						found = true;
+						break;
 					}
 				}
 				if (!found) {
@@ -563,20 +566,20 @@ void BTreeStage::searchValue(int value) {
 	while (true) {
 		if (idGroup == -1) {
 			animations.clear();
-			addAnimationStep(animations, stepTime, -1, "Value not found");
+			addAnimationStep(animations, stepTime, 1, "Value not found");
 
 			setDefaultView();
 			return;
 		}
 		animations.clear();
 		setColorType(animations, idGroup, BTree::ColorType::highlight);
-		addAnimationStep(animations, stepTime, -1, "Searching " + intToString(value));
+		addAnimationStep(animations, stepTime, 4, "Searching " + intToString(value));
 
 		for (auto x : BTreeList.back().groups[idGroup].nodes) {
 			if (BTreeList.back().nodes[x].getValue() == value) {
 				animations.clear();
 				setColorType(animations, idGroup, BTree::ColorType::highlight2);
-				addAnimationStep(animations, stepTime, -1, "Found " + intToString(value));
+				addAnimationStep(animations, stepTime, 3, "Found " + intToString(value));
 				
 				setDefaultView();
 				return;
@@ -588,7 +591,7 @@ void BTreeStage::searchValue(int value) {
 		if (nextIDGroup != -1) {
 			setColorType(animations, nextIDGroup, BTree::ColorType::highlight);
 		}
-		addAnimationStep(animations, stepTime, -1, "Go to next node");
+		addAnimationStep(animations, stepTime, 4, "Go to next node");
 		idGroup = nextIDGroup;
 	}
 }

@@ -4,6 +4,7 @@
 struct SlideBar {
     sf::RectangleShape outerRect, bar;
     float x, y, width, height, barWidth;
+    float curX, startX;
     bool isSliding;
     SlideBar(float x, float y, float width, float height);
     void setBarWidth(float percent);

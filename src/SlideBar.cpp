@@ -43,7 +43,14 @@ void SlideBar::handleMousePressed(float mouseX, float mouseY) {
     if (!isMousePressed(mouseX, mouseY)) {
         return;
     }
-    setBarPosition(mouseX, mouseY);
+    curX = bar.getGlobalBounds().left + bar.getGlobalBounds().width / 2;
+    if (bar.getGlobalBounds().contains(mouseX, mouseY)) {
+        startX = mouseX;
+    } 
+    else {
+        startX = curX;
+    }
+    setBarPosition(curX + mouseX - startX, mouseY);
     isSliding = true;
 }
 
@@ -51,14 +58,14 @@ void SlideBar::handleMouseMoved(float mouseX, float mouseY, sf::RenderWindow &wi
     if (!isSliding) {
         return;
     }
-    setBarPosition(mouseX, mouseY);
+    setBarPosition(curX + mouseX - startX, mouseY);
 }
 
 void SlideBar::handleMouseReleased(float mouseX, float mouseY) {
     if (!isSliding) {
         return;
     }
-    setBarPosition(mouseX, mouseY);
+    setBarPosition(curX + mouseX - startX, mouseY);
     isSliding = false;
 }
 

@@ -22,3 +22,9 @@ search for the node
 "		else: merge(node)",
 "	delete(nextNode, k)"
 
+//search
+"if (node == NULL):",
+"	return NULL",
+"else:",
+"	return this",
+"search for the node"
