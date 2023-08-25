@@ -71,7 +71,7 @@ const float radiusTrie = 15;
 const float thicknessTrie = 3;
 const float minHorizontalDistTrie = 15;
 const float verticalDistTrie = 25;
-int maxSizeDataTrie = 20;
+int maxSizeDataTrie = 26;
 int maxLengthDataTrie = 7;
 
 const float sizeValueLetterGraph = 20;

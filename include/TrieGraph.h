@@ -12,6 +12,7 @@ struct TrieGraph{
     int getParent(int id);
     int getMexID();
     int findEdge(int id, std::string weight);
+    int countString();
     std::pair <sf::RectangleShape, sf::Text> getEdgeLine(sf::Vector2f startPosition, sf::Vector2f endPosition, std::string weight, float percent);
     void setThemeEdge(std::pair <sf::RectangleShape, sf::Text> &edge, Trie::ColorType type, ColorTheme theme);
 

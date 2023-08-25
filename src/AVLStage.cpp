@@ -6,7 +6,7 @@ AVLStage::AVLStage(sf::RenderWindow& window, ColorTheme theme) :
 	Stage(window, { "Create", "Insert", "Delete", "Search"},
 		{
 			{"Random", "Empty", "Fixed Size", "Manual", "Upload File"},
-			{"v = ?"},
+			{"Random", "v = ?"},
 			{"v = ?"},
 			{"v = ?"}
 		},
@@ -19,6 +19,7 @@ AVLStage::AVLStage(sf::RenderWindow& window, ColorTheme theme) :
 				{}
 			},
 			{
+				{},
 				{"v ="}
 			},
 			{
@@ -37,6 +38,7 @@ AVLStage::AVLStage(sf::RenderWindow& window, ColorTheme theme) :
 				{}
 			},
 			{
+				{},
 				{singleNumber},
 			},
 			{
@@ -55,6 +57,7 @@ AVLStage::AVLStage(sf::RenderWindow& window, ColorTheme theme) :
 				{}
 			},
 			{
+				{},
 				{{&zeroInt, &maxValueDataAVL}}
 			},
 			{
@@ -73,6 +76,15 @@ AVLStage::AVLStage(sf::RenderWindow& window, ColorTheme theme) :
 				{}
 			},
 			{
+				{
+					"insert value",
+					"check balance factor of this node",
+    				"	case LL: rotateRight(this)",
+    				"	case RR: rotateLeft(this)",
+    				"	case LR: rotateLeft(this.left); rotateRight(this)",
+    				"	case RL: rotateRight(this.right); rotateLeft(this)",
+					"	case OK: continue"
+				},
 				{
 					"insert value",
 					"check balance factor of this node",
@@ -692,9 +704,15 @@ std::pair<bool, ColorTheme> AVLStage::processEvents() {
 			}
 		}
 		if (operationName[curOperation] == "Insert") {
-			int v = valueTypingBox[0].getProperInt();
-			if (v != -1) {
+			if (modeString == "Random") {
+				int v = rand() % (maxValueDataAVL + 1);
 				insertValue(v);
+			}
+			else {
+				int v = valueTypingBox[0].getProperInt();
+				if (v != -1) {
+					insertValue(v);
+				}
 			}
 		}
 		if (operationName[curOperation] == "Delete") {

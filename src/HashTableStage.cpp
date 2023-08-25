@@ -6,7 +6,7 @@ HashTableStage::HashTableStage(sf::RenderWindow& window, ColorTheme theme) :
 	Stage(window, { "Create", "Insert", "Delete", "Search"},
 		{
 			{"Random", "Empty", "Fixed Size", "Manual", "Upload File"},
-			{"v = ?"},
+			{"Random", "v = ?"},
 			{"v = ?"},
 			{"v = ?"}
 		},
@@ -19,6 +19,7 @@ HashTableStage::HashTableStage(sf::RenderWindow& window, ColorTheme theme) :
 				{}
 			},
 			{
+				{},
 				{"v ="}
 			},
 			{
@@ -37,6 +38,7 @@ HashTableStage::HashTableStage(sf::RenderWindow& window, ColorTheme theme) :
 				{}
 			},
 			{
+				{},
 				{singleNumber},
 			},
 			{
@@ -55,6 +57,7 @@ HashTableStage::HashTableStage(sf::RenderWindow& window, ColorTheme theme) :
 				{}
 			},
 			{
+				{},
 				{{&zeroInt, &maxValueDataHash}}
 			},
 			{
@@ -73,6 +76,14 @@ HashTableStage::HashTableStage(sf::RenderWindow& window, ColorTheme theme) :
 				{}
 			},
 			{
+				{
+					"int id = value % n, cnt = 0;",
+					"while (table[id].state == full && cnt < n) {",
+					"	id = (id + 1) % n; cnt++;",
+					"}",
+					"if (cnt == n) return;",
+					"table[id].value = {value, full};"
+				},
 				{
 					"int id = value % n, cnt = 0;",
 					"while (table[id].state == full && cnt < n) {",
@@ -405,9 +416,15 @@ std::pair<bool, ColorTheme> HashTableStage::processEvents() {
 			}
 		}
 		if (operationName[curOperation] == "Insert") {
-			int v = valueTypingBox[0].getProperInt();
-			if (v != -1) {
+			if (modeString == "Random") {
+				int v = rand() % (maxValueDataHash + 1);
 				insertValue(v);
+			}
+			else {
+				int v = valueTypingBox[0].getProperInt();
+				if (v != -1) {
+					insertValue(v);
+				}
 			}
 		}
 		if (operationName[curOperation] == "Delete") {

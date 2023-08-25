@@ -6,7 +6,7 @@ HeapStage::HeapStage(sf::RenderWindow& window, ColorTheme theme, bool isMinHeap)
 	Stage(window, { "Create", "Insert", "Delete", "Get Top", "Get Size"},
 		{
 			{"Random", "Empty", "Fixed Size", "Manual", "Upload File"},
-			{"v = ?"},
+			{"Random", "v = ?"},
 			{"i = ?"},
 			{""},
 			{""}
@@ -20,6 +20,7 @@ HeapStage::HeapStage(sf::RenderWindow& window, ColorTheme theme, bool isMinHeap)
 				{}
 			},
 			{
+				{},
 				{"v ="}
 			},
 			{
@@ -41,6 +42,7 @@ HeapStage::HeapStage(sf::RenderWindow& window, ColorTheme theme, bool isMinHeap)
 				{}
 			},
 			{
+				{},
 				{singleNumber},
 			},
 			{
@@ -62,6 +64,7 @@ HeapStage::HeapStage(sf::RenderWindow& window, ColorTheme theme, bool isMinHeap)
 				{}
 			},
 			{
+				{},
 				{{&zeroInt, &maxValueDataHeap}}
 			},
 			{
@@ -83,6 +86,12 @@ HeapStage::HeapStage(sf::RenderWindow& window, ColorTheme theme, bool isMinHeap)
 				{}
 			},
 			{
+				{
+					"A[++len] = v",
+					"i = A.length",
+					(isMinHeap ? "while ((i > 1) && (A[i] < A[parent(i)])):" : "while ((i > 1) && (A[i] < A[parent(i)]))"),
+  					"	swap(A[i], A[parent(i)]); i = parent(i)"
+				},
 				{
 					"A[++len] = v",
 					"i = A.length",
@@ -482,9 +491,15 @@ std::pair<bool, ColorTheme> HeapStage::processEvents() {
 			}
 		}
 		if (operationName[curOperation] == "Insert") {
-			int v = valueTypingBox[0].getProperInt();
-			if (v != -1) {
+			if (modeString == "Random") {
+				int v = rand() % (maxValueDataHeap + 1);
 				insertValue(v);
+			}
+			else {
+				int v = valueTypingBox[0].getProperInt();
+				if (v != -1) {
+					insertValue(v);
+				}
 			}
 		}
 		if (operationName[curOperation] == "Delete") {

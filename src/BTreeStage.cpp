@@ -6,7 +6,7 @@ BTreeStage::BTreeStage(sf::RenderWindow& window, ColorTheme theme) :
 	Stage(window, { "Create", "Insert", "Delete", "Search"},
 		{
 			{"Random", "Empty", "Fixed Size", "Manual", "Upload File"},
-			{"v = ?"},
+			{"Random", "v = ?"},
 			{"v = ?"},
 			{"v = ?"}
 		},
@@ -19,6 +19,7 @@ BTreeStage::BTreeStage(sf::RenderWindow& window, ColorTheme theme) :
 				{}
 			},
 			{
+				{},
 				{"v ="}
 			},
 			{
@@ -37,6 +38,7 @@ BTreeStage::BTreeStage(sf::RenderWindow& window, ColorTheme theme) :
 				{}
 			},
 			{
+				{},
 				{singleNumber},
 			},
 			{
@@ -55,6 +57,7 @@ BTreeStage::BTreeStage(sf::RenderWindow& window, ColorTheme theme) :
 				{}
 			},
 			{
+				{},
 				{{&zeroInt, &maxValueDataBTree}}
 			},
 			{
@@ -72,7 +75,13 @@ BTreeStage::BTreeStage(sf::RenderWindow& window, ColorTheme theme) :
 				{},
 				{}
 			},
-			{
+			{{
+					"if (node == NULL):",
+					"	insert node",
+					"if (node.isFull()):",
+					"	split node",
+					"search for the node"
+				},
 				{
 					"if (node == NULL):",
 					"	insert node",
@@ -676,9 +685,15 @@ std::pair<bool, ColorTheme> BTreeStage::processEvents() {
 			}
 		}
 		if (operationName[curOperation] == "Insert") {
-			int v = valueTypingBox[0].getProperInt();
-			if (v != -1) {
+			if (modeString == "Random") {
+				int v = rand() % (maxValueDataBTree + 1);
 				insertValue(v);
+			}
+			else {
+				int v = valueTypingBox[0].getProperInt();
+				if (v != -1) {
+					insertValue(v);
+				}
 			}
 		}
 		if (operationName[curOperation] == "Delete") {

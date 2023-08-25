@@ -6,7 +6,7 @@ TrieStage::TrieStage(sf::RenderWindow& window, ColorTheme theme) :
 	Stage(window, { "Create", "Insert", "Delete", "Search"},
 		{
 			{"Random", "Empty", "Fixed Size", "Upload File"},
-			{"s = ?"},
+			{"Random", "s = ?"},
 			{"s = ?"},
 			{"s = ?"}
 		},
@@ -18,6 +18,7 @@ TrieStage::TrieStage(sf::RenderWindow& window, ColorTheme theme) :
 				{}
 			},
 			{
+				{},
 				{"s ="}
 			},
 			{
@@ -35,6 +36,7 @@ TrieStage::TrieStage(sf::RenderWindow& window, ColorTheme theme) :
 				{}
 			},
 			{
+				{},
 				{string},
 			},
 			{
@@ -52,6 +54,7 @@ TrieStage::TrieStage(sf::RenderWindow& window, ColorTheme theme) :
 				{}
 			},
 			{
+				{},
 				{{&zeroInt, &maxLengthDataTrie}}
 			},
 			{
@@ -69,6 +72,14 @@ TrieStage::TrieStage(sf::RenderWindow& window, ColorTheme theme) :
 				{}
 			},
 			{
+				{
+					"cur = root",
+					"for (char x : str):",
+    				"	if (cur->next[x] == NULL):",
+        			"		cur->next[x] = new TrieNode()",
+    				"	cur = cur->next[x]",
+					"cur->isWord = true"
+				},
 				{
 					"cur = root",
 					"for (char x : str):",
@@ -132,6 +143,13 @@ void TrieStage::insertString(std::string str) {
 	resetAnimation();
 	setAnimatingDirection(Continuous);
 	std::vector <Animation> animations;
+
+	if (TrieList.back().countString() == maxSizeDataTrie) {
+		animations.clear();
+		addAnimationStep(animations, stepTime, -1, "Trie reached maximum number of string of " + intToString(maxSizeDataTrie) + ", cannot insert");
+		setDefaultView();
+		return;
+	}
 
 	int cur = TrieList.back().root;
 	animations.clear();
@@ -417,10 +435,21 @@ std::pair<bool, ColorTheme> TrieStage::processEvents() {
 			}
 		}
 		if (operationName[curOperation] == "Insert") {
-            std::string str = valueTypingBox[0].getText();
-			if (!str.empty()) {
-                insertString(str);
-            }
+			if (modeString == "Random") {
+				int maxAlphabetSize = rand() % 26 + 1;
+				int len = rand() % maxLengthDataTrie + 1;
+				std::string tmp;
+				for (int i = 0; i < len; i++) {
+					tmp.push_back(char(rand() % maxAlphabetSize + 'a'));
+				}
+				insertString(tmp);
+			}
+            else {
+				std::string str = valueTypingBox[0].getText();
+				if (!str.empty()) {
+					insertString(str);
+				}
+			}
 		}
 		if (operationName[curOperation] == "Delete") {
 			std::string str = valueTypingBox[0].getText();

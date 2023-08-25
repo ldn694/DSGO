@@ -48,6 +48,16 @@ int TrieGraph::getParent(int id) {
     return -1;
 }
 
+int TrieGraph::countString() {
+    int cnt = 0;
+    for (auto x = nodes.begin(); x != nodes.end(); x++) {
+        if (x->second.state == ISWORD) {
+            cnt++;
+        }
+    }
+    return cnt;
+}
+
 std::pair <sf::RectangleShape, sf::Text> TrieGraph::getEdgeLine(sf::Vector2f startPosition, sf::Vector2f endPosition, std::string weight, float percent) {
     sf::Vector2f diff = endPosition - startPosition;
     if (length(diff) < 2 * (radiusTrie + thicknessTrie)) {
